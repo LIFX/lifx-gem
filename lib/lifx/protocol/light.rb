@@ -1,6 +1,14 @@
 module LIFX
   module Protocol
     module Light
+      module Waveform
+        SAW = 0
+        SINE = 1
+        HALF_SINE = 2
+        TRIANGLE = 3
+        PULSE = 4
+      end
+
       class Hsbk < BinData::Record
         endian :little
 

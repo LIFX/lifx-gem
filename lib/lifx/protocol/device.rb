@@ -1,6 +1,11 @@
 module LIFX
   module Protocol
     module Device
+      module Service
+        UDP = 1
+        TCP = 2
+      end
+
       class SetSite < BinData::Record
         endian :little
 

@@ -1,6 +1,29 @@
 module LIFX
   module Protocol
     module Wifi
+      module Interface
+        SOFT_AP = 1
+        STATION = 2
+      end
+
+      module Security
+        UNKNOWN = 0
+        OPEN = 1
+        WEP_PSK = 2
+        WPA_TKIP_PSK = 3
+        WPA_AES_PSK = 4
+        WPA2_AES_PSK = 5
+        WPA2_TKIP_PSK = 6
+        WPA2_MIXED_PSK = 7
+      end
+
+      module Status
+        CONNECTING = 0
+        CONNECTED = 1
+        FAILED = 2
+        OFF = 3
+      end
+
       class Get < BinData::Record
         endian :little
 
