@@ -43,7 +43,7 @@ module LIFX
       end
 
       <% end %>
-      <% structs.each do |struct| %>
+      <% structs.select { |s| s.visibility == :public }.each do |struct| %>
       class <%= class_name(struct) %> < BinData::Record
         endian :little
 

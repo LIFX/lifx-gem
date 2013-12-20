@@ -53,23 +53,6 @@ module LIFX
         uint8 :position
       end
 
-      class GetDummyLoad < BinData::Record
-        endian :little
-
-      end
-
-      class SetDummyLoad < BinData::Record
-        endian :little
-
-        bool :on
-      end
-
-      class StateDummyLoad < BinData::Record
-        endian :little
-
-        bool :on
-      end
-
       class GetMeshInfo < BinData::Record
         endian :little
 
@@ -235,24 +218,6 @@ module LIFX
       class Reboot < BinData::Record
         endian :little
 
-      end
-
-      class SetFactoryTestMode < BinData::Record
-        endian :little
-
-        bool :on
-      end
-
-      class DisableFactoryTestMode < BinData::Record
-        endian :little
-
-      end
-
-      class StateFactoryTestMode < BinData::Record
-        endian :little
-
-        bool :on
-        bool :disabled
       end
 
     end

@@ -105,23 +105,6 @@ module LIFX
         int16 :temperature
       end
 
-      class Xyz < BinData::Record
-        endian :little
-
-        float :x
-        float :y
-        float :z
-      end
-
-      class SetCalibrationCoefficients < BinData::Record
-        endian :little
-
-        xyz :r
-        xyz :g
-        xyz :b
-        xyz :w
-      end
-
     end
   end
 end
