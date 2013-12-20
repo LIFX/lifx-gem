@@ -1,0 +1,53 @@
+#!/usr/bin/env ruby
+
+require 'rubygems'
+require 'bundler'
+require 'erubis'
+
+%w(lifx-protocol-rb structle).each do |lib|
+  $LOAD_PATH << File.expand_path(File.join(File.dirname(__FILE__), "..", "..", lib, "lib"))
+end
+
+require 'lx/protocol'
+
+def class_name(struct)
+  struct.name.to_s.split('::').last
+end
+
+def field_entry(field)
+  if field.type == Structle::String
+    "#{class_name(field.type).downcase} :#{field.name}, length: #{field.size}, trim_padding: true"
+  elsif field.type < Structle::Enum
+    "#{class_name(field.type.type).downcase} :#{field.name}"
+  else
+    "#{class_name(field.type).downcase} :#{field.name}"
+  end
+end
+
+template = Erubis::Eruby.new(<<-ERB)
+module LIFX
+  module Protocol
+    module <%= protocol_namespace %>
+      <% structs.each do |struct| %>
+      class <%= class_name(struct) %> < BinData::Record
+        endian :little
+
+        <% struct.fields.each do |name, field| %>
+        <%= field_entry(field) %>
+        <% end %>
+      end
+
+      <% end %>
+    end
+  end
+end
+ERB
+
+protocol_folder = File.expand_path(File.join(File.dirname(__FILE__), "..", "lib", "lifx", "protocol"))
+protocol_namespaces = %w(Device Light Sensor Wan Wifi)
+protocol_namespaces.each do |protocol_namespace|
+  structs = Structle.structs([:Lx, :Protocol, protocol_namespace.to_sym])
+  File.open(File.join(protocol_folder, "#{protocol_namespace.downcase}.rb"), 'w') do |f|
+    f.write(template.result(binding))
+  end
+end
