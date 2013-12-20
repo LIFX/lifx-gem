@@ -22,7 +22,7 @@ def field_entry(field)
   if field.type == Structle::String
     "#{class_name(field.type).downcase} :#{field.name}, length: #{field.size}, trim_padding: true"
   elsif field.type == Structle::Bytes
-    "#{class_name(field.type).downcase} :#{field.name}, length: #{field.size}"
+    "string :#{field.name}, length: #{field.size}"
   elsif field.type < Structle::Enum
     "#{class_name(field.type.type).downcase} :#{field.name}"
   else

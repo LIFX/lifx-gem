@@ -12,36 +12,36 @@ module LIFX
       class ConnectKey < BinData::Record
         endian :little
 
-        bytes :key, length: 32
+        string :key, length: 32
       end
 
       class StateConnect < BinData::Record
         endian :little
 
-        bytes :key, length: 32
+        string :key, length: 32
       end
 
       class Sub < BinData::Record
         endian :little
 
-        bytes :target, length: 8
-        bytes :site, length: 6
+        string :target, length: 8
+        string :site, length: 6
         bool :device # 0 - Targets a device. 1 - Targets a tag.
       end
 
       class Unsub < BinData::Record
         endian :little
 
-        bytes :target, length: 8
-        bytes :site, length: 6
+        string :target, length: 8
+        string :site, length: 6
         bool :device # 0 - Targets a device. 1 - Targets a tag.
       end
 
       class StateSub < BinData::Record
         endian :little
 
-        bytes :target, length: 8
-        bytes :site, length: 6
+        string :target, length: 8
+        string :site, length: 6
         bool :device # 0 - Targets a device. 1 - Targets a tag.
       end
 

@@ -10,7 +10,7 @@ module LIFX
       class SetSite < BinData::Record
         endian :little
 
-        bytes :site, length: 6
+        string :site, length: 6
       end
 
       class GetPanGateway < BinData::Record

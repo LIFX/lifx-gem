@@ -44,7 +44,7 @@ module LIFX
         uint8 :interface
         uint8 :status
         uint32 :ipv4
-        bytes :ipv6, length: 16
+        string :ipv6, length: 16
       end
 
       class GetAccessPoint < BinData::Record
