@@ -31,6 +31,7 @@ def field_entry(field)
 end
 
 template = Erubis::Eruby.new(<<-ERB)
+# Generated code ahoy!
 module LIFX
   module Protocol
     module <%= protocol_namespace %>
@@ -65,4 +66,28 @@ protocol_namespaces.each do |protocol_namespace|
   File.open(File.join(protocol_folder, "#{protocol_namespace.downcase}.rb"), 'w') do |f|
     f.write(template.result(binding))
   end
+end
+
+template = Erubis::Eruby.new(<<-ERB)
+# Generated code ahoy!
+module LIFX
+  module Protocol
+    TYPE_ID_TO_CLASS = {
+      <% mapping.each do |klass, id| %>
+      <%= id %> => <%= klass.to_s.sub('Lx::Protocol::', '') %>,
+      <% end %>
+    }
+
+    CLASS_TO_TYPE_ID = {
+      <% mapping.each do |klass, id| %>
+      <%= klass.to_s.sub('Lx::Protocol::', '') %> => <%= id %>,
+      <% end %>
+    }
+  end
+end
+ERB
+
+mapping = Lx::Protocol::TYPE
+File.open(File.join(protocol_folder, "type.rb"), 'w') do |f|
+  f.write(template.result(binding))
 end

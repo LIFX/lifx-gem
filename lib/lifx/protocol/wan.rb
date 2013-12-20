@@ -1,3 +1,4 @@
+# Generated code ahoy!
 module LIFX
   module Protocol
     module Wan
