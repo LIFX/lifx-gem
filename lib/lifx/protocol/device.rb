@@ -33,13 +33,13 @@ module LIFX
       class SetTime < BinData::Record
         endian :little
 
-        uint64 :time
+        uint64 :time # Nanoseconds since epoch.
       end
 
       class StateTime < BinData::Record
         endian :little
 
-        uint64 :time
+        uint64 :time # Nanoseconds since epoch.
       end
 
       class GetResetSwitch < BinData::Record
@@ -61,10 +61,10 @@ module LIFX
       class StateMeshInfo < BinData::Record
         endian :little
 
-        float :signal
-        uint32 :tx
-        uint32 :rx
-        int16 :mcu_temperature
+        float :signal # Milliwatts.
+        uint32 :tx # Bytes.
+        uint32 :rx # Bytes.
+        int16 :mcu_temperature # Deci-celsius. 25.45 celsius is 2545
       end
 
       class GetMeshFirmware < BinData::Record
@@ -75,9 +75,9 @@ module LIFX
       class StateMeshFirmware < BinData::Record
         endian :little
 
-        uint64 :build
-        uint64 :install
-        uint32 :version
+        uint64 :build # Firmware build nanoseconds since epoch.
+        uint64 :install # Firmware install nanoseconds since epoch.
+        uint32 :version # Firmware human readable version.
       end
 
       class GetWifiInfo < BinData::Record
@@ -88,10 +88,10 @@ module LIFX
       class StateWifiInfo < BinData::Record
         endian :little
 
-        float :signal
-        uint32 :tx
-        uint32 :rx
-        int16 :mcu_temperature
+        float :signal # Milliwatts.
+        uint32 :tx # Bytes.
+        uint32 :rx # Bytes.
+        int16 :mcu_temperature # Deci-celsius. 25.45 celsius is 2545
       end
 
       class GetWifiFirmware < BinData::Record
@@ -102,9 +102,9 @@ module LIFX
       class StateWifiFirmware < BinData::Record
         endian :little
 
-        uint64 :build
-        uint64 :install
-        uint32 :version
+        uint64 :build # Firmware build nanoseconds since epoch.
+        uint64 :install # Firmware install nanoseconds since epoch.
+        uint32 :version # Firmware human readable version.
       end
 
       class GetPower < BinData::Record
@@ -115,13 +115,13 @@ module LIFX
       class SetPower < BinData::Record
         endian :little
 
-        uint16 :level
+        uint16 :level # 0 Standby. > 0 On.
       end
 
       class StatePower < BinData::Record
         endian :little
 
-        uint16 :level
+        uint16 :level # 0 Standby. > 0 On.
       end
 
       class GetLabel < BinData::Record
@@ -199,9 +199,9 @@ module LIFX
       class StateInfo < BinData::Record
         endian :little
 
-        uint64 :time
-        uint64 :uptime
-        uint64 :downtime
+        uint64 :time # Nanoseconds since epoch.
+        uint64 :uptime # Nanoseconds since boot.
+        uint64 :downtime # Nanoseconds off last power cycle.
       end
 
       class GetMcuRailVoltage < BinData::Record

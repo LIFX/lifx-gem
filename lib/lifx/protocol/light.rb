@@ -13,10 +13,10 @@ module LIFX
       class Hsbk < BinData::Record
         endian :little
 
-        uint16 :hue
-        uint16 :saturation
-        uint16 :brightness
-        uint16 :kelvin
+        uint16 :hue # 0..65_535 scaled to 0° - 360°.
+        uint16 :saturation # 0..65_535 scaled to 0% - 100%.
+        uint16 :brightness # 0..65_535 scaled to 0% - 100%.
+        uint16 :kelvin # Explicit 2_400..10_000.
       end
 
       class Get < BinData::Record
@@ -27,18 +27,18 @@ module LIFX
       class Set < BinData::Record
         endian :little
 
-        uint8 :stream
+        uint8 :stream # 0 is no stream.
         hsbk :color
-        uint32 :duration
+        uint32 :duration # Milliseconds.
       end
 
       class SetWaveform < BinData::Record
         endian :little
 
-        uint8 :stream
+        uint8 :stream # 0 is no stream.
         bool :transient
         hsbk :color
-        uint32 :period
+        uint32 :period # Milliseconds per cycle.
         float :cycles
         int16 :duty_cycle
         uint8 :waveform
@@ -47,15 +47,15 @@ module LIFX
       class SetDimAbsolute < BinData::Record
         endian :little
 
-        int16 :brightness
-        uint32 :duration
+        int16 :brightness # 0 is no change.
+        uint32 :duration # Milliseconds.
       end
 
       class SetDimRelative < BinData::Record
         endian :little
 
-        int32 :brightness
-        uint32 :duration
+        int32 :brightness # 0 is no change.
+        uint32 :duration # Milliseconds.
       end
 
       class Rgbw < BinData::Record
@@ -102,7 +102,7 @@ module LIFX
       class StateTemperature < BinData::Record
         endian :little
 
-        int16 :temperature
+        int16 :temperature # Deci-celsius. 25.45 celsius is 2545
       end
 
     end

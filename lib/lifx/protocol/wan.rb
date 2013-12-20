@@ -26,7 +26,7 @@ module LIFX
 
         bytes :target, length: 8
         bytes :site, length: 6
-        bool :device
+        bool :device # 0 - Targets a device. 1 - Targets a tag.
       end
 
       class Unsub < BinData::Record
@@ -34,7 +34,7 @@ module LIFX
 
         bytes :target, length: 8
         bytes :site, length: 6
-        bool :device
+        bool :device # 0 - Targets a device. 1 - Targets a tag.
       end
 
       class StateSub < BinData::Record
@@ -42,7 +42,7 @@ module LIFX
 
         bytes :target, length: 8
         bytes :site, length: 6
-        bool :device
+        bool :device # 0 - Targets a device. 1 - Targets a tag.
       end
 
     end

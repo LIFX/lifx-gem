@@ -48,7 +48,7 @@ module LIFX
         endian :little
 
         <% struct.fields.each do |name, field| %>
-        <%= field_entry(field) %>
+        <%= field_entry(field) %><%= field.comment ? " # \#{field.comment}" : '' %>
         <% end %>
       end
 
