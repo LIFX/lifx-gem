@@ -19,14 +19,19 @@ def constant(name)
 end
 
 def field_entry(field)
+  name = field.name
+  if name == :key
+    name = :auth_key # Key is a reserved name in BinData
+  end
+
   if field.type == Structle::String
-    "#{class_name(field.type).downcase} :#{field.name}, length: #{field.size}, trim_padding: true"
+    "#{class_name(field.type).downcase} :#{name}, length: #{field.size}, trim_padding: true"
   elsif field.type == Structle::Bytes
-    "string :#{field.name}, length: #{field.size}"
+    "string :#{name}, length: #{field.size}"
   elsif field.type < Structle::Enum
-    "#{class_name(field.type.type).downcase} :#{field.name}"
+    "#{class_name(field.type.type).downcase} :#{name}"
   else
-    "#{class_name(field.type).downcase} :#{field.name}"
+    "#{class_name(field.type).downcase} :#{name}"
   end
 end
 
