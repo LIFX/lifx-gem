@@ -31,21 +31,26 @@ module LIFX
 
     LIFX::Protocol::Message.fields.each do |field|
       define_method(field.name) do
-        self.message.send(field.name)
+        @message.send(field.name)
       end
 
       define_method("#{field.name}=") do |value|
-        self.message.send("#{field.name}=", value)
+        @message.send("#{field.name}=", value)
       end
     end
 
     alias_method :tagged?, :tagged
     alias_method :addressable?, :addressable
 
-    attr_accessor :message, :payload
+    attr_accessor :payload
     def initialize(message = Protocol::Message.new, payload = nil)
       @message = message
       @payload = payload
+    end
+
+    def pack
+      @message.payload = payload.pack
+      @message.pack
     end
 
   end
