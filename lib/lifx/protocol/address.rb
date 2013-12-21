@@ -1,7 +1,7 @@
 module LIFX
   module Protocol
     module AddressFields
-      def included(mod)
+      def AddressFields.included(mod)
         mod.instance_eval do
           string :target, length: 8 # Look into refactoring using Choices
           string :site, length: 6

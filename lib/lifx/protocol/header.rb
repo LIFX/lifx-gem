@@ -1,12 +1,12 @@
 module LIFX
   module Protocol
     module HeaderFields
-      def included(mod)
+      def HeaderFields.included(mod)
         mod.instance_eval do
           uint16 :msg_size
           bit12le :protocol
-          bit1le :addressable
-          bit1le :tagged
+          bool_bit1 :addressable
+          bool_bit1 :tagged
           bit2le :_reserved
           uint32 :_reserved1
         end

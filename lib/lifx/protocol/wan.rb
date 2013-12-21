@@ -12,13 +12,13 @@ module LIFX
       class ConnectKey < BinData::Record
         endian :little
 
-        string :key, length: 32
+        string :auth_key, length: 32
       end
 
       class StateConnect < BinData::Record
         endian :little
 
-        string :key, length: 32
+        string :auth_key, length: 32
       end
 
       class Sub < BinData::Record

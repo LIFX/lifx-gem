@@ -1,7 +1,7 @@
 module LIFX
   module Protocol
     module MetadataFields
-      def included(mod)
+      def MetadataFields.included(mod)
         mod.instance_eval do
           uint64 :at_time
           uint16 :type
