@@ -74,12 +74,14 @@ module LIFX
   module Protocol
     TYPE_ID_TO_CLASS = {
       <% mapping.each do |klass, id| %>
+      <% next if klass.visibility == :private %>
       <%= id %> => <%= klass.to_s.sub('Lx::Protocol::', '') %>,
       <% end %>
     }
 
     CLASS_TO_TYPE_ID = {
       <% mapping.each do |klass, id| %>
+      <% next if klass.visibility == :private %>
       <%= klass.to_s.sub('Lx::Protocol::', '') %> => <%= id %>,
       <% end %>
     }
