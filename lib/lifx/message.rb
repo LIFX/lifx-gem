@@ -44,16 +44,27 @@ module LIFX
     alias_method :addressable?, :addressable
 
     attr_accessor :payload
-    def initialize(message = Protocol::Message.new, payload = nil)
-      @message = message
+    def initialize(*args)
+      if args.count == 2 
+        @message = args.first
+        @payload = args.last
+      elsif (hash = args.first).is_a?(Hash)
+        payload = hash.delete(:payload)
+        @message = Protocol::Message.new(hash)
+        self.payload = payload
+      else
+        @message = Protocol::Message.new
+      end
+    end
+
+    def payload=(payload)
       @payload = payload
+      @message.payload = payload.pack
     end
 
     def pack
       raise NoPayload if !payload
-      @message.payload = payload.pack
       @message.pack
     end
-
   end
 end
