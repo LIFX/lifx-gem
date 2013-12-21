@@ -55,5 +55,24 @@ describe LIFX::Message do
       end
     end
 
+    context 'passed in via hash' do
+      let(:msg) do
+        LIFX::Message.new({
+          tagged: true,
+          target: "abcdefgh",
+          at_time: 9001,
+          payload: LIFX::Protocol::Wifi::SetAccessPoint.new(
+            interface: 1,
+            ssid: "who let the dogs out",
+            pass: "woof, woof, woof woof!",
+            security: 1
+          )
+        })
+      end
+
+      it 'sets the size' do
+        msg.msg_size.should > 0
+      end
+    end
   end
 end
