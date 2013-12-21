@@ -3,6 +3,7 @@ module LIFX
     class InvalidFrame < ArgumentError; end
     class UnsupportedProtocolVersion < StandardError; end
     class NotAddressableFrame < StandardError; end
+    class NoPayload < ArgumentError; end
 
     PROTOCOL_VERSION = 1024
 
@@ -49,6 +50,7 @@ module LIFX
     end
 
     def pack
+      raise NoPayload if !payload
       @message.payload = payload.pack
       @message.pack
     end

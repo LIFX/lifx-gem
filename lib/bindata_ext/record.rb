@@ -5,7 +5,7 @@ module BinData
     def pack
       s = StringIO.new
       write(s)
-      s.string.force_encoding(Encoding::BINARY)
+      s.string.b
     end
   end
 end
