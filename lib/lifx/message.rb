@@ -4,6 +4,7 @@ module LIFX
     class UnsupportedProtocolVersion < StandardError; end
     class NotAddressableFrame < StandardError; end
     class NoPayload < ArgumentError; end
+    class UnmappedPayload < ArgumentError; end
 
     PROTOCOL_VERSION = 1024
 
@@ -59,6 +60,11 @@ module LIFX
 
     def payload=(payload)
       @payload = payload
+      type_id = self.class.type_id_for_message_class(payload.class)
+      if type_id.nil?
+        raise UnmappedPayload.new("Unmapped payload class #{payload.class}")
+      end
+      @message.type = type_id
       @message.payload = payload.pack
     end
 

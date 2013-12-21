@@ -71,11 +71,23 @@ describe LIFX::Message do
       end
 
       it 'sets the size' do
-        msg.msg_size.should > 0
+        msg.msg_size.should == 134
       end
 
-      it 'packs' do
-        msg.pack.should == "\x86\x00\x00 \x00\x00\x00\x00abcdefgh\x00\x00\x00\x00\x00\x00\x00\x00)#\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x01who let the dogs out\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00woof, woof, woof woof!\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x01".b
+      it 'packs correctly' do
+        msg.pack.should == "\x86\x00\x00$\x00\x00\x00\x00abcdefgh\x00\x00\x00\x00\x00\x00\x00\x00)#\x00\x00\x00\x00\x00\x001\x01\x00\x00\x01who let the dogs out\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00woof, woof, woof woof!\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x01".b
+        unpacked = LIFX::Message.unpack(msg.pack)
+        msg.protocol.should == 1024
+        msg.tagged?.should be_true
+        msg.addressable?.should be_true
+        msg.target.should == 'abcdefgh'
+        msg.at_time.should == 9001
+        msg.type.should == 305
+        msg.payload.class.should == LIFX::Protocol::Wifi::SetAccessPoint
+        msg.payload.interface.should == 1
+        msg.payload.ssid.should == "who let the dogs out"
+        msg.payload.pass.should == "woof, woof, woof woof!"
+        msg.payload.security.should == 1
       end
     end
   end

@@ -4,7 +4,7 @@ module LIFX
       def HeaderFields.included(mod)
         mod.instance_eval do
           uint16 :msg_size, value: lambda { num_bytes }
-          bit12le :protocol
+          bit12le :protocol, value: 1024
           bool_bit1 :addressable
           bool_bit1 :tagged
           bit2le :_reserved
