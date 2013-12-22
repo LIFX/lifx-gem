@@ -33,7 +33,7 @@ module LIFX
 
     LIFX::Protocol::Message.fields.each do |field|
       define_method(field.name) do
-        @message.send(field.name)
+        @message.send(field.name).snapshot
       end
 
       define_method("#{field.name}=") do |value|
@@ -71,6 +71,19 @@ module LIFX
     def pack
       raise NoPayload if !payload
       @message.pack
+    end
+
+    def inspect
+      hash = {site: site.unpack('H*').join}
+      if tagged?
+        hash[:tags] = target.unpack('H*').join
+      else
+        hash[:device] = target[0...6].unpack('H*').join
+      end
+      hash[:type] = payload.class.to_s.sub('LIFX::Protocol::', '')
+      hash[:payload] = payload.snapshot
+      attrs = hash.map { |k, v| "#{k}=#{v}" }.join(' ')
+      %Q{#<LIFX::Message:0x#{object_id.to_s(16)} #{attrs}>}
     end
   end
 end

@@ -3,7 +3,7 @@ module BinData
     uint8 :_value
 
     def get
-      self._value > 0
+      (self._value || 0) > 0
     end
 
     def set(value)
@@ -15,7 +15,7 @@ module BinData
     bit1le :_value
 
     def get
-      self._value > 0
+      (self._value || 0) > 0
     end
 
     def set(value)
