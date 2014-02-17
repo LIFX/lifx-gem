@@ -5,6 +5,7 @@ module LIFX
     class NotAddressableFrame < StandardError; end
     class NoPayload < ArgumentError; end
     class UnmappedPayload < ArgumentError; end
+    class InvalidFields < ArgumentError; end
 
     PROTOCOL_VERSION = 1024
 
@@ -29,6 +30,10 @@ module LIFX
       def type_id_for_message_class(klass)
         Protocol::CLASS_TO_TYPE_ID[klass]
       end
+
+      def valid_fields
+        @valid_fields ||= Protocol::Message.new.field_names.map(&:to_sym)
+      end
     end
 
     LIFX::Protocol::Message.fields.each do |field|
@@ -51,6 +56,7 @@ module LIFX
         @payload = args.last
       elsif (hash = args.first).is_a?(Hash)
         payload = hash.delete(:payload)
+        check_valid_fields!(hash)
         @message = Protocol::Message.new(hash)
         self.payload = payload
       else
@@ -81,9 +87,21 @@ module LIFX
         hash[:device] = target[0...6].unpack('H*').join
       end
       hash[:type] = payload.class.to_s.sub('LIFX::Protocol::', '')
+      hash[:addressable] = addressable? ? 'true' : 'false'
+      hash[:tagged] = tagged? ? 'true' : 'false'
+      hash[:protocol] = protocol
       hash[:payload] = payload.snapshot
       attrs = hash.map { |k, v| "#{k}=#{v}" }.join(' ')
       %Q{#<LIFX::Message:0x#{object_id.to_s(16)} #{attrs}>}
+    end
+
+    protected
+
+    def check_valid_fields!(hash)
+      invalid_fields = hash.keys - self.class.valid_fields
+      if invalid_fields.count > 0
+        raise InvalidFields.new("Invalid fields for Message: #{invalid_fields.join(', ')}")
+      end
     end
   end
 end
