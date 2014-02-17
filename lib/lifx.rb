@@ -6,6 +6,9 @@ require "bindata_ext/record"
 require "lifx/protocol/type"
 require "lifx/message"
 require "lifx/transport"
+require "lifx/site"
+require "lifx/network"
+require "lifx/client"
 
 module LIFX
   # Your code goes here...

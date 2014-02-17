@@ -15,13 +15,17 @@ module LIFX
       end
 
       def listen(&block)
+        if @listener
+          raise "Socket already being listened to"
+        end
+        
         Thread.abort_on_exception = true
         @listener = Thread.new do
           reader = UDPSocket.new
           reader.setsockopt(Socket::SOL_SOCKET, Socket::SO_REUSEADDR, true)
           reader.bind(host, port)
           loop do
-            bytes, ip = reader.recvfrom(BUFFER_SIZE)
+            bytes, (_, _, ip, _) = reader.recvfrom(BUFFER_SIZE)
             message = Message.unpack(bytes)
 
             if message

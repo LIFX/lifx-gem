@@ -22,7 +22,12 @@ module LIFX
     def flush
       raise NotImplementedError
     end
+
+    def inspect
+      %Q{#<#{self.class.name} #{host}:#{port}>}
+    end
   end
 end
 
 require 'lifx/transport/udp'
+require 'lifx/transport/tcp'
