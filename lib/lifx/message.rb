@@ -62,6 +62,7 @@ module LIFX
       else
         @message = Protocol::Message.new
       end
+      @message.msg_size = @message.num_bytes
     end
 
     def payload=(payload)
@@ -76,6 +77,7 @@ module LIFX
 
     def pack
       raise NoPayload if !payload
+      @message.msg_size = @message.num_bytes
       @message.pack
     end
 
