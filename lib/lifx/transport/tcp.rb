@@ -17,17 +17,21 @@ module LIFX
         Thread.abort_on_exception = true
         @listener = Thread.new do
           loop do
-            header_data = @socket.recv(HEADER_SIZE, Socket::MSG_PEEK)
-            header = Protocol::Header.read(header_data)
-            size = header.msg_size
-            data = @socket.recv(size)
-            message = Message.unpack(data)
-            
-            if message
-              block.call(message)
-            else
-              # FIXME: Make this better
-              raise "Unparsable data"
+            begin
+              header_data = @socket.recv(HEADER_SIZE, Socket::MSG_PEEK)
+              header = Protocol::Header.read(header_data)
+              size = header.msg_size
+              data = @socket.recv(size)
+              message = Message.unpack(data)
+              
+              if message
+                block.call(message)
+              else
+                # FIXME: Make this better
+                raise "Unparsable data"
+              end
+            rescue => ex
+              $stderr.puts("Exception in #{self}: #{ex}")
             end
           end
         end

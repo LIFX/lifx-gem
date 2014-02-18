@@ -18,7 +18,10 @@ module LIFX
         raise NotAddressableFrame if header.addressable == 0
 
         message = Protocol::Message.read(data)
-        payload_class = message_type_for_id(message.type)
+        payload_class = message_type_for_id(message.type.snapshot)
+        if payload_class.nil?
+          raise UnmappedPayload.new("Unrecognised payload ID: #{message.type}")
+        end
         payload = payload_class.read(message.payload)
         new(message, payload)
       end

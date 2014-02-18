@@ -15,10 +15,10 @@ module LIFX
       @discovery_thread = Thread.new do
         payload = Protocol::Device::GetPanGateway.new
         message = Message.new(payload: payload)
-        while @sites.empty? do
+        begin
           @transport.write(message)
           sleep 0.25
-        end
+        end while @sites.empty?
       end
     end
 
