@@ -26,7 +26,7 @@ module LIFX
     end
 
     def lights
-      sites.map(&:lights)
+      sites.map(&:lights).flatten
     end
   end
 end

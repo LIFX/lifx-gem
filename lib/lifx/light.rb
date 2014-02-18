@@ -21,6 +21,14 @@ module LIFX
       end
     end
 
+    def on!
+      site.write(target: id, payload: Protocol::Device::SetPower.new(level: 1))
+    end
+
+    def off!
+      site.write(target: id, payload: Protocol::Device::SetPower.new(level: 0))
+    end
+
     def inspect
       %Q{#<LIFX::Light id=#{id.unpack('H*').join} label=#{label} power=#{power.zero? ? 'off' : 'on'}>}
     end

@@ -94,7 +94,7 @@ module LIFX
       hash[:protocol] = protocol
       hash[:payload] = payload.snapshot
       attrs = hash.map { |k, v| "#{k}=#{v}" }.join(' ')
-      %Q{#<LIFX::Message:0x#{object_id.to_s(16)} #{attrs}>}
+      %Q{#<LIFX::Message #{attrs}>}
     end
 
     def device
