@@ -21,8 +21,8 @@ module LIFX
       end
     end
 
-    def write(params)
-      site.write(params.merge(target: id))
+    def queue_write(params)
+      site.queue_write(params.merge(target: id))
     end
 
     UINT16_MAX = 65_535
@@ -36,7 +36,7 @@ module LIFX
         kelvin: kelvin.to_i
       )
       duration = (duration * MSEC_PER_SEC).to_i
-      write(payload: Protocol::Light::Set.new(
+      queue_write(payload: Protocol::Light::Set.new(
         stream: 0,
         duration: duration,
         color: hsbk)
@@ -52,11 +52,11 @@ module LIFX
     end
 
     def on!
-      write(payload: Protocol::Device::SetPower.new(level: 1))
+      queue_write(payload: Protocol::Device::SetPower.new(level: 1))
     end
 
     def off!
-      write(payload: Protocol::Device::SetPower.new(level: 0))
+      queue_write(payload: Protocol::Device::SetPower.new(level: 0))
     end
 
     def inspect

@@ -19,10 +19,6 @@ module LIFX
       raise NotImplementedError
     end
 
-    def flush
-      raise NotImplementedError
-    end
-
     def inspect
       %Q{#<#{self.class.name} #{host}:#{port}>}
     end
