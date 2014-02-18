@@ -6,9 +6,10 @@ module LIFX
       def initialize(host, port)
         super
         @socket = TCPSocket.new(host, port) # Performs the connection
-        @socket.setsockopt(Socket::SOL_SOCKET,  Socket::SO_SNDBUF,  1024)
-        @socket.setsockopt(Socket::IPPROTO_TCP, Socket::TCP_NODELAY,   1)
-        @socket.setsockopt(Socket::IPPROTO_TCP, Socket::TCP_MAXSEG,  512)
+        @socket.setsockopt(Socket::SOL_SOCKET,  Socket::SO_SNDBUF,    1024)
+        @socket.setsockopt(Socket::SOL_SOCKET,  Socket::SO_KEEPALIVE, true)
+        @socket.setsockopt(Socket::IPPROTO_TCP, Socket::TCP_NODELAY,  1)
+        @socket.setsockopt(Socket::IPPROTO_TCP, Socket::TCP_MAXSEG,   512)
       end
 
       HEADER_SIZE = 8
@@ -32,6 +33,7 @@ module LIFX
               end
             rescue => ex
               $stderr.puts("Exception in #{self}: #{ex}")
+              break
             end
           end
         end
@@ -39,7 +41,7 @@ module LIFX
 
       def write(message)
         data = message.pack
-        @socket.send(data, 0)
+        @socket.write(data)
       end
     end
   end

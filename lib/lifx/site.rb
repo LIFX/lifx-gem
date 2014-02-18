@@ -83,7 +83,7 @@ module LIFX
       queue_write(payload: Protocol::Light::Get.new, tagged: true)
     end
 
-    MINIMUM_TIME_BETWEEN_MESSAGE_SEND = 0.25
+    MINIMUM_TIME_BETWEEN_MESSAGE_SEND = 0.2
     MAXIMUM_QUEUE_LENGTH = 100
 
     def initialize_write_queue
@@ -92,10 +92,10 @@ module LIFX
       @writing_thread = Thread.new do
         loop do
           message = @queue.pop
-          write(message)
           delay = [MINIMUM_TIME_BETWEEN_MESSAGE_SEND - (Time.now - @last_write), 0].max
           puts "Waiting #{delay} till next send"
           sleep(delay)
+          write(message)
           @last_write = Time.now
         end
       end
