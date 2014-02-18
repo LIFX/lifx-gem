@@ -24,5 +24,9 @@ module LIFX
     def sites
       @networks.map(&:sites).flatten
     end
+
+    def lights
+      sites.map(&:lights)
+    end
   end
 end

@@ -15,13 +15,9 @@ module LIFX
       @discovery_thread = Thread.new do
         payload = Protocol::Device::GetPanGateway.new
         message = Message.new(payload: payload)
-        loop do
+        while @sites.empty? do
           @transport.write(message)
-          if @sites.empty?
-            sleep 0.25
-          else
-            break
-          end
+          sleep 0.25
         end
       end
     end
@@ -37,11 +33,12 @@ module LIFX
     protected
 
     def on_message(message, ip)
-      puts "#{@transport.inspect}: #{message.inspect}"
       case message.payload
       when Protocol::Device::StatePanGateway
         @sites[message.site] ||= Site.new(message.site, @transport)
         @sites[message.site].on_message(message, ip, @transport)
+      else
+        puts "#{@transport.inspect}: #{message.inspect}"
       end
     end
   end

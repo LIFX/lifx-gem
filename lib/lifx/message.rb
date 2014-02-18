@@ -48,6 +48,7 @@ module LIFX
 
     alias_method :tagged?, :tagged
     alias_method :addressable?, :addressable
+    alias_method :device, :target
 
     attr_accessor :payload
     def initialize(*args)
