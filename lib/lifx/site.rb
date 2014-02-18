@@ -41,7 +41,6 @@ module LIFX
           end
         end
       when Protocol::Light::State
-        p message
         @lights[message.device] ||= Light.new(self)
         @lights[message.device].on_message(message, ip, transport)
       end
@@ -49,6 +48,10 @@ module LIFX
 
     def lights
       @lights.values
+    end
+
+    def inspect
+      %Q{#<LIFX::Site id=#{id.unpack('H*').join} host=#{best_transport.host} port=#{best_transport.port}>}
     end
 
     protected

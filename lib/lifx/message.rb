@@ -48,7 +48,6 @@ module LIFX
 
     alias_method :tagged?, :tagged
     alias_method :addressable?, :addressable
-    alias_method :device, :target
 
     attr_accessor :payload
     def initialize(*args)
@@ -87,7 +86,7 @@ module LIFX
       if tagged?
         hash[:tags] = target.unpack('H*').join
       else
-        hash[:device] = target[0...6].unpack('H*').join
+        hash[:device] = device.unpack('H*').join
       end
       hash[:type] = payload.class.to_s.sub('LIFX::Protocol::', '')
       hash[:addressable] = addressable? ? 'true' : 'false'
@@ -96,6 +95,10 @@ module LIFX
       hash[:payload] = payload.snapshot
       attrs = hash.map { |k, v| "#{k}=#{v}" }.join(' ')
       %Q{#<LIFX::Message:0x#{object_id.to_s(16)} #{attrs}>}
+    end
+
+    def device
+      target[0...6]
     end
 
     protected
