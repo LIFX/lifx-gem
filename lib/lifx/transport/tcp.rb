@@ -11,7 +11,7 @@ module LIFX
         @socket.setsockopt(Socket::IPPROTO_TCP, Socket::TCP_MAXSEG,  512)
       end
 
-      HEADER_SIZE = 100
+      HEADER_SIZE = 8
       def listen(&block)
         return if @listener
         Thread.abort_on_exception = true
