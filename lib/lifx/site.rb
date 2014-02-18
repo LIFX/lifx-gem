@@ -57,13 +57,14 @@ module LIFX
     end
 
     def flush
+      # TODO: Add a timeout option
       while !@queue.empty?
         sleep(MINIMUM_TIME_BETWEEN_MESSAGE_SEND)
       end
     end
 
     def inspect
-      %Q{#<LIFX::Site id=#{id.unpack('H*').join} host=#{best_transport.host} port=#{best_transport.port}>}
+      %Q{#<LIFX::Site id=#{id} host=#{best_transport.host} port=#{best_transport.port}>}
     end
 
     protected

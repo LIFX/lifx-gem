@@ -6,8 +6,8 @@ module LIFX
           hide :_reserved2
           hide :acknowledge # This isn't used yet
 
-          string :target, length: 8
-          string :site, length: 6
+          string :raw_target, length: 8
+          string :raw_site, length: 6
           bit1le :acknowledge
           bit15le :_reserved2
         end

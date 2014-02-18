@@ -59,9 +59,14 @@ module LIFX
         @payload = args.last
       elsif (hash = args.first).is_a?(Hash)
         payload = hash.delete(:payload)
+        site    = hash.delete(:site)
+        target  = hash.delete(:target)
+
         check_valid_fields!(hash)
         @message = Protocol::Message.new(hash)
         self.payload = payload
+        self.site = site
+        self.target = target
       else
         @message = Protocol::Message.new
       end
@@ -84,12 +89,36 @@ module LIFX
       @message.pack
     end
 
+    def site
+      raw_site.unpack('H*').join
+    end
+
+    def site=(value)
+      self.raw_site = [value].pack('H*')
+    end
+
+    def target
+      raw_target.unpack('H*').join
+    end
+
+    def target=(value)
+      self.raw_target = [value].pack('H*')
+    end
+
+    def raw_device
+      raw_target[0...6]
+    end
+
+    def device
+      raw_device.unpack('H*').join
+    end
+
     def inspect
-      hash = {site: site.unpack('H*').join}
+      hash = {site: site}
       if tagged?
-        hash[:tags] = target.unpack('H*').join
+        hash[:tags] = target
       else
-        hash[:device] = device.unpack('H*').join
+        hash[:device] = device
       end
       hash[:type] = payload.class.to_s.sub('LIFX::Protocol::', '')
       hash[:addressable] = addressable? ? 'true' : 'false'
@@ -98,10 +127,6 @@ module LIFX
       hash[:payload] = payload.snapshot
       attrs = hash.map { |k, v| "#{k}=#{v}" }.join(' ')
       %Q{#<LIFX::Message #{attrs}>}
-    end
-
-    def device
-      target[0...6]
     end
 
     protected
