@@ -1,6 +1,6 @@
 module LIFX
   class Site
-    attr_reader :id
+    attr_reader :id, :gateway
     def initialize(id, udp_transport)
       @id = id
       @udp_transport = udp_transport
@@ -43,6 +43,7 @@ module LIFX
       when Protocol::Light::State
         @lights[message.device] ||= Light.new(self)
         @lights[message.device].on_message(message, ip, transport)
+        @gateway ||= @lights[message.device] if message.device == message.site
       end
     end
 

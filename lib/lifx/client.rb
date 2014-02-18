@@ -13,7 +13,7 @@ module LIFX
       end
     end
 
-    DISCOVERY_DEFAULT_TIMEOUT = 3
+    DISCOVERY_DEFAULT_TIMEOUT = 0.5
     def discover(timeout = DISCOVERY_DEFAULT_TIMEOUT)
       @networks.each do |network|
         network.discover
