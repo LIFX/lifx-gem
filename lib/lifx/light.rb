@@ -51,6 +51,14 @@ module LIFX
       set_hsbk(0, 0, brightness, kelvin, duration)
     end
 
+    def on?
+      !off?
+    end
+
+    def off?
+      power.zero?
+    end
+
     def on!
       queue_write(payload: Protocol::Device::SetPower.new(level: 1))
     end
