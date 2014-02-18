@@ -10,14 +10,24 @@ module LIFX
     end
 
     def discover
-      Thread.new do
+      stop_discovery
+      Thread.abort_on_exception = true
+      @discovery_thread = Thread.new do
         payload = Protocol::Device::GetPanGateway.new
         message = Message.new(payload: payload)
-        3.times do
+        loop do
           @transport.write(message)
-          sleep 0.25
+          if @sites.empty?
+            sleep 0.25
+          else
+            break
+          end
         end
       end
+    end
+
+    def stop_discovery
+      Thread.kill(@discovery_thread) if @discovery_thread
     end
 
     def sites
@@ -31,7 +41,7 @@ module LIFX
       case message.payload
       when Protocol::Device::StatePanGateway
         @sites[message.site] ||= Site.new(message.site, @transport)
-        @sites[message.site].on_message(message, ip)
+        @sites[message.site].on_message(message, ip, @transport)
       end
     end
   end

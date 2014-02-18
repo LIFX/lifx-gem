@@ -9,7 +9,6 @@ module LIFX
     def write(params)
       message = Message.new(params)
       message.site = id
-      p "Best transport:#{best_transport}"
       best_transport.write(message)
       # TODO: Handle socket errors
     end
@@ -23,8 +22,8 @@ module LIFX
       end
     end
 
-    def on_message(message, ip)
-      puts "#{@tcp_transport.inspect}: #{message.inspect}"
+    def on_message(message, ip, transport)
+      puts "#{transport.inspect}: #{message.inspect}"
       case message.payload
       when Protocol::Device::StatePanGateway
         if message.payload.service == Protocol::Device::Service::TCP &&
@@ -33,7 +32,7 @@ module LIFX
 
           @tcp_transport = Transport::TCP.new(ip, message.payload.port.snapshot)
           @tcp_transport.listen do |message, ip|
-            on_message(message, ip)
+            on_message(message, ip, @tcp_transport)
           end
         end
       end
