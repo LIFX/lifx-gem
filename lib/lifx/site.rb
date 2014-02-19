@@ -6,7 +6,7 @@ module LIFX
     include Seen
     include Timers
 
-    attr_reader :id, :gateway
+    attr_reader :id, :gateway_id
 
     def initialize(id, udp_transport)
       @id = id
@@ -45,7 +45,7 @@ module LIFX
       payload = message.payload
       case payload
       when Protocol::Device::StatePanGateway
-        seen!
+        @gateway_id = message.device
         port = payload.port.snapshot
         if payload.service == Protocol::Device::Service::TCP &&
             port > 0 &&
@@ -56,15 +56,19 @@ module LIFX
             on_message(message, ip, @tcp_transport)
           end
         end
+        seen!
       when Protocol::Light::State
         @lights[message.device] ||= Light.new(self)
         @lights[message.device].on_message(message, ip, transport)
-        @gateway ||= @lights[message.device] if message.device == message.site
         seen!
       when Protocol::Device::StateTime
         # Heartbeat
         seen!
       end
+    end
+
+    def gateway
+      @lights[gateway_id]
     end
 
     def lights
