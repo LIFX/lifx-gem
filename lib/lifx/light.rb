@@ -1,7 +1,9 @@
+require 'lifx/seen'
+
 module LIFX
   class Light
+    include Seen
     attr_reader :site
-    attr_reader :last_seen
 
     attr_accessor :id, :label, :color, :power, :dim, :tags
 
@@ -75,10 +77,6 @@ module LIFX
     end
 
     protected
-
-    def seen!
-      @last_seen = Time.now
-    end
 
     def default_duration
       # TODO: Allow client-level configuration
