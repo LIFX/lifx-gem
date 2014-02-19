@@ -16,7 +16,7 @@ module LIFX
       end
     end
 
-    DISCOVERY_DEFAULT_TIMEOUT = 5
+    DISCOVERY_DEFAULT_TIMEOUT = 10
     def discover(timeout = DISCOVERY_DEFAULT_TIMEOUT)
       Timeout.timeout(timeout) do
         @networks.each do |network|
@@ -29,6 +29,17 @@ module LIFX
       end
     rescue Timeout::Error
       sites
+    end
+
+    def flush
+      threads = sites.map do |site|
+        Thread.new do
+          site.flush
+        end
+      end
+      threads.each do |thread|
+        thread.join
+      end
     end
 
     def sites
