@@ -12,7 +12,7 @@ module LIFX
     def write(params)
       message = Message.new(params)
       message.site = id
-      puts "-> #{best_transport.inspect}: #{message.inspect}"
+      LOG.debug("-> #{self.inspect} #{best_transport.inspect}: #{message.inspect}")
       best_transport.write(message)
       # TODO: Handle socket errors
     end
@@ -31,7 +31,7 @@ module LIFX
     end
 
     def on_message(message, ip, transport)
-      puts "<- #{transport.inspect}: #{message.inspect}"
+      LOG.debug("<- #{self.inspect} #{best_transport.inspect}: #{message.inspect}")
       payload = message.payload
       case payload
       when Protocol::Device::StatePanGateway

@@ -37,8 +37,6 @@ module LIFX
       when Protocol::Device::StatePanGateway
         @sites[message.site] ||= Site.new(message.site, @transport)
         @sites[message.site].on_message(message, ip, @transport)
-      else
-        puts "#{@transport.inspect}: #{message.inspect}"
       end
     end
   end

@@ -1,11 +1,13 @@
 require 'socket'
 require 'timeout'
+require 'yell'
 
 module LIFX
   class Client
     LIFX_PORT = 56700
 
-    def initialize
+    def initialize(options = {})
+      LIFX.const_set(:LOG, options[:logger] || default_logger)
       @networks = []
       Socket.ip_address_list.each do |ip|
         next unless ip.ipv4? && !ip.ipv4_loopback? && ip.ipv4_private?
@@ -35,6 +37,15 @@ module LIFX
 
     def lights
       sites.map(&:lights).flatten
+    end
+
+    protected
+
+    def default_logger
+      Yell.new do |logger|
+        logger.level = 'gte.warn'
+        logger.adapter STDERR
+      end
     end
   end
 end
