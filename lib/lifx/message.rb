@@ -6,6 +6,7 @@ module LIFX
     class NoPayload < ArgumentError; end
     class UnmappedPayload < ArgumentError; end
     class InvalidFields < ArgumentError; end
+    class PackError < ArgumentError; end
 
     PROTOCOL_VERSION = 1024
 
@@ -21,14 +22,19 @@ module LIFX
         payload_class = message_type_for_id(message.type.snapshot)
         if payload_class.nil?
           LOG.warn("Message.unpack: Unrecognised payload ID: #{message.type}")
-          LOG.warn("Message.unpack: Message: #{message.inspect}")
+          LOG.warn("Message.unpack: Message: #{message}")
+          return nil
           raise UnmappedPayload.new("Unrecognised payload ID: #{message.type}")
         end
         begin
           payload = payload_class.read(message.payload)
         rescue => ex
-          LOG.error("Message.unpack: Exception while unpacking payload of type #{payload_class}: #{ex}")
-          LOG.error("Message.unpack: Data: #{data.inspect}")
+          if message.raw_site == "\x00" * 6
+            LOG.info("Message.unpack: Ignoring malformed message from virgin bulb")
+          else
+            LOG.error("Message.unpack: Exception while unpacking payload of type #{payload_class}: #{ex}")
+            LOG.error("Message.unpack: Data: #{data.inspect}")
+          end
         end
         new(message, payload)
       end
@@ -78,6 +84,8 @@ module LIFX
         @message = Protocol::Message.new
       end
       @message.msg_size = @message.num_bytes
+    rescue => ex
+      raise PackError.new("Unable to pack message with args: #{args.inspect}")
     end
 
     def payload=(payload)
