@@ -5,6 +5,10 @@ module LIFX
     class TCP < Transport
       def initialize(host, port)
         super
+        connect
+      end
+
+      def connect
         @socket = TCPSocket.new(host, port) # Performs the connection
         @socket.setsockopt(Socket::SOL_SOCKET,  Socket::SO_SNDBUF,    1024)
         @socket.setsockopt(Socket::SOL_SOCKET,  Socket::SO_KEEPALIVE, true)
@@ -20,6 +24,11 @@ module LIFX
           loop do
             begin
               header_data = @socket.recv(HEADER_SIZE, Socket::MSG_PEEK)
+              if header_data.length.zero?
+                LOG.warn("#{self.inspect}: Reconnecting...")
+                connect
+                next
+              end
               header = Protocol::Header.read(header_data)
               size = header.msg_size
               data = @socket.recv(size)
@@ -31,9 +40,6 @@ module LIFX
                 # FIXME: Make this better
                 raise "Unparsable data"
               end
-            rescue => ex
-              $stderr.puts("Exception in #{self}: #{ex}")
-              break
             end
           end
         end
