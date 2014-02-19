@@ -34,12 +34,7 @@ module LIFX
     MSEC_PER_SEC = 1000
     DEFAULT_KELVIN = 3500
     def set_hsbk(hue, saturation, brightness, kelvin, duration = default_duration)
-      hsbk = Protocol::Light::Hsbk.new(
-        hue: (hue / 360.0 * UINT16_MAX).to_i,
-        saturation: (saturation * UINT16_MAX).to_i,
-        brightness: (brightness * UINT16_MAX).to_i,
-        kelvin: kelvin.to_i
-      )
+      hsbk = build_hsbk(hue, saturation, brightness, kelvin)
       duration = (duration * MSEC_PER_SEC).to_i
       queue_write(payload: Protocol::Light::Set.new(
         stream: 0,
@@ -77,6 +72,15 @@ module LIFX
     end
 
     protected
+
+    def build_hsbk(hue, saturation, brightness, kelvin)
+      Protocol::Light::Hsbk.new(
+        hue: (hue / 360.0 * UINT16_MAX).to_i,
+        saturation: (saturation * UINT16_MAX).to_i,
+        brightness: (brightness * UINT16_MAX).to_i,
+        kelvin: kelvin.to_i
+      )
+    end
 
     def default_duration
       # TODO: Allow client-level configuration
