@@ -1,12 +1,22 @@
+require 'lifx/seen'
+require 'lifx/timers'
+
 module LIFX
   class Site
+    include Seen
+    include Timers
+
     attr_reader :id, :gateway
+
     def initialize(id, udp_transport)
       @id = id
       @udp_transport = udp_transport
       @lights = {}
-      initialize_write_queue
-      defer_lights_discovery
+      @threads = []
+      @threads << initialize_write_queue
+      @threads << defer_lights_discovery
+      @threads << initialize_timer_thread
+      initialize_heartbeat
     end
 
     def write(params)
@@ -35,10 +45,11 @@ module LIFX
       payload = message.payload
       case payload
       when Protocol::Device::StatePanGateway
+        seen!
         port = payload.port.snapshot
         if payload.service == Protocol::Device::Service::TCP &&
             port > 0 &&
-            !@tcp_transport
+            (!@tcp_transport || !@tcp_transport.connected?)
 
           @tcp_transport = Transport::TCP.new(ip, port)
           @tcp_transport.listen do |message, ip|
@@ -49,6 +60,10 @@ module LIFX
         @lights[message.device] ||= Light.new(self)
         @lights[message.device].on_message(message, ip, transport)
         @gateway ||= @lights[message.device] if message.device == message.site
+        seen!
+      when Protocol::Device::StateTime
+        # Heartbeat
+        seen!
       end
     end
 
@@ -65,6 +80,15 @@ module LIFX
 
     def inspect
       %Q{#<LIFX::Site id=#{id} host=#{best_transport.host} port=#{best_transport.port}>}
+    end
+
+    def stop
+      @threads.each do |thread|
+        Thread.kill(thread)
+      end
+      if @tcp_transport
+        @tcp_transport.close
+      end
     end
 
     protected
@@ -89,15 +113,21 @@ module LIFX
     def initialize_write_queue
       @queue = SizedQueue.new(MAXIMUM_QUEUE_LENGTH)
       @last_write = Time.now
-      @writing_thread = Thread.new do
+      Thread.new do
         loop do
           message = @queue.pop
           delay = [MINIMUM_TIME_BETWEEN_MESSAGE_SEND - (Time.now - @last_write), 0].max
-          LOG.debug(self.inspect) "Waiting #{delay} till next send"
           sleep(delay)
           write(message)
           @last_write = Time.now
         end
+      end
+    end
+
+    HEARTBEAT_INTERVAL = 10
+    def initialize_heartbeat
+      timers.every(HEARTBEAT_INTERVAL) do
+        queue_write(target: id, payload: Protocol::Device::GetTime.new)
       end
     end
   end

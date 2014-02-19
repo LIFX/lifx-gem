@@ -24,7 +24,12 @@ module LIFX
           LOG.warn("Message.unpack: Message: #{message.inspect}")
           raise UnmappedPayload.new("Unrecognised payload ID: #{message.type}")
         end
-        payload = payload_class.read(message.payload)
+        begin
+          payload = payload_class.read(message.payload)
+        rescue => ex
+          LOG.error("Message.unpack: Exception while unpacking payload of type #{payload_class}: #{ex}")
+          LOG.error("Message.unpack: Data: #{data.inspect}")
+        end
         new(message, payload)
       end
 
@@ -126,7 +131,7 @@ module LIFX
       hash[:addressable] = addressable? ? 'true' : 'false'
       hash[:tagged] = tagged? ? 'true' : 'false'
       hash[:protocol] = protocol
-      hash[:payload] = payload.snapshot
+      hash[:payload] = payload.snapshot if payload
       attrs = hash.map { |k, v| "#{k}=#{v}" }.join(' ')
       %Q{#<LIFX::Message #{attrs}>}
     end

@@ -1,8 +1,10 @@
 module LIFX
   class Light
     attr_reader :site
+    attr_reader :last_seen
 
     attr_accessor :id, :label, :color, :power, :dim, :tags
+
 
     def initialize(site)
       @site = site
@@ -18,6 +20,7 @@ module LIFX
         @power = payload.power
         @dim   = payload.dim
         @tags  = payload.tags
+        seen!
       end
     end
 
@@ -72,6 +75,10 @@ module LIFX
     end
 
     protected
+
+    def seen!
+      @last_seen = Time.now
+    end
 
     def default_duration
       # TODO: Allow client-level configuration

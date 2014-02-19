@@ -5,7 +5,6 @@ require 'yell'
 module LIFX
   class Client
     LIFX_PORT = 56700
-
     def initialize(options = {})
       LIFX.const_set(:LOG, options[:logger] || default_logger)
       @networks = []
@@ -55,7 +54,7 @@ module LIFX
     def default_logger
       Yell.new do |logger|
         logger.level = 'gte.warn'
-        logger.adapter STDERR
+        logger.adapter STDERR, format: '%d [%5L] %p/%t : %m'
       end
     end
   end
