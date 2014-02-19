@@ -93,7 +93,7 @@ module LIFX
         loop do
           message = @queue.pop
           delay = [MINIMUM_TIME_BETWEEN_MESSAGE_SEND - (Time.now - @last_write), 0].max
-          puts "Waiting #{delay} till next send"
+          LOG.debug(self.inspect) "Waiting #{delay} till next send"
           sleep(delay)
           write(message)
           @last_write = Time.now
