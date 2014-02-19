@@ -9,10 +9,11 @@ module LIFX
     attr_reader :id, :gateway_id
 
     def initialize(id, udp_transport)
-      @id = id
+      @id            = id
       @udp_transport = udp_transport
-      @lights = {}
-      @threads = []
+      @lights        = {}
+      @lights_mutex  = Mutex.new
+      @threads       = []
       @threads << initialize_write_queue
       @threads << defer_lights_discovery
       @threads << initialize_timer_thread
@@ -58,8 +59,10 @@ module LIFX
         end
         seen!
       when Protocol::Light::State
-        @lights[message.device] ||= Light.new(self)
-        @lights[message.device].on_message(message, ip, transport)
+        @lights_mutex.synchronize do
+          @lights[message.device] ||= Light.new(self)
+          @lights[message.device].on_message(message, ip, transport)
+        end
         seen!
       when Protocol::Device::StateTime
         # Heartbeat
@@ -103,12 +106,34 @@ module LIFX
       # We wait a bit so the TCP transport has a chance to connect
       Thread.new do
         sleep(DISCOVERY_WAIT_TIME)
-        discover_lights
+        initialize_lights
       end
     end
 
-    def discover_lights
+    LIGHT_STATE_REQUEST_INTERVAL = 10
+    STALE_LIGHT_CHECK_INTERVAL   = 5
+    def initialize_lights
+      timers.every(LIGHT_STATE_REQUEST_INTERVAL) do
+        query_lights
+      end.fire
+      timers.every(STALE_LIGHT_CHECK_INTERVAL) do
+        remove_stale_lights
+      end
+    end
+
+    def query_lights
       queue_write(payload: Protocol::Light::Get.new, tagged: true)
+    end
+
+    STALE_LIGHT_THRESHOLD = 15 # seconds
+    def remove_stale_lights
+      @lights_mutex.synchronize do
+        stale_lights = lights.select { |light| light.age > STALE_LIGHT_THRESHOLD }
+        stale_lights.each do |light|
+          LOG.info("#{self.inspect}: Removing #{light} due to age #{light.age}")
+          @lights.delete(light.id)
+        end
+      end
     end
 
     MINIMUM_TIME_BETWEEN_MESSAGE_SEND = 0.2

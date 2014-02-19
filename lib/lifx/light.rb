@@ -73,7 +73,7 @@ module LIFX
     end
 
     def inspect
-      %Q{#<LIFX::Light id=#{id.unpack('H*').join} label=#{label} power=#{power.zero? ? 'off' : 'on'}>}
+      %Q{#<LIFX::Light id=#{id} label=#{label} power=#{power.zero? ? 'off' : 'on'}>}
     end
 
     protected
