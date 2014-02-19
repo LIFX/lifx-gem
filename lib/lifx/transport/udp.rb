@@ -32,7 +32,7 @@ module LIFX
               block.call(message, ip)
             else
               # TODO: Make this cleaner
-              LOG.warn("#{self.inspect}: Unrecognised bytes: #{bytes.bytes.map { |b| '%02x ' % b }.join}")
+              LOG.warn("#{self}: Unrecognised bytes: #{bytes.bytes.map { |b| '%02x ' % b }.join}")
             end
           end
         end

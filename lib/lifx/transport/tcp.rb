@@ -19,8 +19,8 @@ module LIFX
         @socket.setsockopt(Socket::IPPROTO_TCP, Socket::TCP_NODELAY,  1)
         @socket.setsockopt(Socket::IPPROTO_TCP, Socket::TCP_MAXSEG,   512)
       rescue => ex
-        LOG.error("#{self.inspect}: Exception occured - #{ex}")
-        LOG.error("#{self.inspect}: Backtrace: #{ex.backtrace.join("\n")}")
+        LOG.error("#{self}: Exception occured - #{ex}")
+        LOG.error("#{self}: Backtrace: #{ex.backtrace.join("\n")}")
         @socket = nil
       end
 
@@ -56,10 +56,10 @@ module LIFX
                 raise "Unparsable data"
               end
             rescue => ex
-              LOG.error("#{self.inspect}: Exception occured - #{ex}")
-              LOG.error("#{self.inspect}: Backtrace: #{ex.backtrace.join("\n")}")
+              LOG.error("#{self}: Exception occured - #{ex}")
+              LOG.error("#{self}: Backtrace: #{ex.backtrace.join("\n")}")
               if @socket
-                LOG.error("#{self.inspect}: Reconnecting...")
+                LOG.error("#{self}: Reconnecting...")
                 reconnect
               end
             end

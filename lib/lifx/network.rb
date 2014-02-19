@@ -48,7 +48,7 @@ module LIFX
       @sites.values
     end
 
-    def inspect
+    def to_s
       %Q{#<LIFX::Network broadcast_ip=#{@broadcast_ip} port=#{@port}>}
     end
 
@@ -70,11 +70,11 @@ module LIFX
 
     STALE_SITE_THRESHOLD = 15 # seconds
     def remove_stale_sites
-      LOG.info("#{self.inspect}: Checking for stale sites")
+      LOG.info("#{self}: Checking for stale sites")
       @sites_lock.synchronize do
         stale_sites = sites.select { |site| site.age > STALE_SITE_THRESHOLD }
         stale_sites.each do |site|
-          LOG.info("#{self.inspect}: Removing #{site.inspect} as age is #{site.age}")
+          LOG.info("#{self}: Removing #{site} as age is #{site.age}")
           site.stop
           @sites.delete(site.id)
         end

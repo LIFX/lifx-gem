@@ -23,7 +23,7 @@ module LIFX
     def write(params)
       message = Message.new(params)
       message.site = id
-      LOG.debug("-> #{self.inspect} #{best_transport.inspect}: #{message.inspect}")
+      LOG.debug("-> #{self} #{best_transport}: #{message}")
       best_transport.write(message)
       # TODO: Handle socket errors
     end
@@ -42,7 +42,7 @@ module LIFX
     end
 
     def on_message(message, ip, transport)
-      LOG.debug("<- #{self.inspect} #{best_transport.inspect}: #{message.inspect}")
+      LOG.debug("<- #{self} #{best_transport}: #{message}")
       payload = message.payload
       case payload
       when Protocol::Device::StatePanGateway
@@ -85,7 +85,7 @@ module LIFX
       end
     end
 
-    def inspect
+    def to_s
       %Q{#<LIFX::Site id=#{id} host=#{best_transport.host} port=#{best_transport.port}>}
     end
 
@@ -130,7 +130,7 @@ module LIFX
       @lights_mutex.synchronize do
         stale_lights = lights.select { |light| light.age > STALE_LIGHT_THRESHOLD }
         stale_lights.each do |light|
-          LOG.info("#{self.inspect}: Removing #{light} due to age #{light.age}")
+          LOG.info("#{self}: Removing #{light} due to age #{light.age}")
           @lights.delete(light.id)
         end
       end

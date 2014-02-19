@@ -19,7 +19,7 @@ module LIFX
       raise NotImplementedError
     end
 
-    def inspect
+    def to_s
       %Q{#<#{self.class.name} #{host}:#{port}>}
     end
   end

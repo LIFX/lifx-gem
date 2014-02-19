@@ -120,7 +120,7 @@ module LIFX
       raw_device.unpack('H*').join
     end
 
-    def inspect
+    def to_s
       hash = {site: site}
       if tagged?
         hash[:tags] = target
