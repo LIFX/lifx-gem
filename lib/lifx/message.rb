@@ -72,8 +72,8 @@ module LIFX
         check_valid_fields!(hash)
         @message = Protocol::Message.new(hash)
         self.payload = payload
-        self.site = site
-        self.target = target
+        self.site = site if site
+        self.target = target if target
       else
         @message = Protocol::Message.new
       end

@@ -17,8 +17,8 @@ describe LIFX::Message do
     end
 
     it 'returns the correct address data' do
-      msg.site.should == '1lifx1'
-      msg.target.should == "\x00" * 8
+      msg.raw_site.should == '1lifx1'
+      msg.raw_target.should == "\x00" * 8
     end
 
     it 'returns the correct metadata' do
@@ -59,7 +59,7 @@ describe LIFX::Message do
       let(:msg) do
         LIFX::Message.new({
           tagged: false,
-          target: "abcdefgh",
+          raw_target: "abcdefgh",
           at_time: 9001,
           payload: LIFX::Protocol::Wifi::SetAccessPoint.new(
             interface: 1,
@@ -80,7 +80,7 @@ describe LIFX::Message do
         msg.protocol.should == 1024
         msg.tagged?.should == false
         msg.addressable?.should == true
-        msg.target.should == 'abcdefgh'
+        msg.raw_target.should == 'abcdefgh'
         msg.at_time.should == 9001
         msg.type.should == 305
         msg.payload.class.should == LIFX::Protocol::Wifi::SetAccessPoint
