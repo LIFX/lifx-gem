@@ -16,5 +16,5 @@ require "lifx/client"
 require "lifx/light"
 
 module LIFX
-  # Your code goes here...
+
 end
