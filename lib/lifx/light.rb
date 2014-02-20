@@ -81,7 +81,7 @@ module LIFX
 
     def <=>(other)
       raise ArgumentError.new("Comparison of #{self} with #{other} failed") unless other.is_a?(LIFX::Light)
-      [label, id, 0] <=> [label, id, 0]
+      [label, id, 0] <=> [other.label, other.id, 0]
     end
 
     protected

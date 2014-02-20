@@ -38,7 +38,7 @@ module LIFX
         end
       end
 
-      def stop
+      def close
         Thread.kill(@listener) if @listener
       end
 
