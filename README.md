@@ -1,6 +1,10 @@
 # LIFX
 
-TODO: Write a gem description
+This gem allows you to control your [LIFX](http://lifx.co) lights.
+
+It handles discovery, gateway connections and rate limiting.
+
+This gem is in an alpha state. Expect breaking API changes.
 
 ## Installation
 
@@ -18,7 +22,14 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+```ruby
+client = LIFX::Client.new
+client.discover               # Discover lights
+client.lights.each do |light|
+  light.set_hsb(120, 1, 1, 2) # Set all lights to bright green
+end
+client.flush                  # Wait until all the packets have been sent
+```
 
 ## Contributing
 
