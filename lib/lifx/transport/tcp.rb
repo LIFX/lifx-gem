@@ -70,6 +70,10 @@ module LIFX
       def write(message)
         data = message.pack
         @socket.write(data)
+      rescue => ex
+        LOG.error("#{self}: Exception in #write: #{ex}")
+        LOG.error("#{self}: Backtrace: #{ex.backtrace.join("\n")}")
+        reconnect
       end
     end
   end
