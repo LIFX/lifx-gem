@@ -31,7 +31,7 @@ module LIFX
     end
 
     def flush
-      threads = sites.map do |site|
+      threads = sites.values.map do |site|
         Thread.new do
           site.flush
         end
