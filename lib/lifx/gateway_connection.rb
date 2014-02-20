@@ -21,6 +21,7 @@ module LIFX
           # We receive responses via UDP transport listening to broadcast in Network
           @udp_transport = Transport::UDP.new(ip, payload.port.snapshot)
         elsif !@tcp_transport && payload.service == Protocol::Device::Service::TCP && (port = payload.port.snapshot) > 0
+          LOG.info("#{self}: Establishing connection to #{ip}:#{port}")
           @tcp_transport = Transport::TCP.new(ip, port)
           @tcp_transport.listen do |msg, ip|
             site.on_message(msg, ip, @tcp_transport)
