@@ -10,6 +10,7 @@ module LIFX
 
     def initialize(site)
       @site = site
+      @power = 0
     end
 
     def on_message(message, ip, transport)
@@ -26,6 +27,8 @@ module LIFX
       when Protocol::Device::StatePower
         @power = payload.level
         seen!
+      else
+        LOG.warn("#{self}: Unhandled message: #{message}")
       end
     end
 
@@ -71,8 +74,9 @@ module LIFX
     end
 
     def to_s
-      %Q{#<LIFX::Light id=#{id} label=#{label} power=#{power.zero? ? 'off' : 'on'}>}
+      %Q{#<LIFX::Light id=#{id} label=#{label} power=#{on? ? 'on' : 'off'}>}
     end
+    alias_method :inspect, :to_s
 
     protected
 

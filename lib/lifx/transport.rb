@@ -22,6 +22,7 @@ module LIFX
     def to_s
       %Q{#<#{self.class.name} #{host}:#{port}>}
     end
+    alias_method :inspect, :to_s
   end
 end
 

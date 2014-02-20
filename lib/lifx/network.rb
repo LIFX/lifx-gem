@@ -22,8 +22,8 @@ module LIFX
       end
     end
 
-    DISCOVERY_INTERVAL_WHEN_NO_SITES_FOUND = 0.25
-    DISCOVERY_INTERVAL                     = 10
+    DISCOVERY_INTERVAL_WHEN_NO_SITES_FOUND = 1    # seconds
+    DISCOVERY_INTERVAL                     = 20   # seconds
     def discover
       stop_discovery
       Thread.abort_on_exception = true
@@ -51,6 +51,7 @@ module LIFX
     def to_s
       %Q{#<LIFX::Network broadcast_ip=#{@broadcast_ip} port=#{@port}>}
     end
+    alias_method :inspect, :to_s
 
     protected
 
@@ -68,7 +69,7 @@ module LIFX
       end
     end
 
-    STALE_SITE_THRESHOLD = 15 # seconds
+    STALE_SITE_THRESHOLD = 30 # seconds
     def remove_stale_sites
       LOG.info("#{self}: Checking for stale sites")
       @sites_lock.synchronize do

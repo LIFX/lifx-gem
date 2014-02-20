@@ -57,16 +57,15 @@ module LIFX
             on_message(message, ip, @tcp_transport)
           end
         end
-        seen!
       when Protocol::Device::StateTime
         # Heartbeat
-        seen!
       else
         @lights_mutex.synchronize do
           @lights[message.device] ||= Light.new(self)
           @lights[message.device].on_message(message, ip, transport)
         end
       end
+      seen!
     end
 
     def gateway
@@ -87,6 +86,7 @@ module LIFX
     def to_s
       %Q{#<LIFX::Site id=#{id} host=#{best_transport.host} port=#{best_transport.port}>}
     end
+    alias_method :inspect, :to_s
 
     def stop
       @threads.each do |thread|
@@ -113,14 +113,14 @@ module LIFX
     STALE_LIGHT_CHECK_INTERVAL   = 5
     def initialize_lights
       timers.every(LIGHT_STATE_REQUEST_INTERVAL) do
-        query_lights
+        scan_lights
       end.fire
       timers.every(STALE_LIGHT_CHECK_INTERVAL) do
         remove_stale_lights
       end
     end
 
-    def query_lights
+    def scan_lights
       queue_write(payload: Protocol::Light::Get.new, tagged: true)
     end
 
@@ -145,6 +145,7 @@ module LIFX
         loop do
           message = @queue.pop
           delay = [MINIMUM_TIME_BETWEEN_MESSAGE_SEND - (Time.now - @last_write), 0].max
+          LOG.debug("#{self}: Sleeping for #{delay}")
           sleep(delay)
           write(message)
           @last_write = Time.now
