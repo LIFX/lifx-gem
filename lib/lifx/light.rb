@@ -26,6 +26,7 @@ module LIFX
         seen!
       when Protocol::Device::StatePower
         @power = payload.level
+        queue_write(payload: Protocol::Light::Get.new) if !label
         seen!
       else
         LOG.warn("#{self}: Unhandled message: #{message}")
