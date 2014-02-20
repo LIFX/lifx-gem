@@ -23,6 +23,9 @@ module LIFX
         @dim   = payload.dim
         @tags  = payload.tags
         seen!
+      when Protocol::Device::StatePower
+        @power = payload.level
+        seen!
       end
     end
 
@@ -67,7 +70,7 @@ module LIFX
       queue_write(payload: Protocol::Device::SetPower.new(level: 0))
     end
 
-    def inspect
+    def to_s
       %Q{#<LIFX::Light id=#{id} label=#{label} power=#{power.zero? ? 'off' : 'on'}>}
     end
 
