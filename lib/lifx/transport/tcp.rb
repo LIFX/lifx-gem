@@ -6,6 +6,9 @@ module LIFX
       def initialize(host, port)
         super
         connect
+        at_exit do
+          close
+        end
       end
 
       def connected?
