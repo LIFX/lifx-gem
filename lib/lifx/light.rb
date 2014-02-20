@@ -15,9 +15,9 @@ module LIFX
 
     def on_message(message, ip, transport)
       payload = message.payload
+      @id    = message.device
       case payload
       when Protocol::Light::State
-        @id    = message.device
         @label = payload.label
         @color = payload.color
         @power = payload.power
@@ -77,6 +77,11 @@ module LIFX
       %Q{#<LIFX::Light id=#{id} label=#{label} power=#{on? ? 'on' : 'off'}>}
     end
     alias_method :inspect, :to_s
+
+    def <=>(other)
+      raise ArgumentError.new("Comparison of #{self} with #{other} failed") unless other.is_a?(LIFX::Light)
+      [label, id, 0] <=> [label, id, 0]
+    end
 
     protected
 

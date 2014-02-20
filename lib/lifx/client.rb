@@ -21,7 +21,7 @@ module LIFX
         @networks.each do |network|
           network.discover
         end
-        while sites.empty? || sites.none? { |s| s.gateway }
+        while sites.empty?
           sleep 0.1
         end
         sites
@@ -42,11 +42,15 @@ module LIFX
     end
 
     def sites
-      @networks.map(&:sites).flatten
+      @networks.map(&:sites).reduce({}) do |hash, sites_hash|
+        hash.merge!(sites_hash)
+      end
     end
 
     def lights
-      sites.map(&:lights).flatten
+      sites.values.map(&:lights).reduce({}) do |hash, lights_hash|
+        hash.merge!(lights_hash)
+      end
     end
 
     protected

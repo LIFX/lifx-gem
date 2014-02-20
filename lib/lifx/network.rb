@@ -45,7 +45,7 @@ module LIFX
     end
 
     def sites
-      @sites.values
+      @sites.dup
     end
 
     def to_s
@@ -73,7 +73,7 @@ module LIFX
     def remove_stale_sites
       LOG.info("#{self}: Checking for stale sites")
       @sites_lock.synchronize do
-        stale_sites = sites.select { |site| site.age > STALE_SITE_THRESHOLD }
+        stale_sites = @sites.values.select { |site| site.age > STALE_SITE_THRESHOLD }
         stale_sites.each do |site|
           LOG.info("#{self}: Removing #{site} as age is #{site.age}")
           site.stop
@@ -86,7 +86,7 @@ module LIFX
       case message.payload
       when Protocol::Device::StatePanGateway
         @sites_lock.synchronize do
-          @sites[message.site] ||= Site.new(message.site, @transport)
+          @sites[message.site] ||= Site.new(message.site)
           @sites[message.site].on_message(message, ip, @transport)
         end
       end
