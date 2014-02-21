@@ -1,4 +1,5 @@
 require 'lifx/seen'
+require 'lifx/color'
 
 module LIFX
   class Light
@@ -6,7 +7,6 @@ module LIFX
     attr_reader :site
 
     attr_accessor :id, :label, :color, :power, :dim, :tags
-
 
     def initialize(site)
       @site = site
@@ -18,8 +18,8 @@ module LIFX
       @id    = message.device
       case payload
       when Protocol::Light::State
-        @label = payload.label
-        @color = payload.color
+        @label = payload.label.to_s
+        @color = payload.color.snapshot
         @power = payload.power
         @dim   = payload.dim
         @tags  = payload.tags
@@ -34,28 +34,17 @@ module LIFX
     end
 
     def queue_write(params)
+      LOG.info("#{self}: Queuing: #{params.merge(target: id).inspect}")
       site.queue_write(params.merge(target: id))
     end
 
-    UINT16_MAX = 65_535
-    MSEC_PER_SEC = 1000
-    DEFAULT_KELVIN = 3500
-    def set_hsbk(hue, saturation, brightness, kelvin, duration = default_duration)
-      hsbk = build_hsbk(hue, saturation, brightness, kelvin)
-      duration = (duration * MSEC_PER_SEC).to_i
+    MSEC_PER_SEC   = 1000
+    def set_color(color, duration = default_duration)
       queue_write(payload: Protocol::Light::Set.new(
+        color: color.to_hsbk,
+        duration: (duration * MSEC_PER_SEC).to_i,
         stream: 0,
-        duration: duration,
-        color: hsbk)
-      )
-    end
-
-    def set_hsb(hue, saturation, brightness, duration = default_duration)
-      set_hsbk(hue, saturation, brightness, DEFAULT_KELVIN, duration)
-    end
-
-    def set_white(brightness = 1, kelvin = DEFAULT_KELVIN, duration = default_duration)
-      set_hsbk(0, 0, brightness, kelvin, duration)
+      ))
     end
 
     def on?
