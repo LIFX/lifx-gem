@@ -85,7 +85,7 @@ module LIFX
       end
       @message.msg_size = @message.num_bytes
     rescue => ex
-      raise PackError.new("Unable to pack message with args: #{args.inspect}")
+      raise PackError.new("Unable to pack message with args: #{args.inspect} - #{ex}")
     end
 
     def payload=(payload)
