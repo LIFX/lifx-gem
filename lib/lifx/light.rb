@@ -19,7 +19,7 @@ module LIFX
       case payload
       when Protocol::Light::State
         @label = payload.label.to_s
-        @color = payload.color.snapshot
+        @color = Color.from_struct(payload.color.snapshot)
         @power = payload.power
         @dim   = payload.dim
         @tags  = payload.tags
