@@ -26,6 +26,15 @@ module LIFX
         saturation = (2 * saturation) / (l + saturation)
         new(hue, saturation, brightness)
       end
+
+      def from_struct(hsbk)
+        new(
+          (hsbk.hue.to_f / UINT16_MAX) * 360,
+          (hsbk.saturation.to_f / UINT16_MAX),
+          (hsbk.brightness.to_f / UINT16_MAX),
+          hsbk.kelvin
+        )
+      end
     end
 
     def initialize(hue, saturation, brightness, kelvin)
