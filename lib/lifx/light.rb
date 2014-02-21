@@ -28,14 +28,20 @@ module LIFX
         @power = payload.level
         queue_write(payload: Protocol::Light::Get.new) if !label
         seen!
+      when Protocol::Device::StateLabel
+        @label = payload.label.to_s
+        seen!
       else
         LOG.warn("#{self}: Unhandled message: #{message}")
       end
     end
 
     def queue_write(params)
-      LOG.info("#{self}: Queuing: #{params.merge(target: id).inspect}")
       site.queue_write(params.merge(target: id))
+    end
+
+    def refresh
+      queue_write(payload: Protocol::Light::Get.new)
     end
 
     MSEC_PER_SEC   = 1000
@@ -45,6 +51,15 @@ module LIFX
         duration: (duration * MSEC_PER_SEC).to_i,
         stream: 0,
       ))
+    end
+
+    MAX_LABEL_LENGTH = 32
+    class LabelTooLong < ArgumentError; end
+    def set_label(label)
+      if label.length > MAX_LABEL_LENGTH
+        raise LabelTooLong.new("Label length must be below or equal to #{MAX_LABEL_LENGTH}")
+      end
+      queue_write(payload: Protocol::Device::SetLabel.new(label: label))
     end
 
     def on?
