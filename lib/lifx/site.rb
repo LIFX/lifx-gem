@@ -21,9 +21,7 @@ module LIFX
       initialize_heartbeat
     end
 
-    def write(params)
-      message = Message.new(params)
-      message.site = id
+    def write(message)
       @gateways_mutex.synchronize do 
         gateways.values.each do |gateway|
           gateway.write(message)
@@ -33,7 +31,9 @@ module LIFX
     end
 
     def queue_write(params)
-      @queue << params
+      message = Message.new(params)
+      message.site = id
+      @queue << message
     end
 
     def on_message(message, ip, transport)
