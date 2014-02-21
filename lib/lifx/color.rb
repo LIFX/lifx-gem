@@ -50,5 +50,15 @@ module LIFX
         kelvin: kelvin.to_i
       )
     end
+
+    EQUALITY_THRESHOLD = 0.001 # 0.1% variance
+    def ==(other)
+      return false unless other.is_a?(Color)
+      conditions = []
+      conditions << ((hue - other.hue).abs < (EQUALITY_THRESHOLD * 360)) 
+      conditions << ((saturation - other.saturation).abs < EQUALITY_THRESHOLD)
+      conditions << ((brightness - other.brightness).abs < EQUALITY_THRESHOLD)
+      conditions.all?
+    end
   end
 end
