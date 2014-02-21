@@ -29,6 +29,7 @@ module LIFX
       Thread.abort_on_exception = true
       @discovery_thread = Thread.new do
         message = Message.new(payload: Protocol::Device::GetPanGateway.new)
+        LOG.info("Discovering gateways on #{@broadcast_ip}:#{@port}")
         loop do
           @transport.write(message)
           if sites.empty?
@@ -86,7 +87,10 @@ module LIFX
       case message.payload
       when Protocol::Device::StatePanGateway
         @sites_lock.synchronize do
-          @sites[message.site] ||= Site.new(message.site)
+          if !@sites.has_key?(message.site)
+            LOG.info("Discovered new site #{message.site} at #{ip}")
+            @sites[message.site] = Site.new(message.site)
+          end
           @sites[message.site].on_message(message, ip, @transport)
         end
       end
