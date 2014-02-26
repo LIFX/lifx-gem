@@ -37,6 +37,10 @@ module LIFX
           end
         end
         new(message, payload)
+      rescue => ex
+        LOG.error("Message.unpack: Exception while unpacking #{data.inspect}")
+        LOG.error("Message.unpack: #{ex} - #{ex.backtrac.join("\n")}")
+        raise ex
       end
 
       def message_type_for_id(type_id)
