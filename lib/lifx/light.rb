@@ -1,9 +1,11 @@
 require 'lifx/seen'
 require 'lifx/color'
+require 'lifx/light_target'
 
 module LIFX
   class Light
     include Seen
+    include LightTarget
     attr_reader :site
 
     attr_accessor :id, :label, :color, :power, :dim, :tags
@@ -44,38 +46,12 @@ module LIFX
       queue_write(payload: Protocol::Light::Get.new)
     end
 
-    MSEC_PER_SEC   = 1000
-    def set_color(color, duration = default_duration)
-      queue_write(payload: Protocol::Light::Set.new(
-        color: color.to_hsbk,
-        duration: (duration * MSEC_PER_SEC).to_i,
-        stream: 0,
-      ))
-    end
-
-    MAX_LABEL_LENGTH = 32
-    class LabelTooLong < ArgumentError; end
-    def set_label(label)
-      if label.length > MAX_LABEL_LENGTH
-        raise LabelTooLong.new("Label length must be below or equal to #{MAX_LABEL_LENGTH}")
-      end
-      queue_write(payload: Protocol::Device::SetLabel.new(label: label))
-    end
-
     def on?
       !off?
     end
 
     def off?
       power.zero?
-    end
-
-    def on!
-      queue_write(payload: Protocol::Device::SetPower.new(level: 1))
-    end
-
-    def off!
-      queue_write(payload: Protocol::Device::SetPower.new(level: 0))
     end
 
     def to_s
@@ -89,16 +65,7 @@ module LIFX
     end
 
     protected
-
-    def build_hsbk(hue, saturation, brightness, kelvin)
-      Protocol::Light::Hsbk.new(
-        hue: (hue / 360.0 * UINT16_MAX).to_i,
-        saturation: (saturation * UINT16_MAX).to_i,
-        brightness: (brightness * UINT16_MAX).to_i,
-        kelvin: kelvin.to_i
-      )
-    end
-
+    
     def default_duration
       # TODO: Allow client-level configuration
       0.5
