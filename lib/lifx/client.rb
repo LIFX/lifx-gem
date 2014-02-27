@@ -2,6 +2,8 @@ require 'socket'
 require 'timeout'
 require 'yell'
 
+require 'lifx/network'
+
 module LIFX
   class Client
     LIFX_PORT = 56700
@@ -31,7 +33,7 @@ module LIFX
     end
 
     def flush
-      threads = sites.values.map do |site|
+      threads = sites.map do |site|
         Thread.new do
           site.flush
         end
@@ -41,16 +43,24 @@ module LIFX
       end
     end
 
-    def sites
-      @networks.map(&:sites).reduce({}) do |hash, sites_hash|
+    def sites_hash
+      @networks.map(&:sites_hash).reduce({}) do |hash, sites_hash|
         hash.merge!(sites_hash)
       end
     end
 
-    def lights
-      sites.values.map(&:lights).reduce({}) do |hash, lights_hash|
+    def sites
+      sites_hash.values
+    end
+
+    def lights_hash
+      sites.map(&:lights_hash).reduce({}) do |hash, lights_hash|
         hash.merge!(lights_hash)
       end
+    end
+
+    def lights
+      lights_hash.values
     end
 
     protected

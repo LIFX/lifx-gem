@@ -1,4 +1,5 @@
 require 'lifx/timers'
+require 'lifx/site'
 
 module LIFX
   class Network
@@ -46,6 +47,10 @@ module LIFX
     end
 
     def sites
+      @sites.values
+    end
+
+    def sites_hash
       @sites.dup
     end
 

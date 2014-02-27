@@ -42,10 +42,6 @@ module LIFX
       site.queue_write(params.merge(target: id))
     end
 
-    def refresh
-      queue_write(payload: Protocol::Light::Get.new)
-    end
-
     def on?
       !off?
     end

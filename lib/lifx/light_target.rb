@@ -21,6 +21,10 @@ module LIFX
       set_power(0)
     end
 
+    def refresh
+      queue_write(payload: Protocol::Light::Get.new)
+    end
+
     MAX_LABEL_LENGTH = 32
     class LabelTooLong < ArgumentError; end
     def set_label(label)

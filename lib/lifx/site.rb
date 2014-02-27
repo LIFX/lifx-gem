@@ -1,5 +1,8 @@
 require 'lifx/seen'
 require 'lifx/timers'
+require 'lifx/gateway_connection'
+require 'lifx/group'
+require 'lifx/light'
 
 module LIFX
   class Site
@@ -63,8 +66,12 @@ module LIFX
       end
     end
 
-    def lights
+    def lights_hash
       @lights.dup # So people can't modify internal representation
+    end
+
+    def lights
+      lights_hash.values
     end
 
     def to_s

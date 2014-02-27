@@ -8,12 +8,7 @@ require "lifx/protocol/type"
 require "lifx/message"
 require "lifx/transport"
 
-require "lifx/gateway_connection"
-require "lifx/site"
-require "lifx/network"
 require "lifx/client"
-
-require "lifx/light"
 
 module LIFX
 
