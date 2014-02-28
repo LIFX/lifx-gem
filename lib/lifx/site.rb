@@ -118,7 +118,7 @@ module LIFX
     STALE_LIGHT_THRESHOLD = LIGHT_STATE_REQUEST_INTERVAL * 3 # seconds
     def remove_stale_lights
       @lights_mutex.synchronize do
-        stale_lights = lights.values.select { |light| light.age > STALE_LIGHT_THRESHOLD }
+        stale_lights = lights.select { |light| light.age > STALE_LIGHT_THRESHOLD }
         stale_lights.each do |light|
           LOG.info("#{self}: Removing #{light} due to age #{light.age}")
           @lights.delete(light.id)
