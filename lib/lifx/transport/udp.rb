@@ -23,6 +23,7 @@ module LIFX
         @listener = Thread.new do
           reader = UDPSocket.new
           reader.setsockopt(Socket::SOL_SOCKET, Socket::SO_REUSEADDR, true)
+          reader.setsockopt(Socket::SOL_SOCKET, Socket::SO_REUSEPORT, true)
           reader.bind(host, port)
           loop do
             bytes, (_, _, ip, _) = reader.recvfrom(BUFFER_SIZE)
