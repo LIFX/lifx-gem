@@ -11,5 +11,5 @@ require "lifx/transport"
 require "lifx/client"
 
 module LIFX
-
+  UINT64_MAX = 2 ** 64 - 1
 end

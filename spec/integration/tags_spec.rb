@@ -3,7 +3,6 @@ require 'spec_helper'
 module LIFX
   describe "tags", integration: true do
     it 'Clearing, setting and using tags' do
-      sleep(2)
       light.tags.each do |tag_label|
         light.remove_tag(tag_label)
       end

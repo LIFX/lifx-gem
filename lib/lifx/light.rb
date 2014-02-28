@@ -8,7 +8,7 @@ module LIFX
     include LightTarget
     attr_reader :site
 
-    attr_accessor :id, :label, :color, :power, :dim, :tags
+    attr_accessor :id, :label, :color, :power, :dim, :tags_field
 
     def initialize(site)
       @site = site
@@ -20,11 +20,11 @@ module LIFX
       @id    = message.device
       case payload
       when Protocol::Light::State
-        @label = payload.label.to_s
-        @color = Color.from_struct(payload.color.snapshot)
-        @power = payload.power
-        @dim   = payload.dim
-        @tags  = payload.tags
+        @label      = payload.label.to_s
+        @color      = Color.from_struct(payload.color.snapshot)
+        @power      = payload.power
+        @dim        = payload.dim
+        @tags_field = payload.tags
         seen!
       when Protocol::Device::StatePower
         @power = payload.level
@@ -32,6 +32,9 @@ module LIFX
         seen!
       when Protocol::Device::StateLabel
         @label = payload.label.to_s
+        seen!
+      when Protocol::Device::StateTags
+        @tags_field = payload.tags
         seen!
       else
         LOG.warn("#{self}: Unhandled message: #{message}")
@@ -48,6 +51,18 @@ module LIFX
 
     def off?
       power.zero?
+    end
+
+    def add_tag(tag)
+      site.add_tag_to_light(tag, self)
+    end
+
+    def remove_tag(tag)
+      site.remove_tag_from_light(tag, self)
+    end
+
+    def tags
+      site.tags_on_light(self)
     end
 
     def to_s

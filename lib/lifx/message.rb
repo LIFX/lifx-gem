@@ -79,7 +79,11 @@ module LIFX
         site    = hash.delete(:site)
         target  = hash.delete(:target)
 
+        if target.is_a?(Integer)
+          target = [target].pack('Q')
+        end
         check_valid_fields!(hash)
+
         @message = Protocol::Message.new(hash)
         self.payload = payload
         self.site = site if site
