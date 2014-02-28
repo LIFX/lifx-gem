@@ -39,7 +39,7 @@ module LIFX
         new(message, payload)
       rescue => ex
         LOG.error("Message.unpack: Exception while unpacking #{data.inspect}")
-        LOG.error("Message.unpack: #{ex} - #{ex.backtrac.join("\n")}")
+        LOG.error("Message.unpack: #{ex} - #{ex.backtrace.join("\n")}")
         raise ex
       end
 
