@@ -26,5 +26,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "rspec"
   spec.add_development_dependency "erubis"
   spec.add_development_dependency "ruby-prof"
-  spec.add_development_dependency "byebug"
+  spec.add_development_dependency "pry-byebug"
+  spec.add_development_dependency "pry-rescue"
+  spec.add_development_dependency "pry-stack_explorer"
 end
