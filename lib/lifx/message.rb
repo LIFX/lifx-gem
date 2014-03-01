@@ -147,10 +147,14 @@ module LIFX
       raw_device.unpack('H*').join
     end
 
+    def tags_field
+      raw_target.unpack('Q').first
+    end
+
     def to_s
       hash = {site: site}
       if tagged?
-        hash[:tags] = target
+        hash[:tags] = (0...64).to_a.select { |i| (tags_field & 2 ** i) > 0 }
       else
         hash[:device] = device
       end
