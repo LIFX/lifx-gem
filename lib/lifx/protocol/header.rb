@@ -6,7 +6,7 @@ module LIFX
           hide :_reserved, :_reserved1
 
           uint16 :msg_size
-          bit12le :protocol, value: 1024
+          bit12le :protocol
           bool_bit1 :addressable, value: true
           bool_bit1 :tagged
           bit2le :_reserved

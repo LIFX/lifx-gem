@@ -102,6 +102,7 @@ module LIFX
         @message = Protocol::Message.new
       end
       @message.msg_size = @message.num_bytes
+      @message.protocol = PROTOCOL_VERSION
     rescue => ex
       raise PackError.new("Unable to pack message with args: #{args.inspect} - #{ex}")
     end
