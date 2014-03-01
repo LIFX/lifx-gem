@@ -16,12 +16,12 @@ shared_context 'integration', integration: true do
       c.discover
       begin
         Timeout.timeout(5) do
-          while c.lights.empty?
+          while !c.lights.find { |l| l.label =~ /^Test/ }
             sleep 0.5
           end
         end
       rescue Timeout::Error
-        raise "Could not find any lights"
+        raise "Could not find any lights matching /^Test/"
       end
       c
     end
@@ -33,7 +33,7 @@ shared_context 'integration', integration: true do
 
   let(:site) { lifx.sites.first }
   let(:lights) { site.lights }
-  let(:light) { lights.first }
+  let(:light) { lights.find { |l| l.label =~ /^Test/} }
   let(:all_lights) { site.all_lights }
 end
 
