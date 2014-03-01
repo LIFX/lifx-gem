@@ -1,7 +1,6 @@
 require 'lifx/seen'
 require 'lifx/timers'
 require 'lifx/gateway_connection'
-require 'lifx/group'
 require 'lifx/light'
 require 'lifx/tag_manager'
 
