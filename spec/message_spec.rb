@@ -103,7 +103,7 @@ describe LIFX::Message do
       let(:unpacked) { LIFX::Message.unpack(msg.pack) }
 
       it 'packs the tag correctly' do
-        msg.pack.should == "$\x00\x004\x00\x00\x00\x00\x03\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00)#\x00\x00\x00\x00\x00\x00\x04\x00\x00\x00"
+        msg.pack.should == "$\x00\x004\x00\x00\x00\x00\x03\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00)#\x00\x00\x00\x00\x00\x00\x04\x00\x00\x00".b
       end
 
       it 'sets tagged' do
@@ -112,6 +112,38 @@ describe LIFX::Message do
 
       it 'sets tags' do
         unpacked.tags.should == 3
+      end
+
+      it 'device should be nil' do
+        unpacked.device.should == nil
+      end
+    end
+
+    context 'packing with device' do
+      let(:msg) do
+        LIFX::Message.new({
+          device: '0123456789ab',
+          at_time: 9001,
+          payload: LIFX::Protocol::Device::GetTime.new
+        })
+      end
+
+      let(:unpacked) { LIFX::Message.unpack(msg.pack) }
+
+      it 'packs the tag correctly' do
+        msg.pack.should == "$\x00\x00\x14\x00\x00\x00\x00\x01#Eg\x89\xAB\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00)#\x00\x00\x00\x00\x00\x00\x04\x00\x00\x00".b
+      end
+
+      it 'sets tagged to false' do
+        unpacked.tagged?.should == false
+      end
+
+      it 'sets device' do
+        unpacked.device.should == '0123456789ab'
+      end
+
+      it 'tags should be nil' do
+        unpacked.tags.should == nil
       end
     end
   end

@@ -148,7 +148,7 @@ module LIFX
     end
 
     def device
-      raw_device.unpack('H*').join
+      tagged? ? nil : raw_device.unpack('H*').join
     end
 
     def device=(value)
@@ -157,7 +157,7 @@ module LIFX
     end
 
     def tags
-      raw_target.unpack('Q').first
+      tagged? ? raw_target.unpack('Q').first : nil
     end
 
     def tags=(value)
