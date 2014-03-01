@@ -2,14 +2,17 @@
 $LOAD_PATH << File.join(File.dirname(__FILE__), "..", "lib")
 require 'lifx'
 
-light_udp = LIFX::Transport::UDP.new('0.0.0.0', 56700)
-light_udp.listen do |msg, ip|
-  puts "BROADCAST: #{ip} #{msg}"
-end
+begin
+  light_udp = LIFX::Transport::UDP.new('0.0.0.0', 56700)
+  light_udp.listen do |msg, ip|
+    puts "BROADCAST: #{ip} #{msg}"
+  end
 
-peer_udp = LIFX::Transport::UDP.new('0.0.0.0', 56750)
-peer_udp.listen do |msg, ip|
-  puts "PEER:      #{ip} #{msg}"
+  peer_udp = LIFX::Transport::UDP.new('0.0.0.0', 56750)
+  peer_udp.listen do |msg, ip|
+    puts "PEER:      #{ip} #{msg}"
+  end
+rescue LIFX::Message::UnsupportedProtocolVersion
 end
 
 puts "Listening on 56700 and 56750..."
