@@ -21,6 +21,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'bindata'
   spec.add_dependency 'yell'
   spec.add_dependency 'timers'
+  spec.add_dependency 'configatron', '~> 3.0'
   spec.add_development_dependency "bundler", "~> 1.3"
   spec.add_development_dependency "rake"
   spec.add_development_dependency "rspec"
