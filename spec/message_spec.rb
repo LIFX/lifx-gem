@@ -90,5 +90,29 @@ describe LIFX::Message do
         msg.payload.security.should == 1
       end
     end
+
+    context 'packing with tags' do
+      let(:msg) do
+        LIFX::Message.new({
+          tags: 3,
+          at_time: 9001,
+          payload: LIFX::Protocol::Device::GetTime.new
+        })
+      end
+
+      let(:unpacked) { LIFX::Message.unpack(msg.pack) }
+
+      it 'packs the tag correctly' do
+        msg.pack.should == "$\x00\x004\x00\x00\x00\x00\x03\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00)#\x00\x00\x00\x00\x00\x00\x04\x00\x00\x00"
+      end
+
+      it 'sets tagged' do
+        unpacked.tagged?.should == true
+      end
+
+      it 'sets tags' do
+        unpacked.tags.should == 3
+      end
+    end
   end
 end

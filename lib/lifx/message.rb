@@ -91,16 +91,17 @@ module LIFX
         payload = hash.delete(:payload)
         site    = hash.delete(:site)
         target  = hash.delete(:target)
+        tags    = hash.delete(:tags)
+        device  = hash.delete(:device)
 
-        if target.is_a?(Integer)
-          target = [target].pack('Q')
-        end
         check_valid_fields!(hash)
 
         @message = Protocol::Message.new(hash)
         self.payload = payload
-        self.site = site if site
-        self.target = target if target
+        self.site    = site   if site
+        self.target  = target if target
+        self.tags    = tags   if tags
+        self.device  = device if device
       else
         @message = Protocol::Message.new
       end
@@ -150,11 +151,17 @@ module LIFX
       raw_device.unpack('H*').join
     end
 
+    def device=(value)
+      self.tagged = false
+      self.target = value
+    end
+
     def tags
       raw_target.unpack('Q').first
     end
 
     def tags=(value)
+      self.tagged = true
       self.raw_target = [value].pack('Q')
     end
 
