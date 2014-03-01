@@ -29,12 +29,7 @@ module LIFX
       id = next_unused_id
       raise TagLimitReached if id.nil?
       site.queue_write(tagged: true, payload: Protocol::Device::SetTagLabels.new(tags: id_to_tags_field(id), label: tag_label))
-      Timeout.timeout(10) do
-        while !(tag = tag_with_label(tag_label))
-          sleep 0.1
-        end
-        tag
-      end
+      wait_until { tag } or raise "Couldn't create tag"
     end
 
     def add_tag_to_light(tag_label, light)
