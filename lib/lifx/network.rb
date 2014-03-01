@@ -4,6 +4,7 @@ require 'lifx/site'
 module LIFX
   class Network
     include Timers
+    include Logging
 
     def initialize(broadcast_ip, port)
       # TODO: Rate limiting
@@ -30,7 +31,7 @@ module LIFX
       Thread.abort_on_exception = true
       @discovery_thread = Thread.new do
         message = Message.new(payload: Protocol::Device::GetPanGateway.new)
-        LOG.info("Discovering gateways on #{@broadcast_ip}:#{@port}")
+        logger.info("Discovering gateways on #{@broadcast_ip}:#{@port}")
         loop do
           @transport.write(message)
           if sites.empty?
@@ -77,11 +78,11 @@ module LIFX
 
     STALE_SITE_THRESHOLD = 30 # seconds
     def remove_stale_sites
-      LOG.info("#{self}: Checking for stale sites")
+      logger.info("#{self}: Checking for stale sites")
       @sites_lock.synchronize do
         stale_sites = @sites.values.select { |site| site.age > STALE_SITE_THRESHOLD }
         stale_sites.each do |site|
-          LOG.info("#{self}: Removing #{site} as age is #{site.age}")
+          logger.info("#{self}: Removing #{site} as age is #{site.age}")
           site.stop
           @sites.delete(site.id)
         end
@@ -93,7 +94,7 @@ module LIFX
       when Protocol::Device::StatePanGateway
         @sites_lock.synchronize do
           if !@sites.has_key?(message.site)
-            LOG.info("Discovered new site #{message.site} at #{ip}")
+            logger.info("Discovered new site #{message.site} at #{ip}")
             @sites[message.site] = Site.new(message.site)
           end
           @sites[message.site].on_message(message, ip, @transport)

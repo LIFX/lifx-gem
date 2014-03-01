@@ -2,6 +2,7 @@ require 'lifx/tag'
 
 module LIFX
   class TagManager
+    include Utilities
     # Handles fetching tag labels
     # Keeping tag label states
     attr_reader :tags, :site

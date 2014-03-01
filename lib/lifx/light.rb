@@ -6,6 +6,8 @@ module LIFX
   class Light
     include Seen
     include LightTarget
+    include Logging
+
     attr_reader :site
 
     attr_accessor :id, :label, :color, :power, :dim, :tags_field
@@ -37,7 +39,7 @@ module LIFX
         @tags_field = payload.tags
         seen!
       else
-        LOG.warn("#{self}: Unhandled message: #{message}")
+        logger.warn("#{self}: Unhandled message: #{message}")
       end
     end
 

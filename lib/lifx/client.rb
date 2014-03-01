@@ -7,8 +7,8 @@ require 'lifx/network'
 module LIFX
   class Client
     LIFX_PORT = 56700
-    def initialize(options = {})
-      LIFX.const_set(:LOG, options[:logger] || default_logger)
+    def initialize(logger: nil)
+      LIFX.logger = logger if logger
       @networks = []
       Socket.ip_address_list.each do |ip|
         next unless ip.ipv4? && !ip.ipv4_loopback? && ip.ipv4_private?
@@ -60,16 +60,7 @@ module LIFX
     end
 
     def lights
-      lights_hash.values
-    end
-
-    protected
-
-    def default_logger
-      Yell.new do |logger|
-        logger.level = 'gte.warn'
-        logger.adapter STDERR, format: '%d [%5L] %p/%t : %m'
-      end
+      LightCollection.new(scope: self)
     end
   end
 end

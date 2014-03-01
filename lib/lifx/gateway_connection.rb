@@ -5,6 +5,7 @@ module LIFX
     # GatewayConnection handles the UDP and TCP connections to the gateway
     # A GatewayConnection is created when a new device sends a StatePanGateway
     include Timers
+    include Logging
 
     attr_reader :site, :ip
     def initialize(site, ip)
@@ -24,12 +25,12 @@ module LIFX
           connect(ip, port)
         end
       else
-        LOG.error("#{self}: Unhandled message: #{message}")
+        logger.error("#{self}: Unhandled message: #{message}")
       end
     end
 
     def connect(ip, port)
-      LOG.info("#{self}: Establishing connection to #{ip}:#{port}")
+      logger.info("#{self}: Establishing connection to #{ip}:#{port}")
       @tcp_transport = Transport::TCP.new(ip, port)
       @tcp_transport.listen do |msg, ip|
         site.on_message(msg, ip, @tcp_transport)
@@ -41,7 +42,7 @@ module LIFX
 
     def write(message)
       # TODO: Support force sending over UDP
-      LOG.debug("-> #{self} #{best_transport}: #{message}")
+      logger.debug("-> #{self} #{best_transport}: #{message}")
       best_transport.write(message)
     end
 
