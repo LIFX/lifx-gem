@@ -8,8 +8,9 @@ module LIFX
   class Site
     include Seen
     include Timers
-
-    attr_reader :id, :gateways
+    include Logging
+    
+    attr_reader :id, :gateways, :tag_manager
 
     def initialize(id)
       @id            = id
@@ -42,7 +43,7 @@ module LIFX
     end
 
     def on_message(message, ip, transport)
-      LOG.debug("<- #{self} #{transport}: #{message}")
+      logger.debug("<- #{self} #{transport}: #{message}")
       payload = message.payload
       case payload
       when Protocol::Device::StatePanGateway
@@ -140,7 +141,7 @@ module LIFX
       @lights_mutex.synchronize do
         stale_lights = lights.select { |light| light.age > STALE_LIGHT_THRESHOLD }
         stale_lights.each do |light|
-          LOG.info("#{self}: Removing #{light} due to age #{light.age}")
+          logger.info("#{self}: Removing #{light} due to age #{light.age}")
           @lights.delete(light.id)
         end
       end
@@ -156,7 +157,7 @@ module LIFX
         loop do
           message = @queue.pop
           delay = [MINIMUM_TIME_BETWEEN_MESSAGE_SEND - (Time.now - @last_write), 0].max
-          LOG.debug("#{self}: Sleeping for #{delay}")
+          logger.debug("#{self}: Sleeping for #{delay}")
           sleep(delay)
           write(message)
           @last_write = Time.now
