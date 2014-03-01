@@ -3,6 +3,8 @@ require 'socket'
 module LIFX
   class Transport
     class TCP < Transport
+      include Logging
+
       def initialize(host, port)
         super
         connect
@@ -19,8 +21,8 @@ module LIFX
         @socket.setsockopt(Socket::IPPROTO_TCP, Socket::TCP_NODELAY,  1)
         @socket.setsockopt(Socket::IPPROTO_TCP, Socket::TCP_MAXSEG,   512)
       rescue => ex
-        LOG.error("#{self}: Exception occured - #{ex}")
-        LOG.error("#{self}: Backtrace: #{ex.backtrace.join("\n")}")
+        logger.error("#{self}: Exception occured - #{ex}")
+        logger.error("#{self}: Backtrace: #{ex.backtrace.join("\n")}")
         @socket = nil
       end
 
@@ -56,10 +58,10 @@ module LIFX
                 raise "Unparsable data"
               end
             rescue => ex
-              LOG.error("#{self}: Exception occured - #{ex}")
-              LOG.error("#{self}: Backtrace: #{ex.backtrace.join("\n")}")
+              logger.error("#{self}: Exception occured - #{ex}")
+              logger.error("#{self}: Backtrace: #{ex.backtrace.join("\n")}")
               if @socket
-                LOG.error("#{self}: Reconnecting...")
+                logger.error("#{self}: Reconnecting...")
                 reconnect
               end
             end
@@ -71,8 +73,8 @@ module LIFX
         data = message.pack
         @socket.write(data)
       rescue => ex
-        LOG.error("#{self}: Exception in #write: #{ex}")
-        LOG.error("#{self}: Backtrace: #{ex.backtrace.join("\n")}")
+        logger.error("#{self}: Exception in #write: #{ex}")
+        logger.error("#{self}: Backtrace: #{ex.backtrace.join("\n")}")
         reconnect
       end
     end
