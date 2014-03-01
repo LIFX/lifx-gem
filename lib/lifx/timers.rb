@@ -3,8 +3,11 @@ module LIFX
   module Timers
     protected
     def initialize_timer_thread
+      timers.after(1) {} # Just so timers.wait doesn't complain when there's no timer
       Thread.new do
-        loop { timers.wait }
+        loop do
+          timers.wait
+        end
       end
     end
 
