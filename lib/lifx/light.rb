@@ -66,7 +66,7 @@ module LIFX
     end
 
     def to_s
-      %Q{#<LIFX::Light id=#{id} label=#{label} power=#{on? ? 'on' : 'off'}>}
+      %Q{#<LIFX::Light id=#{id} label=#{label.to_s} power=#{on? ? 'on' : 'off'}>}
     end
     alias_method :inspect, :to_s
 
