@@ -1,7 +1,10 @@
 require 'rspec'
 require 'lifx'
+require 'lifx/utilities'
 
 shared_context 'integration', integration: true do
+  include LIFX::Utilities
+
   def lifx
     $lifx ||= begin
       options = if ENV['DEBUG']
@@ -24,16 +27,6 @@ shared_context 'integration', integration: true do
     end
   end
 
-  def wait_until(timeout = 1, &block)
-    Timeout.timeout(timeout) do
-      while !block.call
-        sleep 0.1
-      end
-    end
-  rescue Timeout::Error
-    $stderr.puts("Timeout exceeded")
-  end
-
   def flush
     lifx.flush
   end
@@ -41,6 +34,7 @@ shared_context 'integration', integration: true do
   let(:site) { lifx.sites.first }
   let(:lights) { site.lights }
   let(:light) { lights.first }
+  let(:all_lights) { site.all_lights }
 end
 
 RSpec.configure do |config|
