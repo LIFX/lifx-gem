@@ -2,9 +2,10 @@ module LIFX
   class Transport
     attr_reader :host, :port
 
-    def initialize(host, port)
+    def initialize(host, port, ignore_unpackable_messages: true)
       @host = host
       @port = port
+      @ignore_unpackable_messages = ignore_unpackable_messages
     end
 
     def listen(&block)

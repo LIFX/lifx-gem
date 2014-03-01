@@ -5,7 +5,7 @@ module LIFX
     class TCP < Transport
       include Logging
 
-      def initialize(host, port)
+      def initialize(*args)
         super
         connect
       end
@@ -51,11 +51,10 @@ module LIFX
               data = @socket.recv(size)
               message = Message.unpack(data)
               
-              if message
-                block.call(message)
-              else
-                # FIXME: Make this better
-                raise "Unparsable data"
+              block.call(message)
+            rescue Message::UnpackError
+              if !@ignore_unpackable_messages
+                logger.error("#{self}: Exception occured - #{ex}")
               end
             rescue => ex
               logger.error("#{self}: Exception occured - #{ex}")

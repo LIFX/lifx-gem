@@ -2,13 +2,16 @@ module LIFX
   class Message
     include Logging
 
-    class InvalidFrame < ArgumentError; end
-    class UnsupportedProtocolVersion < StandardError; end
-    class NotAddressableFrame < StandardError; end
-    class NoPayload < ArgumentError; end
-    class UnmappedPayload < ArgumentError; end
-    class InvalidFields < ArgumentError; end
-    class PackError < ArgumentError; end
+    class MessageError < StandardError; end
+    class UnpackError < MessageError; end
+    class PackError < MessageError; end
+
+    class InvalidFrame < UnpackError; end
+    class UnsupportedProtocolVersion < UnpackError; end
+    class NotAddressableFrame < UnpackError; end
+    class NoPayload < PackError; end
+    class UnmappedPayload < MessageError; end
+    class InvalidFields < PackError; end
 
     PROTOCOL_VERSION = 1024
 

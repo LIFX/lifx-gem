@@ -4,7 +4,7 @@ module LIFX
     class UDP < Transport
       BUFFER_SIZE = 128
 
-      def initialize(host, port)
+      def initialize(*args)
         super
         @socket = create_socket
       end
@@ -26,14 +26,15 @@ module LIFX
           reader.setsockopt(Socket::SOL_SOCKET, Socket::SO_REUSEPORT, true)
           reader.bind(host, port)
           loop do
-            bytes, (_, _, ip, _) = reader.recvfrom(BUFFER_SIZE)
-            message = Message.unpack(bytes)
+            begin
+              bytes, (_, _, ip, _) = reader.recvfrom(BUFFER_SIZE)
+              message = Message.unpack(bytes)
 
-            if message
               block.call(message, ip)
-            else
-              # TODO: Make this cleaner
-              LOG.warn("#{self}: Unrecognised bytes: #{bytes.bytes.map { |b| '%02x ' % b }.join}")
+            rescue Message::UnpackError
+              if !@ignore_unpackable_messages
+                LOG.warn("#{self}: Unrecognised bytes: #{bytes.bytes.map { |b| '%02x ' % b }.join}")
+              end
             end
           end
         end
