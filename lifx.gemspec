@@ -26,4 +26,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "rspec"
   spec.add_development_dependency "erubis"
   spec.add_development_dependency "ruby-prof"
+  spec.add_development_dependency "byebug"
 end
