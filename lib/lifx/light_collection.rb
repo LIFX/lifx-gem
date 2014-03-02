@@ -21,11 +21,13 @@ module LIFX
         tags_field = site.tag_manager.tags_field_for_tags(*tags)
         site.queue_write(params.merge(tagged: true, tags: tags_field))
       end
+      self
     end
 
-    def with_tag(tag_label)
-      self.class.new(scope: scope, tags: [tag_label])
+    def with_tags(*tag_labels)
+      self.class.new(scope: scope, tags: tag_labels)
     end
+    alias_method :with_tag, :with_tags
 
     def lights
       scope.sites.map do |site|
@@ -41,7 +43,8 @@ module LIFX
     def to_s
       %Q{#<#{self.class.name} lights=#{lights} tags=#{tags}>}
     end
-    
-    def_delegators :lights, :to_a, :[], :find, :each, :first, :last, :map
+    alias_method :inspect, :to_s
+
+    def_delegators :lights, :length, :count, :to_a, :[], :find, :each, :first, :last, :map
   end
 end
