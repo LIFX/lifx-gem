@@ -45,6 +45,7 @@ module LIFX
 
     def queue_write(params)
       site.queue_write(params.merge(target: id))
+      self
     end
 
     def on?
@@ -57,10 +58,12 @@ module LIFX
 
     def add_tag(tag)
       site.add_tag_to_light(tag, self)
+      self
     end
 
     def remove_tag(tag)
       site.remove_tag_from_light(tag, self)
+      self
     end
 
     def tags
@@ -68,7 +71,7 @@ module LIFX
     end
 
     def to_s
-      %Q{#<LIFX::Light id=#{id} label=#{label.to_s} power=#{on? ? 'on' : 'off'}>}
+      %Q{#<LIFX::Light id=#{id} label=#{label.to_s} power=#{on? ? 'on' : 'off'}>}.force_encoding(Encoding.default_external)
     end
     alias_method :inspect, :to_s
 
