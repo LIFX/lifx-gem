@@ -10,7 +10,7 @@ describe LIFX::Transport::UDP do
     let(:payload) { double }
     it 'writes a Message to specified host' do
       message.should_receive(:pack).and_return(payload)
-      UDPSocket.any_instance.should_receive(:write).with(payload, 0, 'localhost', 22222)
+      UDPSocket.any_instance.should_receive(:send).with(payload, 0, 'localhost', 22222)
       subject.write(message)
     end
   end
