@@ -3,8 +3,6 @@ require 'lifx'
 require 'lifx/utilities'
 
 shared_context 'integration', integration: true do
-  include LIFX::Utilities
-
   def lifx
     $lifx ||= begin
       c = LIFX::Client.instance
