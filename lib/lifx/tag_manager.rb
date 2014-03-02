@@ -30,7 +30,7 @@ module LIFX
       id = next_unused_id
       raise TagLimitReached if id.nil?
       site.queue_write(tagged: true, payload: Protocol::Device::SetTagLabels.new(tags: id_to_tags_field(id), label: tag_label))
-      wait_until { tag } or raise "Couldn't create tag"
+      wait_until { tag_with_label(tag_label) } or raise "Couldn't create tag"
     end
 
     def add_tag_to_light(tag_label, light)
@@ -52,6 +52,17 @@ module LIFX
 
     def tags_on_light(light)
       tags_field_to_ids(light.tags_field).map { |id| @tags[id].label }
+    end
+
+    def tags_field_for_tags(*tag_labels)
+      tag_labels.reduce(0) do |ret, label|
+        ret |= tags_field_for_tag(label)
+      end
+    end
+
+    def tags_field_for_tag(tag_label)
+      tag = tag_with_label(tag_label)
+      tag ? id_to_tags_field(tag.id) : 0
     end
 
     protected

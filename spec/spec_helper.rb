@@ -7,12 +7,7 @@ shared_context 'integration', integration: true do
 
   def lifx
     $lifx ||= begin
-      options = if ENV['DEBUG']
-        {logger: Yell.new(STDERR)}
-      else
-        {}
-      end
-      c = LIFX::Client.new(options)
+      c = LIFX::Client.instance
       c.discover
       begin
         Timeout.timeout(5) do
@@ -21,7 +16,7 @@ shared_context 'integration', integration: true do
           end
         end
       rescue Timeout::Error
-        raise "Could not find any lights matching /^Test/"
+        raise "Could not find any lights matching /^Test/ in #{c.lights.inspect}"
       end
       c
     end
@@ -31,10 +26,25 @@ shared_context 'integration', integration: true do
     lifx.flush
   end
 
-  let(:site) { lifx.sites.first }
-  let(:lights) { site.lights }
+  def wait(timeout: 5, retry_wait: 0.1, &block)
+    Timeout.timeout(timeout) do
+      begin
+        block.call
+      rescue RSpec::Expectations::ExpectationNotMetError
+        sleep(retry_wait)
+        retry
+      end
+    end
+  rescue Timeout::Error
+    block.call
+  end
+
+  let(:lights) { lifx.lights }
   let(:light) { lights.find { |l| l.label =~ /^Test/} }
-  let(:all_lights) { site.all_lights }
+end
+
+if ENV['DEBUG']
+  LIFX::Config.logger = Yell.new(STDERR)
 end
 
 RSpec.configure do |config|
