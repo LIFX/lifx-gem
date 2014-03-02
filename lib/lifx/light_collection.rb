@@ -24,6 +24,14 @@ module LIFX
       self
     end
 
+    def with_id(id)
+      lights.find { |l| l.id == id}
+    end
+
+    def with_label(label)
+      lights.find { |l| l.label == label }
+    end
+
     def with_tags(*tag_labels)
       self.class.new(scope: scope, tags: tag_labels)
     end
