@@ -10,7 +10,8 @@ shared_context 'integration', integration: true do
       begin
         Timeout.timeout(5) do
           while !c.lights.find { |l| l.label =~ /^Test/ }
-            sleep 0.5
+            c.lights.refresh
+            sleep 1
           end
         end
       rescue Timeout::Error
