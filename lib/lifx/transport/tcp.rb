@@ -27,7 +27,7 @@ module LIFX
       end
 
       def reconnect
-        close
+        @socket.close
         connect
       end
 
@@ -43,7 +43,7 @@ module LIFX
         return if @listener
         Thread.abort_on_exception = true
         @listener = Thread.new do
-          while @socket do
+          loop do
             begin
               header_data = @socket.recv(HEADER_SIZE, Socket::MSG_PEEK)
               header = Protocol::Header.read(header_data)
