@@ -10,7 +10,7 @@ module LIFX
     def self.instance
       @instance ||= new
     end
-    
+
     LIFX_PORT = 56700
     def initialize
       @networks = []
@@ -55,12 +55,6 @@ module LIFX
 
     def sites
       sites_hash.values
-    end
-
-    def lights_hash
-      sites.map(&:lights_hash).reduce({}) do |hash, lights_hash|
-        hash.merge!(lights_hash)
-      end
     end
 
     def lights

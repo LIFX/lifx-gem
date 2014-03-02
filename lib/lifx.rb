@@ -15,4 +15,9 @@ require "lifx/client"
 
 module LIFX
   UINT64_MAX = 2 ** 64 - 1
+  module_function
+
+  def client
+    Client.instance
+  end
 end
