@@ -3,12 +3,16 @@ require 'timeout'
 require 'yell'
 
 require 'lifx/network'
+require 'lifx/light_collection'
 
 module LIFX
   class Client
+    def self.instance
+      @instance ||= new
+    end
+    
     LIFX_PORT = 56700
-    def initialize(logger: nil)
-      LIFX.logger = logger if logger
+    def initialize
       @networks = []
       Socket.ip_address_list.each do |ip|
         next unless ip.ipv4? && !ip.ipv4_loopback? && ip.ipv4_private?

@@ -10,6 +10,7 @@ require "lifx/protocol/type"
 require "lifx/message"
 require "lifx/transport"
 
+require "lifx/config"
 require "lifx/client"
 
 module LIFX

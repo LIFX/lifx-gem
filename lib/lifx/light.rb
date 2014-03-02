@@ -76,12 +76,5 @@ module LIFX
       raise ArgumentError.new("Comparison of #{self} with #{other} failed") unless other.is_a?(LIFX::Light)
       [label, id, 0] <=> [other.label, other.id, 0]
     end
-
-    protected
-    
-    def default_duration
-      # TODO: Allow client-level configuration
-      0.5
-    end
   end
 end
