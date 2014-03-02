@@ -38,6 +38,10 @@ module LIFX
       end.flatten
     end
 
+    def to_s
+      %Q{#<#{self.class.name} lights=#{lights} tags=#{tags}>}
+    end
+    
     def_delegators :lights, :to_a, :[], :find, :each, :first, :last, :map
   end
 end
