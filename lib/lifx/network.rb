@@ -6,9 +6,9 @@ module LIFX
     include Timers
     include Logging
 
-    def initialize(broadcast_ip, port)
-      # TODO: Rate limiting
-      @broadcast_ip = broadcast_ip
+    def initialize(bind_ip: '0.0.0.0', send_ip: '255.255.255.255', port: 56700)
+      @bind_ip      = bind_ip
+      @send_ip      = send_ip
       @port         = port
       @sites        = {}
       @threads      = []
@@ -56,15 +56,15 @@ module LIFX
     end
 
     def to_s
-      %Q{#<LIFX::Network broadcast_ip=#{@broadcast_ip} port=#{@port}>}
+      %Q{#<LIFX::Network bind_ip=#{@bind_ip} send_ip={#{@send_ip}} port=#{@port}>}
     end
     alias_method :inspect, :to_s
 
     protected
 
     def initialize_transport
-      @transport = Transport::UDP.new(@broadcast_ip, @port)
-      @transport.listen do |message, ip|
+      @transport = Transport::UDP.new(@send_ip, @port)
+      @transport.listen(ip: @bind_ip) do |message, ip|
         on_message(message, ip)
       end
     end

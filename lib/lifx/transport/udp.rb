@@ -14,7 +14,7 @@ module LIFX
         @socket.send(data, 0, host, port)
       end
 
-      def listen(&block)
+      def listen(ip: host, port: port, &block)
         if @listener
           raise "Socket already being listened to"
         end
@@ -24,7 +24,7 @@ module LIFX
           reader = UDPSocket.new
           reader.setsockopt(Socket::SOL_SOCKET, Socket::SO_REUSEADDR, true)
           reader.setsockopt(Socket::SOL_SOCKET, Socket::SO_REUSEPORT, true)
-          reader.bind(host, port)
+          reader.bind(ip, port)
           loop do
             begin
               bytes, (_, _, ip, _) = reader.recvfrom(BUFFER_SIZE)

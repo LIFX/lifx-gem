@@ -14,11 +14,7 @@ module LIFX
     LIFX_PORT = 56700
     def initialize
       @networks = []
-      Socket.ip_address_list.each do |ip|
-        next unless ip.ipv4? && !ip.ipv4_loopback? && ip.ipv4_private?
-        broadcast = ip.ip_address.sub(/\.\d+$/, '.255')
-        @networks << Network.new(broadcast, LIFX_PORT)
-      end
+      @networks << Network.new
     end
 
     DISCOVERY_DEFAULT_TIMEOUT = 10
