@@ -12,17 +12,18 @@ module LIFX
     end
 
     LIFX_PORT = 56700
-    def initialize
-      @networks = []
-      @networks << Network.new
+    def initialize(ip: nil)
+      if ip
+        @network = Network.new(ip: ip)
+      else
+        @network = Network.new
+      end
     end
 
     DISCOVERY_DEFAULT_TIMEOUT = 10
     def discover(timeout = DISCOVERY_DEFAULT_TIMEOUT)
       Timeout.timeout(timeout) do
-        @networks.each do |network|
-          network.discover
-        end
+        @network.discover
         while sites.empty?
           sleep 0.1
         end
@@ -44,9 +45,7 @@ module LIFX
     end
 
     def sites_hash
-      @networks.map(&:sites_hash).reduce({}) do |hash, sites_hash|
-        hash.merge!(sites_hash)
-      end
+      @network.sites_hash
     end
 
     def sites

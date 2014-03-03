@@ -31,9 +31,9 @@ module LIFX
       Thread.abort_on_exception = true
       @discovery_thread = Thread.new do
         message = Message.new(payload: Protocol::Device::GetPanGateway.new)
-        logger.info("Discovering gateways on #{@broadcast_ip}:#{@port}")
+        logger.info("Discovering gateways on #{@bind_ip}:#{@port}")
         loop do
-          @transport.write(message)
+          write(message)
           if sites.empty?
             sleep(DISCOVERY_INTERVAL_WHEN_NO_SITES_FOUND)
           else
@@ -55,8 +55,16 @@ module LIFX
       @sites.dup
     end
 
+    def broadcast(params)
+      write(Message.new(params))
+    end
+
+    def write(message)
+      @transport.write(message)
+    end
+
     def to_s
-      %Q{#<LIFX::Network bind_ip=#{@bind_ip} send_ip={#{@send_ip}} port=#{@port}>}
+      %Q{#<LIFX::Network bind_ip=#{@bind_ip} send_ip=#{@send_ip} port=#{@port}>}
     end
     alias_method :inspect, :to_s
 

@@ -18,6 +18,6 @@ module LIFX
   module_function
 
   def client
-    Client.instance
+    @client ||= Client.new
   end
 end
