@@ -20,63 +20,42 @@ module LIFX
       @gateways_mutex = Mutex.new
       @tag_manager   = TagManager.new(self)
       @threads       = []
-      @threads << initialize_write_queue
       @threads << defer_lights_discovery
       @threads << initialize_timer_thread
       initialize_heartbeat
       @tag_manager.discover
     end
 
-    def write(message)
-      @gateways_mutex.synchronize do 
-        gateways.values.each do |gateway|
-          gateway.write(message)
-        end
+    def write(params)
+      @gateways.values.each do |gateway|
+        gateway.write(Message.new(params.merge(site: id)))
       end
-      # TODO: Handle socket errors
     end
 
-    def queue_write(params)
-      message = Message.new(params)
-      message.site = id
-      @queue << message
+    def on_message(&block)
+      @message_handler = block
     end
 
-    def on_message(message, ip, transport)
+    def handle_message(message, ip, transport)
       logger.debug("<- #{self} #{transport}: #{message}")
       payload = message.payload
       case payload
       when Protocol::Device::StatePanGateway
         @gateways_mutex.synchronize do
-          @gateways[message.device] ||= GatewayConnection.new(self, ip)
-          @gateways[message.device].on_message(message, ip, transport)
+          @gateways[message.device] ||= GatewayConnection.new
+          @gateways[message.device].handle_message(message, ip, transport)
+          @gateways[message.device].on_message do |*args|
+            @message_handler.call(*args) if @message_handler
+          end
         end
       when Protocol::Device::StateTime
         # Heartbeat
       when Protocol::Device::StateTagLabels
-        @tag_manager.on_message(message, ip, transport)
+        @tag_manager.handle_message(message, ip, transport)
       else
-        @lights_mutex.synchronize do
-          @lights[message.device] ||= Light.new(self)
-          @lights[message.device].on_message(message, ip, transport)
-        end
+        @message_handler.call(*args) if @message_handler
       end
       seen!
-    end
-
-    def flush
-      # TODO: Add a timeout option
-      while !@queue.empty?
-        sleep(MINIMUM_TIME_BETWEEN_MESSAGE_SEND)
-      end
-    end
-
-    def lights_hash
-      @lights.dup # So people can't modify internal representation
-    end
-
-    def lights
-      lights_hash.values
     end
 
     def tags
@@ -127,48 +106,16 @@ module LIFX
       timers.every(LIGHT_STATE_REQUEST_INTERVAL) do
         scan_lights
       end.fire
-      timers.every(STALE_LIGHT_CHECK_INTERVAL) do
-        remove_stale_lights
-      end
     end
 
     def scan_lights
-      queue_write(payload: Protocol::Light::Get.new, tagged: true)
-    end
-
-    STALE_LIGHT_THRESHOLD = LIGHT_STATE_REQUEST_INTERVAL * 3 # seconds
-    def remove_stale_lights
-      @lights_mutex.synchronize do
-        stale_lights = lights.select { |light| light.age > STALE_LIGHT_THRESHOLD }
-        stale_lights.each do |light|
-          logger.info("#{self}: Removing #{light} due to age #{light.age}")
-          @lights.delete(light.id)
-        end
-      end
-    end
-
-    MINIMUM_TIME_BETWEEN_MESSAGE_SEND = 0.2
-    MAXIMUM_QUEUE_LENGTH = 100
-
-    def initialize_write_queue
-      @queue = SizedQueue.new(MAXIMUM_QUEUE_LENGTH)
-      @last_write = Time.now
-      Thread.new do
-        loop do
-          message = @queue.pop
-          delay = [MINIMUM_TIME_BETWEEN_MESSAGE_SEND - (Time.now - @last_write), 0].max
-          logger.debug("#{self}: Sleeping for #{delay}")
-          sleep(delay)
-          write(message)
-          @last_write = Time.now
-        end
-      end
+      write(payload: Protocol::Light::Get.new, tagged: true)
     end
 
     HEARTBEAT_INTERVAL = 10
     def initialize_heartbeat
       timers.every(HEARTBEAT_INTERVAL) do
-        queue_write(target: id, payload: Protocol::Device::GetTime.new)
+        write(target: id, payload: Protocol::Device::GetTime.new)
       end
     end
   end

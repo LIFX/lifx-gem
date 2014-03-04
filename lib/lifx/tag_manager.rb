@@ -15,7 +15,7 @@ module LIFX
     end
 
     def discover
-      site.queue_write(payload: Protocol::Device::GetTagLabels.new(tags: UINT64_MAX))
+      site.write(payload: Protocol::Device::GetTagLabels.new(tags: UINT64_MAX))
     end
 
     def on_message(message, ip, transport)
@@ -29,7 +29,7 @@ module LIFX
     def create_tag(tag_label)
       id = next_unused_id
       raise TagLimitReached if id.nil?
-      site.queue_write(tagged: true, payload: Protocol::Device::SetTagLabels.new(tags: id_to_tags_field(id), label: tag_label))
+      site.write(tagged: true, payload: Protocol::Device::SetTagLabels.new(tags: id_to_tags_field(id), label: tag_label))
       wait_until { tag_with_label(tag_label) } or raise "Couldn't create tag"
     end
 
@@ -40,14 +40,14 @@ module LIFX
       end
       light_tags_field = light.tags_field
       light_tags_field |= id_to_tags_field(tag.id)
-      light.queue_write(payload: Protocol::Device::SetTags.new(tags: light_tags_field))
+      light.write(payload: Protocol::Device::SetTags.new(tags: light_tags_field))
     end
 
     def remove_tag_from_light(tag_label, light)
       tag = tag_with_label(tag_label)
       light_tags_field = light.tags_field
       light_tags_field &= ~id_to_tags_field(tag.id)
-      light.queue_write(payload: Protocol::Device::SetTags.new(tags: light_tags_field))      
+      light.write(payload: Protocol::Device::SetTags.new(tags: light_tags_field))      
     end
 
     def tags_on_light(light)

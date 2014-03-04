@@ -8,16 +8,19 @@ module LIFX
     include LightTarget
     include Logging
 
-    attr_reader :site
+    attr_reader :context
 
     attr_accessor :id, :label, :color, :power, :dim, :tags_field
 
-    def initialize(site)
-      @site = site
+    def initialize(context, id: nil, site_id: nil)
+      @context = context
+      @id = id
+      @site_id = site_id
       @power = 0
+      @context.register_device(self)
     end
 
-    def on_message(message, ip, transport)
+    def handle_message(message, ip, transport)
       payload = message.payload
       @id    = message.device
       case payload
@@ -30,7 +33,7 @@ module LIFX
         seen!
       when Protocol::Device::StatePower
         @power = payload.level
-        queue_write(payload: Protocol::Light::Get.new) if !label
+        write(payload: Protocol::Light::Get.new) if !label
         seen!
       when Protocol::Device::StateLabel
         @label = payload.label.to_s
@@ -43,8 +46,8 @@ module LIFX
       end
     end
 
-    def queue_write(params)
-      site.queue_write(params.merge(target: id))
+    def write(params)
+      @context.send_to_device(params.merge(device: id))
       self
     end
 

@@ -24,7 +24,7 @@ module LIFX
         saturation *= (l <= 1) ? l : 2 - l
         brightness = (l + saturation) / 2
         saturation = (2 * saturation) / (l + saturation)
-        new(hue, saturation, brightness)
+        new(hue, saturation, brightness, DEFAULT_KELVIN)
       end
 
       def from_struct(hsbk)

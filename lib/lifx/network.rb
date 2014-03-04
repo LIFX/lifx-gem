@@ -33,7 +33,7 @@ module LIFX
         message = Message.new(payload: Protocol::Device::GetPanGateway.new)
         logger.info("Discovering gateways on #{@bind_ip}:#{@port}")
         loop do
-          write(message)
+          @transport.write(message)
           if sites.empty?
             sleep(DISCOVERY_INTERVAL_WHEN_NO_SITES_FOUND)
           else
@@ -56,11 +56,7 @@ module LIFX
     end
 
     def broadcast(params)
-      write(Message.new(params))
-    end
-
-    def write(message)
-      @transport.write(message)
+      @transport.write(Message.new(params))
     end
 
     def to_s

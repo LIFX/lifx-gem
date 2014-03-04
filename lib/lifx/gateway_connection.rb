@@ -7,13 +7,16 @@ module LIFX
     include Timers
     include Logging
 
-    attr_reader :site, :ip
-    def initialize(site, ip)
-      @site = site
-      @ip = ip
+    def initialize
+      @threads = []
+      @threads << initialize_write_queue
     end
 
-    def on_message(message, ip, transport)
+    def on_message(&block)
+      @message_handler = block
+    end
+
+    def handle_message(message, ip, transport)
       payload = message.payload
       case payload
       when Protocol::Device::StatePanGateway
@@ -33,7 +36,9 @@ module LIFX
       logger.info("#{self}: Establishing connection to #{ip}:#{port}")
       @tcp_transport = Transport::TCP.new(ip, port)
       @tcp_transport.listen do |msg, ip|
-        site.on_message(msg, ip, @tcp_transport)
+        if @message_handler
+          @message_handler.call(msg, ip, @tcp_transport)
+        end
       end
       at_exit do
         @tcp_transport.close
@@ -41,17 +46,50 @@ module LIFX
     end
 
     def write(message)
-      # TODO: Support force sending over UDP
-      logger.debug("-> #{self} #{best_transport}: #{message}")
-      best_transport.write(message)
+      @queue << message
     end
 
     def close
+      @threads.each { |thr| Thread.kill(thr) }
       [@tcp_transport, @udp_transport].compact.each(&:close)
     end
 
     def best_transport
       @tcp_transport || @udp_transport
     end
+
+    protected
+
+    MINIMUM_TIME_BETWEEN_MESSAGE_SEND = 0.2
+    MAXIMUM_QUEUE_LENGTH = 100
+
+    def initialize_write_queue
+      @queue = SizedQueue.new(MAXIMUM_QUEUE_LENGTH)
+      @last_write = Time.now
+      Thread.new do
+        loop do
+          if best_transport.nil?
+            sleep 0.1
+            next
+          end
+          message = @queue.pop
+          if !message.is_a?(Message)
+            raise ArgumentError.new("Unexpected object in message queue: #{message.inspect}")
+          end
+          delay = [MINIMUM_TIME_BETWEEN_MESSAGE_SEND - (Time.now - @last_write), 0].max
+          logger.debug("#{self}: Sleeping for #{delay}")
+          sleep(delay)
+          actually_write(message)
+          @last_write = Time.now
+        end
+      end
+    end
+
+    def actually_write(message)
+      # TODO: Support force sending over UDP
+      logger.debug("-> #{self} #{best_transport}: #{message}")
+      best_transport.write(message)
+    end
+
   end
 end

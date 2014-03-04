@@ -6,6 +6,6 @@ task :console do
   if ENV['DEBUG']
     LIFX::Config.logger = Yell.new(STDERR)
   end
-  LIFX.client.discover
-  LIFX.client.pry
+  # LIFX.client.discover
+  LIFX.pry
 end
