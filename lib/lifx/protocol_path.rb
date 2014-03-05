@@ -7,7 +7,7 @@ module LIFX
 
     attr_accessor :raw_site, :raw_target, :tagged
 
-    def initialize(raw_site: nil, raw_target: nil, tagged: false,
+    def initialize(raw_site: "\x00" * 6, raw_target: "\x00" * 8, tagged: false,
                    site_id: nil, device_id: nil, tag_ids: nil)
       self.raw_site = raw_site
       self.raw_target = raw_target

@@ -72,7 +72,7 @@ module LIFX
           ProtocolPath.new(site_id: "316c69667831", tag_ids: [0, 1])
         end
 
-        it 'returns site_id in hex' do
+        it 'sets raw_site properly' do
           subject.raw_site.should == "1lifx1"
         end
 
@@ -84,6 +84,25 @@ module LIFX
           subject.tagged?.should be_true
         end
       end
+
+      context 'tagged target with no site' do
+        subject do
+          ProtocolPath.new(tagged: true)
+        end
+
+        it 'raw_site should be null string' do
+          subject.raw_site.should == "\x00\x00\x00\x00\x00\x00".b
+        end
+
+        it 'sets raw_target correctly' do
+          subject.raw_target.should == "\x00\x00\x00\x00\x00\x00\x00\x00".b
+        end
+
+        it 'returns tagged as true' do
+          subject.tagged?.should be_true
+        end
+      end
+
     end
 
   end
