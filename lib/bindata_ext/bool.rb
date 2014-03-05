@@ -21,5 +21,9 @@ module BinData
     def set(value)
       self._value = value ? 1 : 0
     end
+
+    def !
+      !get
+    end
   end
 end
