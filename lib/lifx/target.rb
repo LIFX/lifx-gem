@@ -1,24 +1,12 @@
 module LIFX
   class Target
     # Target is a high-level abstraction for the target of a Message
-    class << self
-      def broadcast
-        new(broadcast: true)
-      end
 
-      def device_id(device_id)
-        new(device_id: device_id)
-      end
-
-      def tag(tag)
-        new(tag: tag)
-      end
-    end
-
-    attr_reader :tag, :device_id, :broadcast
-    def initialize(tag: nil, device_id: nil, broadcast: nil)
-      @tag = tag
+    attr_reader :site_id, :device_id, :tag, :broadcast
+    def initialize(device_id: nil, site_id: nil, tag: nil, broadcast: nil)
+      @site_id   = site_id
       @device_id = device_id
+      @tag       = tag
       @broadcast = broadcast
     end
 

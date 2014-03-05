@@ -47,7 +47,7 @@ module LIFX
     end
 
     def send_message(payload)
-      @context.send_message(target: Target.new(device_id: id), payload: payload)
+      @context.send_message(target: Target.new(device_id: id, site_id: @site_id), payload: payload)
       self
     end
 

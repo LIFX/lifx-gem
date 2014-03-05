@@ -13,8 +13,6 @@ module LIFX
     # as well as routing write messages to their intended destination
 
     def initialize
-      @device_site = {}
-
       @devices = {}
 
       @transport_manager = TransportManager::LAN.new
@@ -80,6 +78,8 @@ module LIFX
         raise "can't handle this yet"
       elsif target.broadcast?
         raise "can't handle this yet"
+      elsif target.site_id
+        [ProtocolPath.new(site_id: target.site_id, device_id: target.device_id)]
       else
         site_id = @routing_table.site_id_for_device_id(target.device_id)
         if site_id
