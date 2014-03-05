@@ -1,4 +1,7 @@
-require 'rspec'
+require 'bundler'
+Bundler.require
+require 'pry'
+
 require 'lifx'
 require 'lifx/utilities'
 

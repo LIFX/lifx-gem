@@ -1,3 +1,5 @@
+require 'lifx/protocol_path'
+
 module LIFX
   class Message
     include Logging
@@ -26,6 +28,7 @@ module LIFX
         raise NotAddressableFrame if header.addressable == 0
 
         message = Protocol::Message.read(data)
+        path = ProtocolPath.new(raw_site: message.raw_site, raw_target: message.raw_target, tagged: message.tagged)
         payload_class = message_type_for_id(message.type.snapshot)
         if payload_class.nil?
           if self.log_invalid_messages
@@ -47,7 +50,7 @@ module LIFX
             end
           end
         end
-        new(message, payload)
+        new(path, message, payload)
       rescue => ex
         if self.log_invalid_messages
           logger.debug("Message.unpack: Exception while unpacking #{data.inspect}")
@@ -82,26 +85,19 @@ module LIFX
     alias_method :tagged?, :tagged
     alias_method :addressable?, :addressable
 
-    attr_accessor :payload
+    attr_accessor :path, :payload
     def initialize(*args)
-      if args.count == 2 
-        @message = args.first
-        @payload = args.last
+      if args.count == 3 
+        @path, @message, @payload = args
       elsif (hash = args.first).is_a?(Hash)
+        path = hash.delete(:path)
         payload = hash.delete(:payload)
-        site    = hash.delete(:site)
-        target  = hash.delete(:target)
-        tags    = hash.delete(:tags)
-        device  = hash.delete(:device)
 
         check_valid_fields!(hash)
 
         @message = Protocol::Message.new(hash)
         self.payload = payload
-        self.site    = site   if site
-        self.target  = target if target
-        self.tags    = tags   if tags
-        self.device  = device if device
+        self.path = path
       else
         @message = Protocol::Message.new
       end
@@ -123,46 +119,12 @@ module LIFX
 
     def pack
       raise NoPayload if !payload
+      raise NoPath if !path
+      @message.raw_site = path.raw_site
+      @message.raw_target = path.raw_target
+      @message.tagged = path.tagged?
       @message.msg_size = @message.num_bytes
       @message.pack
-    end
-
-    def site
-      raw_site.unpack('H*').join
-    end
-
-    def site=(value)
-      self.raw_site = [value].pack('H*')
-    end
-
-    def target
-      raw_target.unpack('H*').join
-    end
-
-    def target=(value)
-      self.raw_target = [value].pack('H*')
-    end
-
-    def raw_device
-      raw_target[0...6]
-    end
-
-    def device
-      tagged? ? nil : raw_device.unpack('H*').join
-    end
-
-    def device=(value)
-      self.tagged = false
-      self.target = value
-    end
-
-    def tags
-      tagged? ? raw_target.unpack('Q').first : nil
-    end
-
-    def tags=(value)
-      self.tagged = true
-      self.raw_target = [value].pack('Q')
     end
 
     def to_s

@@ -54,7 +54,7 @@ module LIFX
     end
 
     def tagged?
-      !!@tagged
+      !!tagged
     end
 
     protected

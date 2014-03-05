@@ -22,7 +22,7 @@ describe LIFX::Message do
 
     it 'has correct ProtocolPath data' do
       msg.path.should be_instance_of(LIFX::ProtocolPath)
-      msg.path.site_id.should == '1bbb1aoeu'
+      msg.path.site_id.should == '316c69667831'
       msg.path.tag_ids.should == []
       msg.path.device_id.should == nil
     end
