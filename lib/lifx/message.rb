@@ -7,6 +7,7 @@ module LIFX
     class MessageError < StandardError; end
     class UnpackError < MessageError; end
     class PackError < MessageError; end
+    class NoPath < MessageError; end
 
     class InvalidFrame < UnpackError; end
     class UnsupportedProtocolVersion < UnpackError; end

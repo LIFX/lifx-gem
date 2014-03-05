@@ -61,6 +61,14 @@ describe LIFX::Message do
       end
     end
 
+    context 'no path' do
+      let(:msg) { LIFX::Message.new(payload: LIFX::Protocol::Device::SetPower.new) }
+
+      it 'throws an exception' do
+        expect { msg.pack }.to raise_error(LIFX::Message::NoPath)
+      end
+    end
+
     context 'passed in via hash' do
       let(:msg) do
         LIFX::Message.new({
