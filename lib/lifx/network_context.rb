@@ -38,7 +38,7 @@ module LIFX
     end
     alias_method :lights, :devices
 
-    def send_message(target: nil, payload:nil)
+    def send_message(target:, payload:)
       paths = resolve_paths_for_target(target)
       messages = paths.map do |path|
         Message.new(path: path, payload: payload)
@@ -77,7 +77,7 @@ module LIFX
       if target.tag?
         raise "can't handle this yet"
       elsif target.broadcast?
-        raise "can't handle this yet"
+        @routing_table.site_ids.map { |site_id| ProtocolPath.new(site_id: site_id, tag_ids: []) }
       elsif target.site_id
         [ProtocolPath.new(site_id: target.site_id, device_id: target.device_id)]
       else

@@ -149,7 +149,8 @@ module LIFX
       attrs = hash.map { |k, v| "#{k}=#{v}" }.join(' ')
       %Q{#<LIFX::Message #{attrs}>}
     end
-
+    alias_method :inspect, :to_s
+    
     protected
 
     def check_valid_fields!(hash)

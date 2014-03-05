@@ -18,7 +18,7 @@ module LIFX
     end
 
     def site_ids
-      @device_site_mapping.values.map(&:site_id)
+      @device_site_mapping.values.map(&:site_id).uniq
     end
   end
 end
