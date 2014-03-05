@@ -13,12 +13,18 @@ describe LIFX::Message do
       msg.msg_size.should == 57
       msg.protocol.should == 1024
       msg.addressable?.should == true
-      msg.tagged?.should == true
     end
 
     it 'returns the correct address data' do
       msg.raw_site.should == '1lifx1'
       msg.raw_target.should == "\x00" * 8
+    end
+
+    it 'has correct ProtocolPath data' do
+      msg.path.should be_instance_of(LIFX::ProtocolPath)
+      msg.path.site_id.should == '1bbb1aoeu'
+      msg.path.tag_ids.should == []
+      msg.path.device_id.should == nil
     end
 
     it 'returns the correct metadata' do
@@ -58,8 +64,7 @@ describe LIFX::Message do
     context 'passed in via hash' do
       let(:msg) do
         LIFX::Message.new({
-          tagged: false,
-          raw_target: "abcdefgh",
+          path: LIFX::ProtocolPath.new(tagged: false, raw_target: "abcdefgh"),
           at_time: 9001,
           payload: LIFX::Protocol::Wifi::SetAccessPoint.new(
             interface: 1,
@@ -78,9 +83,9 @@ describe LIFX::Message do
         msg.pack.should == "\x86\x00\x00\x14\x00\x00\x00\x00abcdefgh\x00\x00\x00\x00\x00\x00\x00\x00)#\x00\x00\x00\x00\x00\x001\x01\x00\x00\x01who let the dogs out\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00woof, woof, woof woof!\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x01".b
         unpacked = LIFX::Message.unpack(msg.pack)
         msg.protocol.should == 1024
-        msg.tagged?.should == false
+        msg.path.tagged?.should == false
         msg.addressable?.should == true
-        msg.raw_target.should == 'abcdefgh'
+        msg.path.raw_target.should == 'abcdefgh'
         msg.at_time.should == 9001
         msg.type.should == 305
         msg.payload.class.should == LIFX::Protocol::Wifi::SetAccessPoint
@@ -94,7 +99,7 @@ describe LIFX::Message do
     context 'packing with tags' do
       let(:msg) do
         LIFX::Message.new({
-          tags: 3,
+          path: LIFX::ProtocolPath.new(tag_ids: [0,1]),
           at_time: 9001,
           payload: LIFX::Protocol::Device::GetTime.new
         })
@@ -107,22 +112,22 @@ describe LIFX::Message do
       end
 
       it 'sets tagged' do
-        unpacked.tagged?.should == true
+        unpacked.path.tagged?.should == true
       end
 
       it 'sets tags' do
-        unpacked.tags.should == 3
+        unpacked.path.tag_ids.should == [0, 1]
       end
 
       it 'device should be nil' do
-        unpacked.device.should == nil
+        unpacked.path.device_id.should == nil
       end
     end
 
     context 'packing with device' do
       let(:msg) do
         LIFX::Message.new({
-          device: '0123456789ab',
+          path: LIFX::ProtocolPath.new(device_id: '0123456789ab', site_id: '0' * 12),
           at_time: 9001,
           payload: LIFX::Protocol::Device::GetTime.new
         })
@@ -135,15 +140,15 @@ describe LIFX::Message do
       end
 
       it 'sets tagged to false' do
-        unpacked.tagged?.should == false
+        unpacked.path.tagged?.should == false
       end
 
       it 'sets device' do
-        unpacked.device.should == '0123456789ab'
+        unpacked.path.device_id.should == '0123456789ab'
       end
 
       it 'tags should be nil' do
-        unpacked.tags.should == nil
+        unpacked.path.tag_ids.should == nil
       end
     end
   end
