@@ -1,5 +1,7 @@
 module LIFX
   class Transport
+    include Logging
+    
     attr_reader :host, :port
 
     def initialize(host, port, ignore_unpackable_messages: true)

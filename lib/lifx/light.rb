@@ -1,5 +1,6 @@
 require 'lifx/seen'
 require 'lifx/color'
+require 'lifx/target'
 require 'lifx/light_target'
 
 module LIFX
@@ -12,7 +13,7 @@ module LIFX
 
     attr_accessor :id, :label, :color, :power, :dim, :tags_field
 
-    def initialize(context, id: nil, site_id: nil)
+    def initialize(context:, id: , site_id: nil)
       @context = context
       @id = id
       @site_id = site_id
@@ -22,7 +23,6 @@ module LIFX
 
     def handle_message(message, ip, transport)
       payload = message.payload
-      @id    = message.device
       case payload
       when Protocol::Light::State
         @label      = payload.label.to_s
@@ -33,7 +33,7 @@ module LIFX
         seen!
       when Protocol::Device::StatePower
         @power = payload.level
-        write(payload: Protocol::Light::Get.new) if !label
+        send_message(Protocol::Light::Get.new) if !label
         seen!
       when Protocol::Device::StateLabel
         @label = payload.label.to_s
@@ -46,8 +46,8 @@ module LIFX
       end
     end
 
-    def write(params)
-      @context.send_to_device(params.merge(device: id))
+    def send_message(payload)
+      @context.send_message(target: Target.new(device_id: id), payload: payload)
       self
     end
 

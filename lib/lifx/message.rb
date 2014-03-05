@@ -1,8 +1,10 @@
+require 'forwardable'
 require 'lifx/protocol_path'
 
 module LIFX
   class Message
     include Logging
+    extend Forwardable
 
     class MessageError < StandardError; end
     class UnpackError < MessageError; end
@@ -86,6 +88,8 @@ module LIFX
     alias_method :tagged?, :tagged
     alias_method :addressable?, :addressable
 
+    def_delegators :path, :device_id, :site_id, :tagged
+    
     attr_accessor :path, :payload
     def initialize(*args)
       if args.count == 3 
@@ -99,6 +103,7 @@ module LIFX
         @message = Protocol::Message.new(hash)
         self.payload = payload
         self.path = path
+        @message.tagged = path.tagged?
       else
         @message = Protocol::Message.new
       end
@@ -129,16 +134,16 @@ module LIFX
     end
 
     def to_s
-      hash = {site: site}
-      if tagged?
-        hash[:tags] = (0...64).to_a.select { |i| (tags & 2 ** i) > 0 }
+      hash = {site: path.site_id}
+      if path.tagged?
+        hash[:tags] = path.tag_ids
         hash[:tags] = 'all' if hash[:tags].empty?
       else
-        hash[:device] = device
+        hash[:device] = path.device_id
       end
       hash[:type] = payload.class.to_s.sub('LIFX::Protocol::', '')
       hash[:addressable] = addressable? ? 'true' : 'false'
-      hash[:tagged] = tagged? ? 'true' : 'false'
+      hash[:tagged] = path.tagged? ? 'true' : 'false'
       hash[:protocol] = protocol
       hash[:payload] = payload.snapshot if payload
       attrs = hash.map { |k, v| "#{k}=#{v}" }.join(' ')

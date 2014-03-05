@@ -22,13 +22,13 @@ module LIFX
       @threads       = []
       @threads << defer_lights_discovery
       @threads << initialize_timer_thread
-      initialize_heartbeat
-      @tag_manager.discover
+      # @tag_manager.discover
     end
 
-    def write(params)
+    def write(message)
+      message.path.site_id = id
       @gateways.values.each do |gateway|
-        gateway.write(Message.new(params.merge(site: id)))
+        gateway.write(message)
       end
     end
 
@@ -42,9 +42,9 @@ module LIFX
       case payload
       when Protocol::Device::StatePanGateway
         @gateways_mutex.synchronize do
-          @gateways[message.device] ||= GatewayConnection.new
-          @gateways[message.device].handle_message(message, ip, transport)
-          @gateways[message.device].on_message do |*args|
+          @gateways[message.device_id] ||= GatewayConnection.new
+          @gateways[message.device_id].handle_message(message, ip, transport)
+          @gateways[message.device_id].on_message do |*args|
             @message_handler.call(*args) if @message_handler
           end
         end
@@ -109,14 +109,7 @@ module LIFX
     end
 
     def scan_lights
-      write(payload: Protocol::Light::Get.new, tagged: true)
-    end
-
-    HEARTBEAT_INTERVAL = 10
-    def initialize_heartbeat
-      timers.every(HEARTBEAT_INTERVAL) do
-        write(target: id, payload: Protocol::Device::GetTime.new)
-      end
+      write(Message.new(path: ProtocolPath.new(tagged: true), payload: Protocol::Light::Get.new))
     end
   end
 end

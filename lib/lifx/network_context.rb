@@ -1,6 +1,8 @@
 require 'lifx/timers'
 require 'lifx/transport_manager'
+require 'lifx/routing_table'
 require 'lifx/light'
+require 'lifx/protocol_path'
 
 module LIFX
   class NetworkContext
@@ -19,6 +21,8 @@ module LIFX
       @transport_manager.on_message do |msg, ip, transport|
         handle_message(msg, ip, transport)
       end
+
+      @routing_table = RoutingTable.new
     end
 
     def stop
@@ -31,29 +35,18 @@ module LIFX
       @transport_manager.discover
     end
 
-    def send_to_site(params)
-      @transport_manager.write(params)
+    def devices
+      @devices.values
     end
+    alias_method :lights, :devices
 
-    def send_to_device(device: nil, site: nil, payload: nil, method: :best)
-      site ||= resolve_site_id_for_device_id(device)
-
-      # If no site found, send it to all known sites
-      # If there are no known sites, throw exception
-      if site.nil?
-        raise "Can't handle no sites being resolved yet"
+    def send_message(target: nil, payload:nil)
+      paths = resolve_paths_for_target(target)
+      messages = paths.map do |path|
+        Message.new(path: path, payload: payload)
       end
-
-      send_message(tagged: false, device: device, site: site, payload: payload)
-    end
-
-    def send_to_all(site: nil, payload: nil, method: :best)
-      if site.nil?
-        @device_sites.values.each do |site|
-          send_message(site: true, tagged: true, payload: payload)
-        end
-      else
-        send_message(site, tagged: true, payload: payload)
+      messages.each do |message|
+        @transport_manager.write(message)
       end
     end
 
@@ -62,33 +55,39 @@ module LIFX
       @devices[device_id] = device # What happens when there's already one registered?
     end
 
-    def devices
-      @devices.values
-    end
-    alias_method :lights, :devices
+    protected
 
     def handle_message(message, ip, transport)
       logger.debug("<- #{self} #{transport}: #{message}")
 
-      @device_site[message.device] = message.site unless message.tagged
+      @routing_table.update_from_message(message)
       case message.payload
       when Protocol::Device::StatePanGateway
       else
         if !message.tagged
-          if @devices[message.device].nil?
-            device = Light.new(self, id: message.device)
+          if @devices[message.device_id].nil?
+            device = Light.new(context: self, id: message.device_id)
             register_device(device)
           end
-          device = @devices[message.device]
+          device = @devices[message.device_id]
           device.handle_message(message, ip, transport)
         end
       end
     end
 
-    protected
-
-    def resolve_site_id_for_device_id(device_id)
-      @device_site[device_id]
+    def resolve_paths_for_target(target)
+      if target.tag?
+        raise "can't handle this yet"
+      elsif target.broadcast?
+        raise "can't handle this yet"
+      else
+        site_id = @routing_table.site_id_for_device_id(target.device_id)
+        if site_id
+          [ProtocolPath.new(site_id: site_id, device_id: target.device_id)]
+        else
+          @routing_table.site_ids.map { |site_id| ProtocolPath.new(site_id: site_id, device_id: target.device_id)}
+        end
+      end
     end
   end
 end

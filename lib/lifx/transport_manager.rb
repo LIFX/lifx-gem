@@ -60,10 +60,10 @@ module LIFX
         stop_discovery
         Thread.abort_on_exception = true
         @discovery_thread = Thread.new do
-          message = Message.new(tagged: true, payload: Protocol::Device::GetPanGateway.new)
+          message = Message.new(path: ProtocolPath.new(tagged: true), payload: Protocol::Device::GetPanGateway.new)
           logger.info("Discovering gateways on #{@bind_ip}:#{@port}")
           loop do
-            @transport.write(message)
+            write(message)
             if @sites.empty?
               sleep(DISCOVERY_INTERVAL_WHEN_NO_SITES_FOUND)
             else
@@ -81,8 +81,12 @@ module LIFX
 
       end
 
-      def write(params)
-        @sites[message.site].write(params)
+      def write(message)
+        if message.path.all_sites?
+          @transport.write(message)
+        else
+          @sites[message.path.site_id].write(message)
+        end
       end
 
       protected
@@ -98,13 +102,13 @@ module LIFX
         payload = message.payload
         case payload
         when Protocol::Device::StatePanGateway
-          if !@sites.has_key?(message.site)
-            @sites[message.site] = Site.new(message.site)
-            @sites[message.site].on_message do |*args|
+          if !@sites.has_key?(message.path.site_id)
+            @sites[message.path.site_id] = Site.new(message.path.site_id)
+            @sites[message.path.site_id].on_message do |*args|
               @message_handler.call(*args)
             end
           end
-          @sites[message.site].handle_message(message, ip, transport)
+          @sites[message.path.site_id].handle_message(message, ip, transport)
         end
       end
     end

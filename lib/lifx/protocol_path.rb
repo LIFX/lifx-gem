@@ -7,7 +7,7 @@ module LIFX
 
     attr_accessor :raw_site, :raw_target, :tagged
 
-    def initialize(raw_site: "\x00" * 6, raw_target: "\x00" * 8, tagged: false,
+    def initialize(raw_site: "\x00".b * 6, raw_target: "\x00".b * 8, tagged: false,
                    site_id: nil, device_id: nil, tag_ids: nil)
       self.raw_site = raw_site
       self.raw_target = raw_target
@@ -23,7 +23,7 @@ module LIFX
     end
 
     def site_id=(value)
-      self.raw_site = [value].pack('H12')
+      self.raw_site = [value].pack('H12').b
     end
 
     def device_id
@@ -35,7 +35,7 @@ module LIFX
     end
 
     def device_id=(value)
-      self.raw_target = [value].pack('H16')
+      self.raw_target = [value].pack('H16').b
       self.tagged = false
     end
 
@@ -57,6 +57,10 @@ module LIFX
       !!tagged
     end
 
+    def all_sites?
+      site_id == "000000000000"
+    end
+
     protected
 
     def tags_field
@@ -64,7 +68,7 @@ module LIFX
     end
 
     def tags_field=(value)
-      self.raw_target = [value].pack('Q')
+      self.raw_target = [value].pack('Q').b
       self.tagged = true
     end
 
