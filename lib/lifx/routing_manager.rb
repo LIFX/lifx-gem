@@ -19,7 +19,9 @@ module LIFX
 
     def resolve_target(target)
       if target.tag?
-        raise "can't handle this yet"
+        @tag_table.entries_with(label: target.tag).map do |entry|
+          ProtocolPath.new(site_id: entry.site_id, tag_ids: [entry.tag_id])
+        end
       elsif target.broadcast?
         if @routing_table.site_ids.empty?
           [ProtocolPath.new(site_id: "\x00".b * 6, tag_ids: [])]

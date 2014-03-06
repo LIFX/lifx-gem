@@ -37,7 +37,11 @@ module LIFX
       @transport_manager.discover
     end
 
-    def devices
+    def lights
+      LightCollection.new(context: self)
+    end
+
+    def all_lights
       @devices.values
     end
 
@@ -45,7 +49,6 @@ module LIFX
       @routing_manager.tags
     end
 
-    alias_method :lights, :devices
 
     def send_message(target:, payload:)
       paths = @routing_manager.resolve_target(target)

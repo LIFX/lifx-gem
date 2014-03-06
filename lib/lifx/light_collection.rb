@@ -8,15 +8,15 @@ module LIFX
     # Represents a collection of lights
     attr_reader :tag, :context
 
-    def initialize(context:, tag: nil, lights: context.lights)
+    def initialize(context:, tag: nil, lights: context.all_lights)
       @context = context
       @tag = tag
-      @lights = lights
+      @lights = tag ? lights.select { |l| l.tags.include?(tag) } : lights
     end
 
     def send_message(payload)
       if tag
-        context.send_message(target: Target.new(tag), payload: payload)
+        context.send_message(target: Target.new(tag: tag), payload: payload)
       else
         context.send_message(target: Target.new(broadcast: true), payload: payload)
       end
@@ -24,32 +24,26 @@ module LIFX
     end
 
     def with_id(id)
-      lights.find { |l| l.id == id}
+      @lights.find { |l| l.id == id}
     end
 
     def with_label(label)
-      lights.find { |l| l.label == label }
+      @lights.find { |l| l.label == label }
     end
 
-    def with_tag(*tag_labels)
-      self.class.new(scope: scope, tags: tag_labels)
+    def with_tag(tag)
+      self.class.new(context: context, tag: tag, lights: lights)
     end
 
     def lights
-      if !tag
-        lights
-      else
-        lights.select do |light|
-          light.tags.include?(tag)
-        end
-      end
+      @lights
     end
 
     def to_s
-      %Q{#<#{self.class.name} lights=#{lights} tags=#{tags}>}
+      %Q{#<#{self.class.name} lights=#{lights} tag=#{tag}>}
     end
     alias_method :inspect, :to_s
 
-    # def_delegators :lights, :length, :count, :to_a, :[], :find, :each, :first, :last, :map
+    def_delegators :lights, :empty?, :length, :count, :to_a, :[], :find, :each, :first, :last, :map
   end
 end
