@@ -1,9 +1,12 @@
+require 'lifx/utilities'
+
 module LIFX
   class ProtocolPath
     # ProtocolPath contains all the addressable information that is required
     # for the protocol.
     # It handles the conversion between raw binary and hex strings
     # as well as raw tags_field to tags array
+    include Utilities
 
     attr_accessor :raw_site, :raw_target, :tagged
 
@@ -41,7 +44,7 @@ module LIFX
 
     def tag_ids
       if tagged?
-        (0...64).to_a.select { |t| (tags_field & 2 ** t) > 0 }
+        tag_ids_from_field(tags_field)
       else
         nil
       end

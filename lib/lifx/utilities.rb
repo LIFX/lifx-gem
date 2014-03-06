@@ -10,5 +10,9 @@ module LIFX
     rescue Timeout::Error
 
     end
+
+    def tag_ids_from_field(uint64)
+      (0...64).to_a.select { |t| (tags_field & (2 ** t)) > 0 }
+    end
   end
 end
