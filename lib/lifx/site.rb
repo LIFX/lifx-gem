@@ -1,8 +1,6 @@
 require 'lifx/seen'
 require 'lifx/timers'
 require 'lifx/gateway_connection'
-require 'lifx/light'
-require 'lifx/tag_manager'
 
 module LIFX
   class Site
@@ -14,15 +12,11 @@ module LIFX
 
     def initialize(id)
       @id            = id
-      @lights        = {}
-      @lights_mutex  = Mutex.new
       @gateways      = {}
       @gateways_mutex = Mutex.new
-      @tag_manager   = TagManager.new(self)
       @threads       = []
       @threads << defer_lights_discovery
       @threads << initialize_timer_thread
-      # @tag_manager.discover
     end
 
     def write(message)
@@ -48,10 +42,6 @@ module LIFX
             @message_handler.call(*args) if @message_handler
           end
         end
-      when Protocol::Device::StateTime
-        # Heartbeat
-      when Protocol::Device::StateTagLabels
-        @tag_manager.handle_message(message, ip, transport)
       else
         @message_handler.call(*args) if @message_handler
       end
