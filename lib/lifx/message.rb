@@ -103,14 +103,14 @@ module LIFX
         @message = Protocol::Message.new(hash)
         self.payload = payload
         self.path = path
-        @message.tagged = path.tagged?
+        @message.tagged = path.tagged? if path
       else
         @message = Protocol::Message.new
       end
       @message.msg_size = @message.num_bytes
       @message.protocol = PROTOCOL_VERSION
     rescue => ex
-      raise PackError.new("Unable to pack message with args: #{args.inspect} - #{ex}")
+      raise MessageError.new("Unable to initialize message with args: #{args.inspect} - #{ex}")
     end
 
     def payload=(payload)
