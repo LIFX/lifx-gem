@@ -6,10 +6,9 @@ module LIFX
       @device_site_mapping = {}
     end
 
-    def update_from_message(message)
-      return if message.tagged?
-      @device_site_mapping[message.device_id] ||= Entry.new(message.site_id, message.device_id, Time.now)
-      @device_site_mapping[message.device_id].last_seen = Time.now
+    def update_table(site_id:, device_id:)
+      @device_site_mapping[device_id] ||= Entry.new(site_id, device_id, Time.now)
+      @device_site_mapping[device_id].last_seen = Time.now
     end
 
     def site_id_for_device_id(device_id)
