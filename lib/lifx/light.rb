@@ -11,7 +11,7 @@ module LIFX
 
     attr_reader :context
 
-    attr_accessor :id, :label, :color, :power, :dim, :tags_field
+    attr_reader :id, :site_id, :label, :color, :power, :dim, :tags_field
 
     def initialize(context:, id: , site_id: nil)
       @context = context
@@ -41,13 +41,11 @@ module LIFX
       when Protocol::Device::StateTags
         @tags_field = payload.tags
         seen!
-      else
-        logger.warn("#{self}: Unhandled message: #{message}")
       end
     end
 
     def send_message(payload)
-      @context.send_message(target: Target.new(device_id: id, site_id: @site_id), payload: payload)
+      context.send_message(target: Target.new(device_id: id, site_id: @site_id), payload: payload)
       self
     end
 
@@ -60,17 +58,15 @@ module LIFX
     end
 
     def add_tag(tag)
-      site.add_tag_to_light(tag, self)
-      self
+      context.add_tag_to_device(tag: tag, device: self)
     end
 
     def remove_tag(tag)
-      site.remove_tag_from_light(tag, self)
-      self
+      context.remove_tag_from_device(tag: tag, device: self)
     end
 
     def tags
-      site.tags_on_light(self)
+      context.tags_for_device(self)
     end
 
     def to_s

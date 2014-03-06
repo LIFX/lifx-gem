@@ -11,7 +11,7 @@ module LIFX
 
     end
 
-    def tag_ids_from_field(uint64)
+    def tag_ids_from_field(tags_field)
       (0...64).to_a.select { |t| (tags_field & (2 ** t)) > 0 }
     end
   end

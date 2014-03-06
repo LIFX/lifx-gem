@@ -21,7 +21,12 @@ module LIFX
     end
 
     def update_table(tag_id:, label:, site_id:)
-      @entries[site_id][tag_id] ||= Entry.new(tag_id, label, site_id)
+      entry = @entries[site_id][tag_id] ||= Entry.new(tag_id, label, site_id)
+      entry.label = label
+    end
+
+    def tags
+      @entries.values.map(&:values).flatten.map(&:label).uniq
     end
   end
 end

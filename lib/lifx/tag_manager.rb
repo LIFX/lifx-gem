@@ -2,98 +2,69 @@ require 'lifx/tag'
 
 module LIFX
   class TagManager
+    # TagManager handles discovery of tags, resolving tags to [site_id, tags_field] pairs,
+    # creating, setting and removing tags.
+
+    # Stores site <-> [tag_name, tag_id]
     include Utilities
-    # Handles fetching tag labels
-    # Keeping tag label states
-    attr_reader :tags, :site
+    
+    attr_reader :context
 
     class TagLimitReached < StandardError; end
 
-    def initialize(site)
-      @site = site
-      @tags = {}
+    def initialize(context:, tag_table:)
+      @context = context
+      @tag_table = tag_table
     end
 
-    def discover
-      site.write(payload: Protocol::Device::GetTagLabels.new(tags: UINT64_MAX))
-    end
-
-    def on_message(message, ip, transport)
-      payload = message.payload
-      case payload
-      when Protocol::Device::StateTagLabels
-        add_or_update_tag(payload.tags, payload.label)
-      end
-    end
-
-    def create_tag(tag_label)
-      id = next_unused_id
+    def create_tag(label:, site_id:)
+      id = next_unused_id_on_site_id(site_id)
       raise TagLimitReached if id.nil?
-      site.write(tagged: true, payload: Protocol::Device::SetTagLabels.new(tags: id_to_tags_field(id), label: tag_label))
-      wait_until { tag_with_label(tag_label) } or raise "Couldn't create tag"
+      # Add the entry for the tag we're about to create to prevent a case where
+      # we don't receive a StateTagLabels before another tag gets created
+      @tag_table.update_table(tag_id: id, label: label, site_id: site_id)
+      context.send_message(target: Target.new(site_id: site_id), payload: Protocol::Device::SetTagLabels.new(tags: id_to_tags_field(id), label: label))
     end
 
-    def add_tag_to_light(tag_label, light)
-      tag = tag_with_label(tag_label)
-      if !tag
-        tag = create_tag(tag_label)
+    def add_tag_to_device(tag:, device:)
+      tag_entry = entry_with(label: tag, site_id: device.site_id)
+      if !tag_entry
+        create_tag(label: tag, site_id: device.site_id)
+        tag_entry = entry_with(label: tag, site_id: device.site_id)
       end
-      light_tags_field = light.tags_field
-      light_tags_field |= id_to_tags_field(tag.id)
-      light.write(payload: Protocol::Device::SetTags.new(tags: light_tags_field))
+
+      device_tags_field = device.tags_field
+      device_tags_field |= id_to_tags_field(tag_entry.tag_id)
+      device.send_message(Protocol::Device::SetTags.new(tags: device_tags_field))
     end
 
-    def remove_tag_from_light(tag_label, light)
-      tag = tag_with_label(tag_label)
-      light_tags_field = light.tags_field
-      light_tags_field &= ~id_to_tags_field(tag.id)
-      light.write(payload: Protocol::Device::SetTags.new(tags: light_tags_field))      
-    end
+    def remove_tag_from_device(tag:, device:)
+      tag_entry = entry_with(label: tag, site_id: device.site_id)
+      return if !tag_entry
 
-    def tags_on_light(light)
-      tags_field_to_ids(light.tags_field).map { |id| @tags[id].label }
-    end
-
-    def tags_field_for_tags(*tag_labels)
-      tag_labels.reduce(0) do |ret, label|
-        ret |= tags_field_for_tag(label)
-      end
-    end
-
-    def tags_field_for_tag(tag_label)
-      tag = tag_with_label(tag_label)
-      tag ? id_to_tags_field(tag.id) : 0
+      device_tags_field = device.tags_field
+      device_tags_field &= ~id_to_tags_field(tag_entry.tag_id)
+      device.send_message(Protocol::Device::SetTags.new(tags: device_tags_field))
     end
 
     protected
 
     VALID_TAG_IDS = (0...64).to_a.freeze
 
-    def tag_with_label(label)
-      @tags.values.find { |t| t.label == label }
+    def entry_with(**args)
+      entries_with(**args).first
     end
 
-    def add_or_update_tag(tags_field, label)
-      id = tags_field_to_id(tags_field)
-      @tags[id] ||= Tag.new(site, id, label)
-    end
-
-    def tags_field_to_ids(tags_field)
-      VALID_TAG_IDS.select do |i|
-        tags_field & (2 ** i) > 0
-      end
-    end
-
-    def tags_field_to_id(tags_field)
-      tags_field_to_ids(tags_field).first
+    def entries_with(**args)
+      @tag_table.entries_with(**args)
     end
 
     def id_to_tags_field(id)
       2 ** id
     end
 
-    def next_unused_id
-      (VALID_TAG_IDS - @tags.keys).first
+    def next_unused_id_on_site_id(site_id)
+      (VALID_TAG_IDS - entries_with(site_id: site_id).map(&:tag_id)).first
     end
   end
 end

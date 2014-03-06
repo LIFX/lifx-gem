@@ -47,23 +47,7 @@ module LIFX
       end
       seen!
     end
-
-    def tags
-      @tag_manager.tags
-    end
-
-    def tags_on_light(light)
-      @tag_manager.tags_on_light(light)
-    end
-
-    def add_tag_to_light(tag, light)
-      @tag_manager.add_tag_to_light(tag, light)
-    end
-
-    def remove_tag_from_light(tag, light)
-      @tag_manager.remove_tag_from_light(tag, light)
-    end
-
+    
     def to_s
       %Q{#<LIFX::Site id=#{id}>}
     end

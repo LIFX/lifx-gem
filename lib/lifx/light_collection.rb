@@ -5,21 +5,20 @@ module LIFX
     include LightTarget
     extend Forwardable
 
-    # Stores an array of lights and handles addressing multiple lights
-    attr_reader :scope, :tags
+    # Represents a collection of lights
+    attr_reader :tag, :context
 
-    def initialize(scope: raise(ArgumentError, "scope required"), tags: [])
-      if !scope.respond_to?(:sites)
-        raise(ArgumentError, "scope must respond to sites")
-      end
-      @scope = scope
-      @tags = tags
+    def initialize(context:, tag: nil, lights: context.lights)
+      @context = context
+      @tag = tag
+      @lights = lights
     end
 
-    def queue_write(params)
-      scope.sites.each do |site|
-        tags_field = site.tag_manager.tags_field_for_tags(*tags)
-        site.queue_write(params.merge(tagged: true, tags: tags_field))
+    def send_message(payload)
+      if tag
+        context.send_message(target: Target.new(tag), payload: payload)
+      else
+        context.send_message(target: Target.new(broadcast: true), payload: payload)
       end
       self
     end
@@ -32,20 +31,18 @@ module LIFX
       lights.find { |l| l.label == label }
     end
 
-    def with_tags(*tag_labels)
+    def with_tag(*tag_labels)
       self.class.new(scope: scope, tags: tag_labels)
     end
-    alias_method :with_tag, :with_tags
 
     def lights
-      scope.sites.map do |site|
-        tags_field = site.tag_manager.tags_field_for_tags(*tags)
-        if tags_field.zero?
-          site.lights
-        else
-          site.lights.select { |light| (light.tags_field & tags_field) > 0 }
+      if !tag
+        lights
+      else
+        lights.select do |light|
+          light.tags.include?(tag)
         end
-      end.flatten
+      end
     end
 
     def to_s
@@ -53,6 +50,6 @@ module LIFX
     end
     alias_method :inspect, :to_s
 
-    def_delegators :lights, :length, :count, :to_a, :[], :find, :each, :first, :last, :map
+    # def_delegators :lights, :length, :count, :to_a, :[], :find, :each, :first, :last, :map
   end
 end
