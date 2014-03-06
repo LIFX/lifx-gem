@@ -12,12 +12,8 @@ module LIFX
     end
 
     LIFX_PORT = 56700
-    def initialize(ip: nil)
-      if ip
-        @network_context = NetworkContext.new(ip: ip)
-      else
-        @network_context = NetworkContext.new
-      end
+    def initialize(transport: :lan)
+      @network_context = NetworkContext.new(transport: transport)
     end
 
     DISCOVERY_DEFAULT_TIMEOUT = 10
@@ -33,8 +29,8 @@ module LIFX
       lights
     end
 
-    def flush
-      @network_context.flush
+    def flush(**options)
+      @network_context.flush(**options)
     end
 
     def lights

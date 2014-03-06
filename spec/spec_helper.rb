@@ -8,7 +8,7 @@ require 'lifx/utilities'
 shared_context 'integration', integration: true do
   def lifx
     $lifx ||= begin
-      c = LIFX::Client.instance
+      c = LIFX.client
       c.discover
       begin
         Timeout.timeout(5) do

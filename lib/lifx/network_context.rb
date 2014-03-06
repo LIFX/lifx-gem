@@ -15,10 +15,15 @@ module LIFX
 
     attr_reader :tag_manager, :routing_manager
     
-    def initialize
+    def initialize(transport: :lan)
       @devices = {}
 
-      @transport_manager = TransportManager::LAN.new
+      @transport_manager = case transport
+      when :lan
+        TransportManager::LAN.new
+      else
+        raise ArgumentError.new("Unknown transport method: #{transport}")
+      end
       @transport_manager.on_message do |msg, ip, transport|
         handle_message(msg, ip, transport)
       end
@@ -28,6 +33,7 @@ module LIFX
     end
 
     def stop
+      @transport_manager.stop
       @threads.each do |thread|
         Thread.kill(thread)
       end
@@ -36,19 +42,6 @@ module LIFX
     def discover
       @transport_manager.discover
     end
-
-    def lights
-      LightCollection.new(context: self)
-    end
-
-    def all_lights
-      @devices.values
-    end
-
-    def tags
-      @routing_manager.tags
-    end
-
 
     def send_message(target:, payload:)
       paths = @routing_manager.resolve_target(target)
@@ -61,9 +54,25 @@ module LIFX
       end
     end
 
+    def flush(**options)
+      @transport_manager.flush(**options)
+    end
+
     def register_device(device)
       device_id = device.id
       @devices[device_id] = device # What happens when there's already one registered?
+    end
+
+    def lights
+      LightCollection.new(context: self)
+    end
+
+    def all_lights
+      @devices.values
+    end
+
+    def tags
+      @routing_manager.tags
     end
 
     # Tags

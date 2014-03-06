@@ -47,6 +47,14 @@ module LIFX
       end
       seen!
     end
+
+    def flush(**options)
+      @gateways.values.map do |gateway|
+        Thread.new do
+          gateway.flush(**options)
+        end
+      end.each(&:join)
+    end
     
     def to_s
       %Q{#<LIFX::Site id=#{id}>}

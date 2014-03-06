@@ -54,6 +54,21 @@ module LIFX
       [@tcp_transport, @udp_transport].compact.each(&:close)
     end
 
+    def flush(timeout: nil)
+      proc = lambda do
+        while !@queue.empty?
+          sleep 0.05
+        end
+      end
+      if timeout
+        Timeout.timeout(timeout) do
+          proc.call
+        end
+      else
+        proc.call
+      end
+    end
+
     def best_transport
       @tcp_transport || @udp_transport
     end

@@ -21,6 +21,14 @@ module LIFX
         raise NotImplementedError
       end
 
+      def flush(**options)
+        raise NotImplementedError
+      end
+
+      def stop
+        raise NotImplementedError
+      end
+
       def add_observer(obj, &callback)
         raise NotImplementedError
       end
@@ -54,6 +62,14 @@ module LIFX
         discover
       end
 
+      def flush(**options)
+        @sites.values.map do |site|
+          Thread.new do
+            site.flush(**options)
+          end
+        end.each(&:join)
+      end
+
       DISCOVERY_INTERVAL_WHEN_NO_SITES_FOUND = 1    # seconds
       DISCOVERY_INTERVAL                     = 20   # seconds
       def discover
@@ -77,8 +93,11 @@ module LIFX
         Thread.kill(@discovery_thread) if @discovery_thread
       end
 
-      def close
-
+      def stop
+        @transport.close
+        @sites.values.each do |site|
+          site.stop
+        end
       end
 
       def write(message)
