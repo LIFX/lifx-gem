@@ -1,13 +1,18 @@
 require 'lifx/routing_table'
 require 'lifx/tag_table'
+require 'lifx/utilities'
 
 module LIFX
   class RoutingManager
+    include Utilities
     # RoutingManager manages a routing table of site <-> device
     # It can resolve a target to ProtocolPaths and manages the TagTable
 
+    attr_reader :tag_table, :routing_table
+
     def initialize(context: )
       @context = context
+
       @routing_table = RoutingTable.new
       @tag_table = TagTable.new
     end
@@ -33,13 +38,32 @@ module LIFX
       end
     end
 
+    def tags_for_device_id(device_id)
+      entry = @routing_table.entry_for_device_id(device_id)
+      entry.tag_ids.map do |tag_id|
+        tag = @tag_table.entry_with(site_id: entry.site_id, tag_id: tag_id)
+        tag && tag.label
+      end.compact
+    end
+
     def update_from_message(message)
       return if message.tagged?
 
-      @routing_table.update_table(site_id: message.site_id, device_id: message.device_id)
-      case message.payload
+      payload = message.payload
+      case payload
       when Protocol::Device::StateTagLabels
-        @tag_table.update_from_message(message)
+        tag_ids = tags_field_to_ids(payload.tags)
+        if payload.label.empty?
+          # FIXME: Handle delection later
+        else
+          @tag_table.update_table(site_id: message.site_id, tag_id: tag_ids.first, label: payload.label)
+        end
+      when Protocol::Device::StateTags
+        @routing_table.update_table(site_id: message.site_id,
+                                    device_id: message.device_id,
+                                    tag_ids: tags_field_to_ids(message.payload.tags))
+      else
+        @routing_table.update_table(site_id: message.site_id, device_id: message.device_id)
       end
     end
   end
