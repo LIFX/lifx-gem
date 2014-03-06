@@ -1,3 +1,4 @@
+require 'lifx/observable'
 require 'lifx/timers'
 
 module LIFX
@@ -6,15 +7,13 @@ module LIFX
     # A GatewayConnection is created when a new device sends a StatePanGateway
     include Timers
     include Logging
+    include Observable
 
     def initialize
       @threads = []
       @threads << initialize_write_queue
     end
 
-    def on_message(&block)
-      @message_handler = block
-    end
 
     def handle_message(message, ip, transport)
       payload = message.payload
@@ -36,9 +35,7 @@ module LIFX
       logger.info("#{self}: Establishing connection to #{ip}:#{port}")
       @tcp_transport = Transport::TCP.new(ip, port)
       @tcp_transport.listen do |msg, ip|
-        if @message_handler
-          @message_handler.call(msg, ip, @tcp_transport)
-        end
+        notify_observers(msg: msg, ip: ip, transport: @tcp_transport)
       end
       at_exit do
         @tcp_transport.close

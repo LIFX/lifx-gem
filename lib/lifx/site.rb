@@ -1,5 +1,6 @@
 require 'lifx/seen'
 require 'lifx/timers'
+require 'lifx/observable'
 require 'lifx/gateway_connection'
 
 module LIFX
@@ -7,6 +8,7 @@ module LIFX
     include Seen
     include Timers
     include Logging
+    include Observable
     
     attr_reader :id, :gateways, :tag_manager
 
@@ -26,10 +28,6 @@ module LIFX
       end
     end
 
-    def on_message(&block)
-      @message_handler = block
-    end
-
     def handle_message(message, ip, transport)
       logger.debug("<- #{self} #{transport}: #{message}")
       payload = message.payload
@@ -38,8 +36,8 @@ module LIFX
         @gateways_mutex.synchronize do
           @gateways[message.device_id] ||= GatewayConnection.new
           @gateways[message.device_id].handle_message(message, ip, transport)
-          @gateways[message.device_id].on_message do |*args|
-            @message_handler.call(*args) if @message_handler
+          @gateways[message.device_id].add_observer(self) do |**args|
+            notify_observers(**args)
           end
         end
       else
