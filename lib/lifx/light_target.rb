@@ -7,10 +7,12 @@ module LIFX
         duration: (duration * MSEC_PER_SEC).to_i,
         stream: 0,
       ))
+      self
     end
 
     def set_power(value)
       send_message(Protocol::Device::SetPower.new(level: value))
+      self
     end
 
     def turn_on
@@ -23,6 +25,7 @@ module LIFX
 
     def refresh
       send_message(Protocol::Light::Get.new)
+      self
     end
   end
 end
