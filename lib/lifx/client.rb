@@ -7,8 +7,18 @@ require 'lifx/light_collection'
 
 module LIFX
   class Client
-    def self.instance
-      @instance ||= new
+    class << self
+      def lan
+        @lan ||= new
+      end
+
+      def virtual_bulb
+        @virtual_bulb ||= begin
+          @virtual_bulb_client = new(transport: :virtual_bulb)
+          @virtual_bulb_client.discover
+          @virtual_bulb_client.lights.first
+        end
+      end
     end
 
     LIFX_PORT = 56700

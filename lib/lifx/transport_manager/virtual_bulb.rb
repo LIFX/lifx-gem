@@ -26,6 +26,10 @@ module LIFX
       def stop
         @gateway.close
       end
+
+      def flush(**options)
+        @gateway.flush(**options)
+      end
     end
   end
 end
