@@ -70,6 +70,15 @@ module LIFX
     def tags
       context.tags_for_device(self)
     end
+    
+    MAX_LABEL_LENGTH = 32
+    class LabelTooLong < ArgumentError; end
+    def set_label(label)
+      if label.length > MAX_LABEL_LENGTH
+        raise LabelTooLong.new("Label length must be below or equal to #{MAX_LABEL_LENGTH}")
+      end
+      send_message(Protocol::Device::SetLabel.new(label: label))
+    end
 
     def to_s
       %Q{#<LIFX::Light id=#{id} label=#{label.to_s} power=#{on? ? 'on' : 'off'}>}.force_encoding(Encoding.default_external)

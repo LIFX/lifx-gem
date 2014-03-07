@@ -24,14 +24,5 @@ module LIFX
     def refresh
       send_message(Protocol::Light::Get.new)
     end
-
-    MAX_LABEL_LENGTH = 32
-    class LabelTooLong < ArgumentError; end
-    def set_label(label)
-      if label.length > MAX_LABEL_LENGTH
-        raise LabelTooLong.new("Label length must be below or equal to #{MAX_LABEL_LENGTH}")
-      end
-      send_message(Protocol::Device::SetLabel.new(label: label))
-    end
   end
 end
