@@ -3,7 +3,9 @@ module LIFX
     # Color handles converting to and from the Hsbk structure
     # that the protocol requires
     UINT16_MAX = 65535
-    DEFAULT_KELVIN = 0
+    DEFAULT_KELVIN = 3500
+    KELVIN_MIN = 2500
+    KELVIN_MAX = 10000
 
     class << self
       def white(brightness = 1.0, kelvin = DEFAULT_KELVIN)
@@ -47,7 +49,7 @@ module LIFX
         hue: (hue / 360.0 * UINT16_MAX).to_i,
         saturation: (saturation * UINT16_MAX).to_i,
         brightness: (brightness * UINT16_MAX).to_i,
-        kelvin: kelvin.to_i
+        kelvin: [KELVIN_MIN, kelvin.to_i, KELVIN_MAX].sort[1]
       )
     end
 
