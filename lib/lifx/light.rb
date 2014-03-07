@@ -59,10 +59,12 @@ module LIFX
 
     def add_tag(tag)
       context.add_tag_to_device(tag: tag, device: self)
+      self
     end
 
     def remove_tag(tag)
       context.remove_tag_from_device(tag: tag, device: self)
+      self
     end
 
     def tags
