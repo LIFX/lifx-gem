@@ -48,6 +48,6 @@ module LIFX
     end
     alias_method :inspect, :to_s
 
-    def_delegators :lights, :empty?, :length, :count, :to_a, :[], :find, :each, :first, :last, :map
+    def_delegators :lights, :empty?, :length, :count, :to_a, :[], :find, :each, :first, :last, :map, :to_a
   end
 end
