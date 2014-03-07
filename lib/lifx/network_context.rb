@@ -21,6 +21,8 @@ module LIFX
       @transport_manager = case transport
       when :lan
         TransportManager::LAN.new
+      when :virtual_bulb
+        TransportManager::VirtualBulb.new
       else
         raise ArgumentError.new("Unknown transport method: #{transport}")
       end
@@ -32,15 +34,15 @@ module LIFX
       @tag_manager = TagManager.new(context: self, tag_table: @routing_manager.tag_table)
     end
 
+    def discover
+      @transport_manager.discover
+    end
+
     def stop
       @transport_manager.stop
       @threads.each do |thread|
         Thread.kill(thread)
       end
-    end
-
-    def discover
-      @transport_manager.discover
     end
 
     def send_message(target:, payload:)

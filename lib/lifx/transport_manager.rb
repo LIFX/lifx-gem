@@ -11,7 +11,7 @@ module LIFX
       def initialize(**args)
       end
 
-      def connect
+      def discover
         raise NotImplementedError
       end
 
@@ -33,3 +33,4 @@ module LIFX
 end
 
 require 'lifx/transport_manager/lan'
+require 'lifx/transport_manager/virtual_bulb'

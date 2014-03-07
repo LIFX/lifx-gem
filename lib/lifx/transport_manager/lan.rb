@@ -13,10 +13,6 @@ module LIFX
         initialize_transport
       end
 
-      def connect
-        discover
-      end
-
       def flush(**options)
         @sites.values.map do |site|
           Thread.new do
@@ -49,6 +45,7 @@ module LIFX
       end
 
       def stop
+        stop_discovery
         @transport.close
         @sites.values.each do |site|
           site.stop
