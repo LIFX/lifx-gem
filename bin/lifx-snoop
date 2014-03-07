@@ -2,15 +2,28 @@
 $LOAD_PATH << File.join(File.dirname(__FILE__), "..", "lib")
 require 'lifx'
 
+matchers = ARGV.map do |arg|
+  Regexp.new(arg, Regexp::IGNORECASE)
+end
+
+if matchers.empty?
+  matchers << //
+end
+
 begin
   light_udp = LIFX::Transport::UDP.new('0.0.0.0', 56700)
-  light_udp.listen do |msg, ip|
-    puts "BROADCAST: #{ip} #{msg}"
+  light_udp.add_observer(self) do |message:, ip:, transport:|
+    if matchers.any? { |m| message.to_s =~ m }
+      puts "BROADCAST: #{ip} #{message}"
+    end
   end
+  light_udp.listen
 
   peer_udp = LIFX::Transport::UDP.new('0.0.0.0', 56750)
-  peer_udp.listen do |msg, ip|
-    puts "PEER:      #{ip} #{msg}"
+  peer_udp.add_observer(self) do |message:, ip:, transport:|
+    if matchers.any? { |m| message.to_s =~ m }
+      puts "PEER:      #{ip} #{message}"
+    end
   end
 rescue LIFX::Message::UnsupportedProtocolVersion
 end
