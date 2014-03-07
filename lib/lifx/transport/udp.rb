@@ -14,7 +14,7 @@ module LIFX
         @socket.send(data, 0, host, port)
       end
 
-      def listen(ip: self.host, port: self.port, &block)
+      def listen(ip: self.host, port: self.port)
         if @listener
           raise "Socket already being listened to"
         end
@@ -29,7 +29,7 @@ module LIFX
             begin
               bytes, (_, _, ip, _) = reader.recvfrom(128)
               message = Message.unpack(bytes)
-              block.call(message, ip)
+              notify_observers(message: message, ip: ip, transport: self)
             rescue Message::UnpackError
               if !@ignore_unpackable_messages
                 logger.warn("#{self}: Unrecognised bytes: #{bytes.bytes.map { |b| '%02x ' % b }.join}")

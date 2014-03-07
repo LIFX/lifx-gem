@@ -24,8 +24,8 @@ module LIFX
       else
         raise ArgumentError.new("Unknown transport method: #{transport}")
       end
-      @transport_manager.add_observer(self) do |msg: msg, ip: ip, transport: transport|
-        handle_message(msg, ip, transport)
+      @transport_manager.add_observer(self) do |message:, ip:, transport:|
+        handle_message(message, ip, transport)
       end
 
       @routing_manager = RoutingManager.new(context: self)

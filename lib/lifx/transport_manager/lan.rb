@@ -67,9 +67,10 @@ module LIFX
 
       def initialize_transport
         @transport = Transport::UDP.new(@send_ip, @port)
-        @transport.listen(ip: @bind_ip) do |message, ip|
+        @transport.add_observer(self) do |message:, ip:, transport:|
           handle_broadcast_message(message, ip, @transport)
         end
+        @transport.listen(ip: @bind_ip)
       end
 
       def handle_broadcast_message(message, ip, transport)

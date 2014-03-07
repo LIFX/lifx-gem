@@ -34,9 +34,10 @@ module LIFX
     def connect(ip, port)
       logger.info("#{self}: Establishing connection to #{ip}:#{port}")
       @tcp_transport = Transport::TCP.new(ip, port)
-      @tcp_transport.listen do |msg, ip|
-        notify_observers(msg: msg, ip: ip, transport: @tcp_transport)
+      @tcp_transport.add_observer(self) do |message:, ip:, transport:|
+        notify_observers(message: message, ip: ip, transport: @tcp_transport)
       end
+      @tcp_transport.listen
       at_exit do
         @tcp_transport.close
       end

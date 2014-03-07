@@ -39,7 +39,7 @@ module LIFX
       end
 
       HEADER_SIZE = 8
-      def listen(&block)
+      def listen
         return if @listener
         Thread.abort_on_exception = true
         @listener = Thread.new do
@@ -51,7 +51,7 @@ module LIFX
               data = @socket.recv(size)
               message = Message.unpack(data)
               
-              block.call(message)
+              notify_observers(message: message, ip: host, transport: self)
             rescue Message::UnpackError
               if !@ignore_unpackable_messages
                 logger.error("#{self}: Exception occured - #{ex}")

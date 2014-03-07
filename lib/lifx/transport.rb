@@ -1,6 +1,9 @@
+require 'lifx/observable'
+
 module LIFX
   class Transport
     include Logging
+    include Observable
     
     attr_reader :host, :port
 
@@ -10,7 +13,7 @@ module LIFX
       @ignore_unpackable_messages = ignore_unpackable_messages
     end
 
-    def listen(&block)
+    def listen
       raise NotImplementedError
     end
 
@@ -26,6 +29,10 @@ module LIFX
       %Q{#<#{self.class.name} #{host}:#{port}>}
     end
     alias_method :inspect, :to_s
+
+    def observer_callback_definition
+      -> (message:, ip: nil, transport: nil) {}
+    end
   end
 end
 
