@@ -3,14 +3,15 @@ require 'lifx/site'
 module LIFX
   module TransportManager
     class LAN < Base
-      def initialize(bind_ip: '0.0.0.0', send_ip: '255.255.255.255', port: 56700)
+      def initialize(bind_ip: '0.0.0.0', send_ip: '255.255.255.255', port: 56700, peer_port: 56750)
         super
-        @bind_ip = bind_ip
-        @send_ip = send_ip
-        @port    = port
-
+        @bind_ip   = bind_ip
+        @send_ip   = send_ip
+        @port      = port
+        @peer_port = peer_port
+        
         @sites = {}
-        initialize_transport
+        initialize_transports
       end
 
       def flush(**options)
@@ -58,16 +59,19 @@ module LIFX
         else
           @sites[message.path.site_id].write(message)
         end
+        @peer_transport.write(message)
       end
 
       protected
 
-      def initialize_transport
+      def initialize_transports
         @transport = Transport::UDP.new(@send_ip, @port)
         @transport.add_observer(self) do |message:, ip:, transport:|
           handle_broadcast_message(message, ip, @transport)
         end
         @transport.listen(ip: @bind_ip)
+
+        @peer_transport = Transport::UDP.new('255.255.255.255', @peer_port)
       end
 
       def handle_broadcast_message(message, ip, transport)
