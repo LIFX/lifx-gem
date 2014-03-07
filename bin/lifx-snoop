@@ -25,6 +25,7 @@ begin
       puts "PEER:      #{ip} #{message}"
     end
   end
+  peer_udp.listen
 rescue LIFX::Message::UnsupportedProtocolVersion
 end
 
