@@ -2,7 +2,11 @@
 
 This gem allows you to control your [LIFX](http://lifx.co) lights.
 
-It handles discovery, gateway connections and rate limiting.
+It handles discovery, gateway connections, tags, and provides a object-based API
+for talking to Lights.
+
+Due to the nature of the protocol, all commands are asynchronous and will return immediately.
+A synchronous version can be built on top of this gem.
 
 This gem is in an alpha state. Expect breaking API changes.
 
@@ -23,12 +27,20 @@ Or install it yourself as:
 ## Usage
 
 ```ruby
-client = LIFX::Client.new
-client.discover               # Discover lights
-client.lights.each do |light|
-  light.set_hsb(120, 1, 1, 2) # Set all lights to bright green
-end
-client.flush                  # Wait until all the packets have been sent
+client = LIFX::Client.lan                  # Talk to bulbs on the LAN
+client.discover                            # Discover lights
+client.lights.turn_on                      # Tell all lights to turn on
+light = client.lights.with_label('Office') # Get light with label 'Office'
+
+# Set the first light to bright green over 5 seconds
+light.set_color(LIFX::Color.hsb(120, 1, 1), duration: 5)
+light.set_label('My Office')
+
+light.add_tag('Offices')   # Add tag to light
+
+client.lights.with_tag('Offices').turn_off
+
+client.flush # Wait until all the packets have been sent
 ```
 
 ## Contributing
