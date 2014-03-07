@@ -14,15 +14,11 @@ This gem is in an alpha state. Expect breaking API changes.
 
 Add this line to your application's Gemfile:
 
-    gem 'lifx'
+    gem 'lifx', git: "git@github.com:LifxLabs/lifx-gem.git"
 
 And then execute:
 
     $ bundle
-
-Or install it yourself as:
-
-    $ gem install lifx
 
 ## Usage
 
