@@ -12,13 +12,13 @@ shared_context 'integration', integration: true do
       c.discover
       begin
         Timeout.timeout(5) do
-          while !c.lights.find { |l| l.label =~ /^Test/ }
+          while !c.lights.with_label(/\btest\b/i)
             c.lights.refresh
             sleep 1
           end
         end
       rescue Timeout::Error
-        raise "Could not find any lights matching /^Test/ in #{c.lights.inspect}"
+        raise "Could not find any lights matching /\btest\b/i in #{c.lights.inspect}"
       end
       c
     end
@@ -42,7 +42,7 @@ shared_context 'integration', integration: true do
   end
 
   let(:lights) { lifx.lights }
-  let(:light) { lights.find { |l| l.label =~ /^Test/} }
+  let(:light) { lights.with_label(/\btest\b/i) }
 end
 
 if ENV['DEBUG']

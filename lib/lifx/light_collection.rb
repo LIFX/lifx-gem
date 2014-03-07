@@ -28,7 +28,11 @@ module LIFX
     end
 
     def with_label(label)
-      @lights.find { |l| l.label == label }
+      if label.is_a?(Regexp)
+        @lights.find { |l| l.label =~ label }
+      else
+        @lights.find { |l| l.label == label }
+      end
     end
 
     def with_tag(tag)
