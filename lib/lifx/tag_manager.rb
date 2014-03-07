@@ -7,7 +7,8 @@ module LIFX
 
     # Stores site <-> [tag_name, tag_id]
     include Utilities
-    
+    include Logging
+
     attr_reader :context
 
     class TagLimitReached < StandardError; end
@@ -23,7 +24,8 @@ module LIFX
       # Add the entry for the tag we're about to create to prevent a case where
       # we don't receive a StateTagLabels before another tag gets created
       @tag_table.update_table(tag_id: id, label: label, site_id: site_id)
-      context.send_message(target: Target.new(site_id: site_id), payload: Protocol::Device::SetTagLabels.new(tags: id_to_tags_field(id), label: label))
+      context.send_message(target: Target.new(site_id: site_id),
+                           payload: Protocol::Device::SetTagLabels.new(tags: id_to_tags_field(id), label: label))
     end
 
     def add_tag_to_device(tag:, device:)
@@ -47,6 +49,30 @@ module LIFX
       device.send_message(Protocol::Device::SetTags.new(tags: device_tags_field))
     end
 
+    def tags
+      @tag_table.tags
+    end
+
+    def unused_tags
+      @tag_table.tags.select do |tag|
+        context.lights.with_tag(tag).empty?
+      end
+    end
+
+    # This will clear out tags that currently do not resolve to any devices.
+    # If used when devices that are tagged with a tag that is not attached to an
+    # active device, it will effectively untag them when they're back on.
+    def purge_unused_tags!
+      unused_tags.each do |tag|
+        logger.info("Purging tag '#{tag}'")
+        entries_with(label: tag).each do |entry|
+          payload = Protocol::Device::SetTagLabels.new(tags: id_to_tags_field(entry.tag_id), label: '')
+          context.send_message(target: Target.new(site_id: entry.site_id),
+                               payload: payload)
+        end
+      end
+    end
+    
     protected
 
     VALID_TAG_IDS = (0...64).to_a.freeze

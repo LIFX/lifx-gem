@@ -21,15 +21,17 @@ module LIFX
       end
     end
 
-    LIFX_PORT = 56700
+    extend Forwardable
+
+    attr_reader :context
     def initialize(transport: :lan)
-      @network_context = NetworkContext.new(transport: transport)
+      @context = NetworkContext.new(transport: transport)
     end
 
     DISCOVERY_DEFAULT_TIMEOUT = 10
     def discover(timeout = DISCOVERY_DEFAULT_TIMEOUT)
       Timeout.timeout(timeout) do
-        @network_context.discover
+        @context.discover
         while lights.empty?
           sleep 0.1
         end
@@ -39,12 +41,6 @@ module LIFX
       lights
     end
 
-    def flush(**options)
-      @network_context.flush(**options)
-    end
-
-    def lights
-      @network_context.lights
-    end
+    def_delegators :@context, :lights, :tags, :unused_tags, :purge_unused_tags!, :refresh, :flush
   end
 end

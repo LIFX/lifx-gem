@@ -25,6 +25,13 @@ module LIFX
       entry.label = label
     end
 
+    def delete_entries_with(tag_id: nil, site_id: nil, label: nil)
+      matching_entries = entries_with(tag_id: tag_id, site_id: site_id, label: label)
+      matching_entries.each do |entry|
+        @entries[entry.site_id].delete(entry.tag_id)
+      end
+    end
+
     def tags
       @entries.values.map(&:values).flatten.map(&:label).uniq
     end

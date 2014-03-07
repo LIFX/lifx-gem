@@ -42,10 +42,6 @@ module LIFX
       end
     end
 
-    def tags
-      @tag_table.tags
-    end
-
     def tags_for_device_id(device_id)
       entry = @routing_table.entry_for_device_id(device_id)
       entry.tag_ids.map do |tag_id|
@@ -68,7 +64,9 @@ module LIFX
       when Protocol::Device::StateTagLabels
         tag_ids = tag_ids_from_field(payload.tags)
         if payload.label.empty?
-          # FIXME: Handle deletion later
+          tag_ids.each do |tag_id|
+            @tag_table.delete_entries_with(site_id: message.site_id, tag_id: tag_id)
+          end
         else
           @tag_table.update_table(site_id: message.site_id, tag_id: tag_ids.first, label: payload.label)
         end

@@ -9,7 +9,7 @@ module LIFX
   class NetworkContext
     include Timers
     include Logging
-
+    extend Forwardable
     # A NetworkContext handles discovery and gateway connection management
     # as well as routing write messages to their intended destination
 
@@ -73,22 +73,16 @@ module LIFX
       @devices.values
     end
 
-    def tags
-      @routing_manager.tags
-    end
-
     # Tags
+
+    def_delegators :@tag_manager, :tags,
+                                  :unused_tags,
+                                  :purge_unused_tags!,
+                                  :add_tag_to_device,
+                                  :remove_tag_from_device
 
     def tags_for_device(device)
       @routing_manager.tags_for_device_id(device.id)
-    end
-
-    def add_tag_to_device(tag:, device:)
-      @tag_manager.add_tag_to_device(tag: tag, device: device)
-    end
-
-    def remove_tag_from_device(tag:, device:)
-      @tag_manager.remove_tag_from_device(tag: tag, device: device)
     end
 
     protected

@@ -44,7 +44,7 @@ module LIFX
     end
 
     def to_s
-      %Q{#<#{self.class.name} lights=#{lights} tag=#{tag}>}
+      %Q{#<#{self.class.name} lights=#{lights}#{tag ? " tag=#{tag}" : ''}>}
     end
     alias_method :inspect, :to_s
 
