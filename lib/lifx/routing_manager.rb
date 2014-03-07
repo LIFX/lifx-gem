@@ -68,7 +68,7 @@ module LIFX
             @tag_table.delete_entries_with(site_id: message.site_id, tag_id: tag_id)
           end
         else
-          @tag_table.update_table(site_id: message.site_id, tag_id: tag_ids.first, label: payload.label)
+          @tag_table.update_table(site_id: message.site_id, tag_id: tag_ids.first, label: payload.label.to_s)
         end
       when Protocol::Device::StateTags, Protocol::Light::State
         @routing_table.update_table(site_id: message.site_id,
