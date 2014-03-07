@@ -6,10 +6,12 @@ module LIFX
       light.add_tag('Test')
       wait { light.tags.should include('Test') }
 
-      lifx.lights.with_tag('Test').turn_on
+      test_tag = lights.with_tag('Test')
+      test_tag.turn_on
       color = Color.hsb(rand(360), 0.3, 0.3)
 
-      lifx.lights.with_tag('Test').set_color(color) 
+      test_tag.set_color(color, duration: 0) 
+      flush
       sleep 1 # Set messages are scheduled 250ms if no at_time is set
               # It also returns the current light state rather than the final state
       light.refresh
