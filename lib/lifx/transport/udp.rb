@@ -11,7 +11,7 @@ module LIFX
 
       def write(message)
         data = message.pack
-        @socket.send(data, 0, host, port)
+        @socket.send(data, 0)
       end
 
       def listen(ip: self.host, port: self.port)
@@ -48,6 +48,7 @@ module LIFX
       def create_socket
         UDPSocket.new.tap do |socket|
           socket.setsockopt(Socket::SOL_SOCKET, Socket::SO_BROADCAST, true)
+          socket.connect(host, port)
         end
       end
     end
