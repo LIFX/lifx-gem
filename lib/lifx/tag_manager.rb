@@ -1,5 +1,3 @@
-require 'lifx/tag'
-
 module LIFX
   class TagManager
     # TagManager handles discovery of tags, resolving tags to [site_id, tags_field] pairs,
