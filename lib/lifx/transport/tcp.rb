@@ -34,6 +34,7 @@ module LIFX
       def close
         return if !@socket
         Thread.kill(@listener)
+        @listener = nil
         @socket.close
         @socket = nil
       end
@@ -46,10 +47,10 @@ module LIFX
           while @socket do
             begin
               header_data = @socket.recv(HEADER_SIZE, Socket::MSG_PEEK)
-              header = Protocol::Header.read(header_data)
-              size = header.msg_size
-              data = @socket.recv(size)
-              message = Message.unpack(data)
+              header      = Protocol::Header.read(header_data)
+              size        = header.msg_size
+              data        = @socket.recv(size)
+              message     = Message.unpack(data)
               
               notify_observers(message: message, ip: host, transport: self)
             rescue Message::UnpackError
