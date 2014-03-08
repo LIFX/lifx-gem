@@ -40,8 +40,6 @@ module LIFX
             notify_observers(**args)
           end
         end
-      else
-        @message_handler.call(*args) if @message_handler
       end
       seen!
     end
@@ -81,7 +79,6 @@ module LIFX
     end
 
     LIGHT_STATE_REQUEST_INTERVAL = 30
-    STALE_LIGHT_CHECK_INTERVAL   = 5
     def initialize_lights
       timers.every(LIGHT_STATE_REQUEST_INTERVAL) do
         scan_lights
