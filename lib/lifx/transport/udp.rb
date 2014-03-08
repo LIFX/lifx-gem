@@ -15,10 +15,7 @@ module LIFX
       end
 
       def listen(ip: self.host, port: self.port)
-        if @listener
-          raise "Socket already being listened to"
-        end
-        
+        return if @listener
         Thread.abort_on_exception = true
         @listener = Thread.new do
           reader = UDPSocket.new
