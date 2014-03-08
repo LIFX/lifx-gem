@@ -23,15 +23,19 @@ module LIFX
       end
 
       DISCOVERY_INTERVAL_WHEN_NO_SITES_FOUND = 1    # seconds
-      DISCOVERY_INTERVAL                     = 20   # seconds
+      DISCOVERY_INTERVAL                     = 10   # seconds
+      DISCOVERY_MINIMUM_INTERVAL             = 20   # seconds
       def discover
         stop_discovery
         Thread.abort_on_exception = true
         @discovery_thread = Thread.new do
+          @last_request_seen = Time.at(0)
           message = Message.new(path: ProtocolPath.new(tagged: true), payload: Protocol::Device::GetPanGateway.new)
           logger.info("Discovering gateways on #{@bind_ip}:#{@port}")
           loop do
-            write(message)
+            if Time.now - @last_request_seen > DISCOVERY_MINIMUM_INTERVAL
+              write(message)
+            end
             if @sites.empty?
               sleep(DISCOVERY_INTERVAL_WHEN_NO_SITES_FOUND)
             else
@@ -62,6 +66,14 @@ module LIFX
         @peer_transport.write(message)
       end
 
+      def sites
+        @sites.dup
+      end
+
+      def gateways
+        @sites.values.map(&:gateways)
+      end
+
       protected
 
       def initialize_transports
@@ -85,6 +97,8 @@ module LIFX
             end
           end
           @sites[message.path.site_id].handle_message(message, ip, transport)
+        when Protocol::Device::GetPanGateway
+          @last_request_seen = Time.now
         end
       end
     end

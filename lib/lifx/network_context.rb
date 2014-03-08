@@ -10,10 +10,9 @@ module LIFX
     include Timers
     include Logging
     extend Forwardable
-    # A NetworkContext handles discovery and gateway connection management
-    # as well as routing write messages to their intended destination
 
-    attr_reader :tag_manager, :routing_manager
+    # NetworkContext stores lights and ties together TransportManager, TagManager and RoutingManager
+    attr_reader :transport_manager, :tag_manager, :routing_manager
     
     def initialize(transport: :lan)
       @devices = {}
