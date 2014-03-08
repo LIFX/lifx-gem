@@ -57,8 +57,7 @@ module LIFX
 
       if !@routing_table.site_ids.include?(message.site_id)
         # New site detected, fire refresh events
-        context.send_message(target: Target.new(site_id: message.site_id), payload: Protocol::Device::GetTagLabels.new(tags: UINT64_MAX))
-        context.send_message(target: Target.new(site_id: message.site_id), payload: Protocol::Device::GetTags.new)
+        refresh_site(message.site_id)
       end
       case payload
       when Protocol::Device::StateTagLabels
@@ -77,6 +76,11 @@ module LIFX
       else
         @routing_table.update_table(site_id: message.site_id, device_id: message.device_id)
       end
+    end
+
+    def refresh_site(site_id)
+      context.send_message(target: Target.new(site_id: site_id), payload: Protocol::Device::GetTagLabels.new(tags: UINT64_MAX))
+      context.send_message(target: Target.new(site_id: site_id), payload: Protocol::Device::GetTags.new)
     end
   end
 end
