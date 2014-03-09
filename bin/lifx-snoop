@@ -1,6 +1,7 @@
 #!/usr/bin/env ruby
 $LOAD_PATH << File.join(File.dirname(__FILE__), "..", "lib")
 require 'lifx'
+require 'time'
 
 matchers = ARGV.map do |arg|
   Regexp.new(arg, Regexp::IGNORECASE)
@@ -14,7 +15,7 @@ begin
   light_udp = LIFX::Transport::UDP.new('0.0.0.0', 56700)
   light_udp.add_observer(self) do |message:, ip:, transport:|
     if matchers.any? { |m| message.to_s =~ m }
-      puts "BROADCAST: #{ip} #{message}"
+      puts "#{Time.now.iso8601(5)} BROADCAST: #{ip} #{message}"
     end
   end
   light_udp.listen
@@ -22,7 +23,7 @@ begin
   peer_udp = LIFX::Transport::UDP.new('0.0.0.0', 56750)
   peer_udp.add_observer(self) do |message:, ip:, transport:|
     if matchers.any? { |m| message.to_s =~ m }
-      puts "PEER:      #{ip} #{message}"
+      puts "#{Time.now.iso8601(5)} PEER:      #{ip} #{message}"
     end
   end
   peer_udp.listen
