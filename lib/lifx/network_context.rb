@@ -14,7 +14,7 @@ module LIFX
     # NetworkContext stores lights and ties together TransportManager, TagManager and RoutingManager
     attr_reader :transport_manager, :tag_manager, :routing_manager
     
-    def initialize(transport: :lan)
+    def initialize(transport: :lan, cache_path: nil)
       @devices = {}
 
       @transport_manager = case transport
@@ -29,7 +29,7 @@ module LIFX
         handle_message(message, ip, transport)
       end
 
-      @routing_manager = RoutingManager.new(context: self)
+      @routing_manager = RoutingManager.new(context: self, cache_path: cache_path)
       @tag_manager = TagManager.new(context: self, tag_table: @routing_manager.tag_table)
     end
 
@@ -90,18 +90,13 @@ module LIFX
       logger.debug("<- #{self} #{transport}: #{message}")
 
       @routing_manager.update_from_message(message)
-      case message.payload
-      when Protocol::Device::StatePanGateway
-        # Ideally this should not reach here as this is a TransportManager message
-      else
-        if !message.tagged?
-          if @devices[message.device_id].nil?
-            device = Light.new(context: self, id: message.device_id, site_id: message.site_id)
-            register_device(device)
-          end
-          device = @devices[message.device_id]
-          device.handle_message(message, ip, transport)
+      if !message.tagged?
+        if @devices[message.device_id].nil?
+          device = Light.new(context: self, id: message.device_id, site_id: message.site_id)
+          register_device(device)
         end
+        device = @devices[message.device_id]
+        device.handle_message(message, ip, transport)
       end
     end
   end

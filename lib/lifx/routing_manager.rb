@@ -10,11 +10,11 @@ module LIFX
 
     attr_reader :context, :tag_table, :routing_table
 
-    def initialize(context:)
+    def initialize(context:, cache_path: nil)
       @context = context
 
-      @routing_table = RoutingTable.new
-      @tag_table = TagTable.new
+      @routing_table = RoutingTable.new(cache_path: cache_path)
+      @tag_table = TagTable.new(cache_path: cache_path)
     end
 
     def resolve_target(target)
