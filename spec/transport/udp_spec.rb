@@ -22,9 +22,10 @@ describe LIFX::Transport::UDP do
 
     it 'listens to the specified socket data, unpacks it and notifies observers' do
       messages = []
-      subject.listen do |message, ip|
+      subject.add_observer(self) do |message:, ip:, transport:|
         messages << message
       end
+      subject.listen
 
       LIFX::Message.should_receive(:unpack).with(raw_message).and_return(message)
       socket.send(raw_message, 0, 'localhost', 22222)
