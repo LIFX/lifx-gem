@@ -1,9 +1,16 @@
 module LIFX
   class TagTable
-    class Entry < Struct.new(:tag_id, :label, :site_id); end
+    class Entry < Struct.new(:tag_id, :label, :site_id)
+      def self.from_hash(tag_id:, label:, site_id:)
+        new(tag_id, label, site_id)
+      end
+    end
 
-    def initialize
+    def initialize(entries: {})
       @entries = Hash.new { |h, k| h[k] = {} }
+      entries.each do |k, v|
+        @entries[k] = v
+      end
     end
 
     def entries_with(tag_id: nil, site_id: nil, label: nil)
@@ -34,6 +41,10 @@ module LIFX
 
     def tags
       @entries.values.map(&:values).flatten.map(&:label).uniq
+    end
+
+    def entries
+      @entries.dup
     end
   end
 end

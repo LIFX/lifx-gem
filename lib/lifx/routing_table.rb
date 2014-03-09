@@ -1,9 +1,13 @@
 module LIFX
   class RoutingTable
-    class Entry < Struct.new(:site_id, :device_id, :tag_ids, :last_seen); end
+    class Entry < Struct.new(:site_id, :device_id, :tag_ids, :last_seen)
+      def self.from_hash(site_id:, device_id:, tag_ids:, last_seen:)
+        new(site_id, device_id, tag_ids, last_seen)
+      end
+    end
     # RoutingTable stores the device <-> site mapping
-    def initialize
-      @device_site_mapping = {}
+    def initialize(entries: {})
+      @device_site_mapping = entries
     end
 
     def update_table(site_id:, device_id:, tag_ids: nil)
@@ -17,12 +21,16 @@ module LIFX
     end
 
     def site_id_for_device_id(device_id)
-      entry = entry_for_device_id(device)
+      entry = entry_for_device_id(device_id)
       entry ? entry.site_id : nil
     end
 
     def site_ids
       @device_site_mapping.values.map(&:site_id).uniq
+    end
+
+    def entries
+      @device_site_mapping.dup
     end
   end
 end

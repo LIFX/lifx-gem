@@ -13,8 +13,9 @@ module LIFX
     def initialize(context:, cache_path: nil)
       @context = context
 
-      @routing_table = RoutingTable.new(cache_path: cache_path)
-      @tag_table = TagTable.new(cache_path: cache_path)
+      initialize_cache(cache_path)
+      @routing_table = RoutingTable.new(entries: cache.fetch('routing_table', {}))
+      @tag_table = TagTable.new(entries: cache.fetch('tag_table', {}))
     end
 
     def resolve_target(target)
@@ -81,6 +82,40 @@ module LIFX
     def refresh_site(site_id)
       context.send_message(target: Target.new(site_id: site_id), payload: Protocol::Device::GetTagLabels.new(tags: UINT64_MAX))
       context.send_message(target: Target.new(site_id: site_id), payload: Protocol::Device::GetTags.new)
+    end
+
+    protected
+
+    def initialize_cache(cache_path)
+      return unless cache_path
+      if File.exists?(cache_path)
+        begin
+          @cache = read_cache(cache_path)
+        rescue => ex
+          logger.warn("Could not load cache at path: #{path} - #{ex}")
+        end
+      end
+      at_exit do
+        persist_cache(cache_path)
+      end
+    end
+
+    def read_cache(cache_path)
+      YAML.load(File.read(cache_path))
+    end
+
+    def persist_cache(cache_path)
+      cache['routing_table'] = routing_table.entries
+      cache['tag_table']     = tag_table.entries
+      dir = File.dirname(cache_path)
+      FileUtils.mkdir_p(dir) unless Dir.exists?(dir)
+      File.open(cache_path, 'w') do |io|
+        io.write(YAML.dump(cache))
+      end
+    end
+
+    def cache
+      @cache ||= {}
     end
   end
 end
