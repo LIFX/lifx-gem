@@ -13,10 +13,11 @@ module LIFX
 
     attr_reader :id, :site_id, :label, :color, :power, :dim, :tags_field
 
-    def initialize(context:, id: , site_id: nil)
+    def initialize(context:, id:, site_id: nil, label: nil)
       @context = context
       @id = id
       @site_id = site_id
+      @label = label
       @power = 0
       @context.register_device(self)
     end
