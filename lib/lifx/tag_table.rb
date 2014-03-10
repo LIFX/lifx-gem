@@ -10,7 +10,7 @@ module LIFX
     end
 
     def entries_with(tag_id: nil, site_id: nil, label: nil)
-      @entries.values.map(&:values).flatten.select do |entry|
+      entries.select do |entry|
         ret = []
         ret << (entry.tag_id == tag_id) if tag_id
         ret << (entry.site_id == site_id) if site_id
@@ -40,7 +40,7 @@ module LIFX
     end
 
     def entries
-      @entries.values.map(&:values.flatten)
+      @entries.values.map(&:values).flatten
     end
   end
 end
