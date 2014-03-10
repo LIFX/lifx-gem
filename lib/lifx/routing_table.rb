@@ -22,11 +22,11 @@ module LIFX
     end
 
     def site_ids
-      @device_site_mapping.values.map(&:site_id).uniq
+      entries.map(&:site_id).uniq
     end
 
     def entries
-      @device_site_mapping.dup
+      @device_site_mapping.values
     end
   end
 end
