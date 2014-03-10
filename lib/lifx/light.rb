@@ -93,7 +93,7 @@ module LIFX
     end
 
     def to_s
-      %Q{#<LIFX::Light id=#{id} label=#{label.to_s} power=#{on? ? 'on' : 'off'}>}.force_encoding(Encoding.default_external)
+      %Q{#<LIFX::Light id=#{id} label=#{label.to_s} power=#{power_state}>}.force_encoding(Encoding.default_external)
     end
     alias_method :inspect, :to_s
 
