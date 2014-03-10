@@ -1,14 +1,14 @@
 module LIFX
   module Utilities
-    def wait_until(seconds: 10, spin_wait: 0.1, &block)
-      Timeout.timeout(seconds) do
-        while !(ret = block.call) do
-          sleep(spin_wait)
+    def try_until(condition_proc, timeout_exception: Timeout::Error, timeout: 3, retry_wait: 0.5, &action_block)
+      Timeout.timeout(timeout) do
+        while !condition_proc.call
+          action_block.call
+          sleep(retry_wait)
         end
-        return ret
       end
     rescue Timeout::Error
-
+      raise timeout_exception
     end
 
     def tag_ids_from_field(tags_field)

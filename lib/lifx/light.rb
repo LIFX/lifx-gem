@@ -28,12 +28,12 @@ module LIFX
       when Protocol::Light::State
         @label      = payload.label.to_s
         @color      = Color.from_struct(payload.color.snapshot)
-        @power      = payload.power
+        @power      = payload.power.to_i
         @dim        = payload.dim
         @tags_field = payload.tags
         seen!
       when Protocol::Device::StatePower
-        @power = payload.level
+        @power = payload.level.to_i
         send_message(Protocol::Light::Get.new) if !label
         seen!
       when Protocol::Device::StateLabel
@@ -42,6 +42,15 @@ module LIFX
       when Protocol::Device::StateTags
         @tags_field = payload.tags
         seen!
+      end
+    end
+
+    def site_id
+      if @site_id.nil?
+        # FIXME: This is ugly.
+        context.routing_manager.routing_table.site_id_for_device_id(id)
+      else
+        @site_id
       end
     end
 

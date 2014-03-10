@@ -33,6 +33,10 @@ module LIFX
         tag_entry = entry_with(label: tag, site_id: device.site_id)
       end
 
+      try_until -> { !device.tags_field.nil? }, timeout_exception: "Could not fetch tags from device" do
+        device.send_message(Protocol::Device::GetTags.new)
+      end
+
       device_tags_field = device.tags_field
       device_tags_field |= id_to_tags_field(tag_entry.tag_id)
       device.send_message(Protocol::Device::SetTags.new(tags: device_tags_field))
@@ -41,6 +45,10 @@ module LIFX
     def remove_tag_from_device(tag:, device:)
       tag_entry = entry_with(label: tag, site_id: device.site_id)
       return if !tag_entry
+
+      try_until -> { !device.tags_field.nil? }, timeout_exception: "Could not fetch tags from device" do
+        device.send_message(Protocol::Device::GetTags.new)
+      end
 
       device_tags_field = device.tags_field
       device_tags_field &= ~id_to_tags_field(tag_entry.tag_id)
