@@ -18,7 +18,7 @@ module LIFX
       @id = id
       @site_id = site_id
       @label = label
-      @power = 0
+      @power = nil
       @context.register_device(self)
     end
 
@@ -51,11 +51,22 @@ module LIFX
     end
 
     def on?
-      !off?
+      power_state == :on
     end
 
     def off?
-      power.zero?
+      power_state == :off
+    end
+
+    def power_state
+      case power
+      when nil
+        :unknown
+      when 0
+        :off
+      else
+        :on
+      end
     end
 
     def add_tag(tag)
