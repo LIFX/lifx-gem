@@ -36,11 +36,11 @@ module LIFX
     end
 
     def tags
-      @entries.values.map(&:values).flatten.map(&:label).uniq
+      entries.map(&:label).uniq
     end
 
     def entries
-      @entries.dup
+      @entries.values.map(&:values.flatten)
     end
   end
 end
