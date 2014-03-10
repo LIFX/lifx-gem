@@ -24,8 +24,8 @@ module LIFX
     extend Forwardable
 
     attr_reader :context
-    def initialize(transport: :lan, cache_path: nil)
-      @context = NetworkContext.new(transport: transport, cache_path: cache_path)
+    def initialize(transport: :lan)
+      @context = NetworkContext.new(transport: transport)
     end
 
     DISCOVERY_DEFAULT_TIMEOUT = 10

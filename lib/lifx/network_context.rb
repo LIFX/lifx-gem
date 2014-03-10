@@ -14,7 +14,7 @@ module LIFX
     # NetworkContext stores lights and ties together TransportManager, TagManager and RoutingManager
     attr_reader :transport_manager, :tag_manager, :routing_manager
     
-    def initialize(transport: :lan, cache_path: nil)
+    def initialize(transport: :lan)
       @devices = {}
 
       @transport_manager = case transport
@@ -29,7 +29,7 @@ module LIFX
         handle_message(message, ip, transport)
       end
 
-      @routing_manager = RoutingManager.new(context: self, cache_path: cache_path)
+      @routing_manager = RoutingManager.new(context: self)
       @tag_manager = TagManager.new(context: self, tag_table: @routing_manager.tag_table)
     end
 

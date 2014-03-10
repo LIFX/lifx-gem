@@ -1,10 +1,6 @@
 module LIFX
   class TagTable
-    class Entry < Struct.new(:tag_id, :label, :site_id)
-      def self.from_hash(tag_id:, label:, site_id:)
-        new(tag_id, label, site_id)
-      end
-    end
+    class Entry < Struct.new(:tag_id, :label, :site_id); end
 
     def initialize(entries: {})
       @entries = Hash.new { |h, k| h[k] = {} }
