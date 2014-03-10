@@ -61,7 +61,12 @@ module LIFX
         if message.path.all_sites?
           @transport.write(message)
         else
-          @sites[message.path.site_id].write(message)
+          site = @sites[message.path.site_id]
+          if site
+            site.write(message)
+          else
+            @transport.write(message)
+          end
         end
         @peer_transport.write(message)
       end
