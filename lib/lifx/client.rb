@@ -6,9 +6,12 @@ require 'lifx/network_context'
 require 'lifx/light_collection'
 
 module LIFX
+  # {LIFX::Client} is the top level interface to the library. It mainly maps
+  # methods to the backing {NetworkContext} instance.
   class Client
+
     class << self
-      # Returns a LIFX::Client set up for accessing devices on the LAN
+      # Returns a {Client} set up for accessing devices on the LAN
       #
       # @return [Client] A LAN LIFX::Client
       def lan
@@ -18,8 +21,8 @@ module LIFX
       # Returns a LIFX::Light that's set up to talk to the virtual bulb
       # located at http://virtualbulb.lifx.co.
       # 
-      # For this to work, you must have the page loaded and be accessing it
-      # from the same public IP.
+      # @note For this to work, you must have the page loaded and be accessing it
+      #   from the same public IP.
       # @return [Light] A Light that represents your virtual bulb instance
       def virtual_bulb
         @virtual_bulb ||= begin
@@ -32,7 +35,8 @@ module LIFX
 
     extend Forwardable
 
-    # @return [NetworkContext] Refers to the client's network context
+    # Refers to the client's network context.
+    # @return [NetworkContext] Enclosed network context
     attr_reader :context
 
     # @param transport: [:lan, :virtual_bulb] Specify which transport to use
@@ -43,7 +47,7 @@ module LIFX
     # Default timeout in seconds for discovery
     DISCOVERY_DEFAULT_TIMEOUT = 10
 
-    # This method tells the [NetworkContext] to look for devices, and will block
+    # This method tells the {NetworkContext} to look for devices, and will block
     # until there's at least one device.
     # 
     # @param timeout: [Numeric] How long to try to wait for before returning
@@ -81,22 +85,24 @@ module LIFX
     # Purges unused tags from the system.
     # Should only use when all devices are on the network, otherwise
     # offline devices using their tags will not be tagged correctly.
-    # @see [NetworkContext#purge_unused_tags!]
+    # @return [Array<String>] Tags that were purged
     def purge_unused_tags!
       context.purge_unused_tags!
     end
 
     # Asks all devices on the network to send their state. Asynchronous, so the
-    # lights returned may not have updated yet.
-    # @return [LightCollection] (see #lights)
+    # lights returned may not have updated yet. aa
+    # @return [void]
     def refresh
       context.refresh
     end
 
     # Blocks until all messages have been sent to the gateways
-    # @see [NetworkContext#flush]
-    def flush(**args)
-      context.flush(**args)
+    # @param timeout: [Numeric] When specified, flush will wait `timeout:` seconds before throwing `Timeout::Error`
+    # @raise [Timeout::Error] if `timeout:` was exceeded while waiting for send queue to flush
+    # @return [void]
+    def flush(timeout: nil)
+      context.flush(timeout: timeout)
     end
   end
 end
