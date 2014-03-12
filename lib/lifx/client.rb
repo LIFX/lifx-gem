@@ -90,13 +90,6 @@ module LIFX
       context.purge_unused_tags!
     end
 
-    # Asks all devices on the network to send their state. Asynchronous, so the
-    # lights returned may not have updated yet. aa
-    # @return [void]
-    def refresh
-      context.refresh
-    end
-
     # Blocks until all messages have been sent to the gateways
     # @param timeout: [Numeric] When specified, flush will wait `timeout:` seconds before throwing `Timeout::Error`
     # @raise [Timeout::Error] if `timeout:` was exceeded while waiting for send queue to flush
