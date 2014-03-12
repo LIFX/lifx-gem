@@ -62,6 +62,7 @@ module LIFX
               logger.error("#{self}: Backtrace: #{ex.backtrace.join("\n")}")
               if @socket
                 logger.error("#{self}: Reconnecting...")
+                sleep 1
                 reconnect
               end
             end
