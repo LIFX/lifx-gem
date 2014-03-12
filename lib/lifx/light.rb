@@ -4,6 +4,7 @@ require 'lifx/target'
 require 'lifx/light_target'
 
 module LIFX
+  # LIFX::Light represents a Light device
   class Light
     include Seen
     include LightTarget
@@ -11,7 +12,7 @@ module LIFX
 
     attr_reader :context
 
-    attr_reader :id, :site_id, :label, :color, :power, :dim, :tags_field
+    attr_reader :id, :site_id, :label, :color, :power, :tags_field
 
     def initialize(context:, id:, site_id: nil, label: nil)
       @context = context
@@ -29,7 +30,6 @@ module LIFX
         @label      = payload.label.to_s
         @color      = Color.from_struct(payload.color.snapshot)
         @power      = payload.power.to_i
-        @dim        = payload.dim
         @tags_field = payload.tags
         seen!
       when Protocol::Device::StatePower
