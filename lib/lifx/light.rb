@@ -79,7 +79,7 @@ module LIFX
       @tags_field
     end
 
-    # Sends a message to the Light
+    # Queues a message to be sent the Light
     # @param payload [Protocol::Payload] the payload to send
     # @return [Light] returns self for chaining
     def send_message(payload)
@@ -109,7 +109,7 @@ module LIFX
       end
     end
 
-    # Adds a tag to the Light
+    # Attempts to add a tag to the Light
     # @param tag [String] The tag to add
     # @return [Light] self
     def add_tag(tag)
@@ -117,7 +117,7 @@ module LIFX
       self
     end
 
-    # Removes a tag from the Light
+    # Attempts to remove a tag from the Light
     # @param tag [String] The tag to remove
     # @return [Light] self
     def remove_tag(tag)
