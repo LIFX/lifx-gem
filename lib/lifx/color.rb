@@ -24,7 +24,7 @@ module LIFX
       def hsb(hue, saturation, brightness)
         new(hue, saturation, brightness, DEFAULT_KELVIN)
       end
-      alias_method :hsb, :hsv
+      alias_method :hsv, :hsb
 
       # Helper method to create from HSBK/HSVK
       # @param hue [Float] Valid range: `0..360`
