@@ -14,24 +14,35 @@ module LIFX
       @threads << initialize_write_queue
     end
 
-
     def handle_message(message, ip, transport)
       payload = message.payload
       case payload
       when Protocol::Device::StatePanGateway
-        if !@udp_transport && payload.service == Protocol::Device::Service::UDP
+        if !udp_connected? && payload.service == Protocol::Device::Service::UDP
           # UDP transport here is only for sending directly to bulb
           # We receive responses via UDP transport listening to broadcast in Network
-          @udp_transport = Transport::UDP.new(ip, payload.port.snapshot)
-        elsif !@tcp_transport && payload.service == Protocol::Device::Service::TCP && (port = payload.port.snapshot) > 0
-          connect(ip, port)
+          connect_udp(ip, payload.port.to_i)
+        elsif !tcp_connected? && payload.service == Protocol::Device::Service::TCP && (port = payload.port.snapshot) > 0
+          connect_tcp(ip, port)
         end
       else
         logger.error("#{self}: Unhandled message: #{message}")
       end
     end
 
-    def connect(ip, port)
+    def udp_connected?
+      !!@udp_transport
+    end
+
+    def tcp_connected?
+      @tcp_transport && @tcp_transport.connected?
+    end
+
+    def connect_udp(ip, port)
+      @udp_transport = Transport::UDP.new(ip, port)
+    end
+
+    def connect_tcp(ip, port)
       logger.info("#{self}: Establishing connection to #{ip}:#{port}")
       @tcp_transport = Transport::TCP.new(ip, port)
       @tcp_transport.add_observer(self) do |message:, ip:, transport:|
@@ -44,7 +55,7 @@ module LIFX
     end
 
     def write(message)
-      @queue << message
+      @queue.push(message)
     end
 
     def close
@@ -79,20 +90,26 @@ module LIFX
     def initialize_write_queue
       @queue = SizedQueue.new(MAXIMUM_QUEUE_LENGTH)
       @last_write = Time.now
+      Thread.abort_on_exception = true
       Thread.new do
         loop do
           if best_transport.nil?
             sleep 0.1
             next
           end
-          message = @queue.pop
-          if !message.is_a?(Message)
-            raise ArgumentError.new("Unexpected object in message queue: #{message.inspect}")
-          end
           delay = [MINIMUM_TIME_BETWEEN_MESSAGE_SEND - (Time.now - @last_write), 0].max
           logger.debug("#{self}: Sleeping for #{delay}")
           sleep(delay)
-          actually_write(message)
+          Thread.exclusive do
+            message = @queue.pop
+            if !message.is_a?(Message)
+              raise ArgumentError.new("Unexpected object in message queue: #{message.inspect}")
+            end
+            if !actually_write(message)
+              logger.debug("#{self}: Couldn't write, pushing back onto queue.")
+              @queue << message 
+            end
+          end
           @last_write = Time.now
         end
       end
