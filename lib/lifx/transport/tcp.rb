@@ -27,8 +27,10 @@ module LIFX
       end
 
       def reconnect
-        @socket.close if @socket
-        connect
+        Thread.exclusive do
+          @socket.close if @socket
+          connect
+        end
       end
 
       def close
