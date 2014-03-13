@@ -38,6 +38,10 @@ module LIFX
       @tcp_transport && @tcp_transport.connected?
     end
 
+    def connected?
+      udp_connected? || tcp_connected?
+    end
+
     def connect_udp(ip, port)
       @udp_transport = Transport::UDP.new(ip, port)
     end
@@ -93,7 +97,7 @@ module LIFX
       Thread.abort_on_exception = true
       Thread.new do
         loop do
-          if best_transport.nil?
+          if !connected?
             sleep 0.1
             next
           end
@@ -106,7 +110,7 @@ module LIFX
               raise ArgumentError.new("Unexpected object in message queue: #{message.inspect}")
             end
             if !actually_write(message)
-              logger.debug("#{self}: Couldn't write, pushing back onto queue.")
+              logger.error("#{self}: Couldn't write, pushing back onto queue.")
               @queue << message 
             end
           end
@@ -117,8 +121,21 @@ module LIFX
 
     def actually_write(message)
       # TODO: Support force sending over UDP
-      logger.debug("-> #{self} #{best_transport}: #{message}")
-      best_transport.write(message)
+      if tcp_connected?
+        if @tcp_transport.write(message)
+          logger.debug("-> #{self} #{@tcp_transport}: #{message}")
+          return true
+        end
+      end
+
+      if udp_connected?
+        if @udp_tranport.write(message)
+          logger.debug("-> #{self} #{@tcp_transport}: #{message}")
+          return true
+        end
+      end
+
+      false
     end
 
   end
