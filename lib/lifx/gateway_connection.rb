@@ -129,7 +129,7 @@ module LIFX
       end
 
       if udp_connected?
-        if @udp_tranport.write(message)
+        if @udp_transport.write(message)
           logger.debug("-> #{self} #{@tcp_transport}: #{message}")
           return true
         end

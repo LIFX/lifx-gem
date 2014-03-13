@@ -7,6 +7,7 @@ module LIFX
 
       def initialize(*args)
         super
+        @mutex = Mutex.new
         connect
       end
 
@@ -14,23 +15,33 @@ module LIFX
         @socket && !@socket.closed?
       end
 
+      CONNECT_TIMEOUT = 5
       def connect
-        @socket = TCPSocket.new(host, port) # Performs the connection
+        Timeout.timeout(5) do
+          @socket = TCPSocket.new(host, port) # Performs the connection
+        end
         @socket.setsockopt(Socket::SOL_SOCKET,  Socket::SO_SNDBUF,    1024)
         @socket.setsockopt(Socket::SOL_SOCKET,  Socket::SO_KEEPALIVE, true)
         @socket.setsockopt(Socket::IPPROTO_TCP, Socket::TCP_NODELAY,  1)
         @socket.setsockopt(Socket::IPPROTO_TCP, Socket::TCP_MAXSEG,   512)
+        logger.error("#{self}: Connected.")
       rescue => ex
-        logger.error("#{self}: Exception occured - #{ex}")
+        logger.error("#{self}: Exception occured in #connect - #{ex}")
         logger.error("#{self}: Backtrace: #{ex.backtrace.join("\n")}")
         @socket = nil
       end
 
       def reconnect
-        Thread.exclusive do
+        Thread.kill(@reconnect_thr) if @reconnect_thr
+        @reconnect_thr = Thread.new do
+          sleep 1
           @socket.close if @socket
           connect
         end
+      end
+
+      def reconnecting?
+        @reconnect_thr && @reconnect_thr.alive?
       end
 
       def close
@@ -48,7 +59,16 @@ module LIFX
         @listener = Thread.new do
           while @socket do
             begin
+              if reconnecting?
+                sleep 0.1
+                next
+              end
               header_data = @socket.recv(HEADER_SIZE, Socket::MSG_PEEK)
+              if header_data.length != HEADER_SIZE
+                logger.error("#{self}: No data")
+                reconnect
+                next
+              end
               header      = Protocol::Header.read(header_data)
               size        = header.msg_size
               data        = @socket.recv(size)
@@ -60,11 +80,10 @@ module LIFX
                 logger.error("#{self}: Exception occured - #{ex}")
               end
             rescue => ex
-              logger.error("#{self}: Exception occured - #{ex}")
+              logger.error("#{self}: Exception occured in #listen - #{ex}")
               logger.error("#{self}: Backtrace: #{ex.backtrace.join("\n")}")
               if @socket
                 logger.error("#{self}: Reconnecting...")
-                sleep 1
                 reconnect
               end
             end
@@ -72,9 +91,18 @@ module LIFX
         end
       end
 
+      SEND_TIMEOUT = 2
       def write(message)
+        return false if !connected? || reconnecting?
         data = message.pack
-        @socket.write(data)
+        Timeout.timeout(SEND_TIMEOUT) do
+          begin
+            @socket.write(data)
+          rescue => ex
+            logger.error("#{self}: Internal exception: #{ex}")
+            return false
+          end
+        end
         true
       rescue => ex
         logger.error("#{self}: Exception in #write: #{ex}")
