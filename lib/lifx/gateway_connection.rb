@@ -31,7 +31,7 @@ module LIFX
     end
 
     def udp_connected?
-      !!@udp_transport
+      @udp_transport && @udp_transport.connected?
     end
 
     def tcp_connected?
@@ -82,14 +82,10 @@ module LIFX
       end
     end
 
-    def best_transport
-      @tcp_transport || @udp_transport
-    end
-
     protected
 
-    MINIMUM_TIME_BETWEEN_MESSAGE_SEND = 0.2
-    MAXIMUM_QUEUE_LENGTH = 100
+    MINIMUM_TIME_BETWEEN_MESSAGE_SEND = 1 / 5.0
+    MAXIMUM_QUEUE_LENGTH = 10
 
     def initialize_write_queue
       @queue = SizedQueue.new(MAXIMUM_QUEUE_LENGTH)
@@ -119,9 +115,21 @@ module LIFX
       end
     end
 
+    def check_connections
+      if @tcp_transport && !tcp_connected?
+        @tcp_transport = nil
+      end
+
+      if @udp_transport && !udp_connected?
+        @udp_transport = nil
+      end
+    end
+
     def actually_write(message)
+      check_connections
+
       # TODO: Support force sending over UDP
-      if tcp_connected?
+      if tcp_connected? && !message.use_udp
         if @tcp_transport.write(message)
           logger.debug("-> #{self} #{@tcp_transport}: #{message}")
           return true

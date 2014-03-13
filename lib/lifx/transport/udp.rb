@@ -9,9 +9,23 @@ module LIFX
         @socket = create_socket
       end
 
+      def connected?
+        !!@socket
+      end
+
+      def close
+        return if !@socket
+        @socket.close
+        @socket = nil
+      end
+
       def write(message)
         data = message.pack
         @socket.send(data, 0, host, port)
+      rescue => ex
+        logger.error("#{self}: Error on #write: #{ex}")
+        logger.error("#{self}: Backtrace: #{ex.backtrace.join("\n")}")
+        close
       end
 
       def listen(ip: self.host, port: self.port)
