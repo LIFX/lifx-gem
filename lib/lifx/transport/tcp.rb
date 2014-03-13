@@ -24,7 +24,7 @@ module LIFX
         @socket.setsockopt(Socket::SOL_SOCKET,  Socket::SO_KEEPALIVE, true)
         @socket.setsockopt(Socket::IPPROTO_TCP, Socket::TCP_NODELAY,  1)
         @socket.setsockopt(Socket::IPPROTO_TCP, Socket::TCP_MAXSEG,   512)
-        logger.error("#{self}: Connected.")
+        logger.info("#{self}: Connected.")
       rescue => ex
         logger.error("#{self}: Exception occured in #connect - #{ex}")
         logger.error("#{self}: Backtrace: #{ex.backtrace.join("\n")}")
