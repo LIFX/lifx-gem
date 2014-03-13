@@ -35,7 +35,7 @@ module LIFX
         Thread.kill(@reconnect_thr) if @reconnect_thr
         @reconnect_thr = Thread.new do
           sleep 1
-          @socket.close if @socket
+          @socket.close if !@socket.closed?
           connect
         end
       end
@@ -48,7 +48,7 @@ module LIFX
         return if !@socket
         Thread.kill(@listener)
         @listener = nil
-        @socket.close
+        @socket.close if !@socket.closed?
         @socket = nil
       end
 
