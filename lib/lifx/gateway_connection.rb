@@ -2,6 +2,7 @@ require 'lifx/observable'
 require 'lifx/timers'
 
 module LIFX
+  # @api private
   class GatewayConnection
     # GatewayConnection handles the UDP and TCP connections to the gateway
     # A GatewayConnection is created when a new device sends a StatePanGateway

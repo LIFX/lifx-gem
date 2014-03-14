@@ -1,6 +1,7 @@
 require 'socket'
 module LIFX
   class Transport
+    # @api private
     class UDP < Transport
       BUFFER_SIZE = 128
 

@@ -4,6 +4,7 @@ require 'lifx/observable'
 require 'lifx/gateway_connection'
 
 module LIFX
+  # @api private
   class Site
     include Seen
     include Timers
