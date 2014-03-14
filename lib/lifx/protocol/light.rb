@@ -10,7 +10,7 @@ module LIFX
         PULSE = 4
       end
 
-      class Hsbk < BinData::Record
+      class Hsbk < Payload
         endian :little
 
         uint16 :hue # 0..65_535 scaled to 0° - 360°.
@@ -19,12 +19,12 @@ module LIFX
         uint16 :kelvin # Explicit 2_400..10_000.
       end
 
-      class Get < BinData::Record
+      class Get < Payload
         endian :little
 
       end
 
-      class Set < BinData::Record
+      class Set < Payload
         endian :little
 
         uint8 :stream # 0 is no stream.
@@ -32,7 +32,7 @@ module LIFX
         uint32 :duration # Milliseconds.
       end
 
-      class SetWaveform < BinData::Record
+      class SetWaveform < Payload
         endian :little
 
         uint8 :stream # 0 is no stream.
@@ -44,21 +44,21 @@ module LIFX
         uint8 :waveform
       end
 
-      class SetDimAbsolute < BinData::Record
+      class SetDimAbsolute < Payload
         endian :little
 
         int16 :brightness # 0 is no change.
         uint32 :duration # Milliseconds.
       end
 
-      class SetDimRelative < BinData::Record
+      class SetDimRelative < Payload
         endian :little
 
         int32 :brightness # 0 is no change.
         uint32 :duration # Milliseconds.
       end
 
-      class Rgbw < BinData::Record
+      class Rgbw < Payload
         endian :little
 
         uint16 :red
@@ -67,13 +67,13 @@ module LIFX
         uint16 :white
       end
 
-      class SetRgbw < BinData::Record
+      class SetRgbw < Payload
         endian :little
 
         rgbw :color
       end
 
-      class State < BinData::Record
+      class State < Payload
         endian :little
 
         hsbk :color
@@ -83,23 +83,23 @@ module LIFX
         uint64 :tags
       end
 
-      class GetRailVoltage < BinData::Record
+      class GetRailVoltage < Payload
         endian :little
 
       end
 
-      class StateRailVoltage < BinData::Record
+      class StateRailVoltage < Payload
         endian :little
 
         uint32 :voltage
       end
 
-      class GetTemperature < BinData::Record
+      class GetTemperature < Payload
         endian :little
 
       end
 
-      class StateTemperature < BinData::Record
+      class StateTemperature < Payload
         endian :little
 
         int16 :temperature # Deci-celsius. 25.45 celsius is 2545

@@ -2,26 +2,26 @@
 module LIFX
   module Protocol
     module Wan
-      class ConnectPlain < BinData::Record
+      class ConnectPlain < Payload
         endian :little
 
         string :user, length: 32, trim_padding: true
         string :pass, length: 32, trim_padding: true
       end
 
-      class ConnectKey < BinData::Record
+      class ConnectKey < Payload
         endian :little
 
         string :auth_key, length: 32
       end
 
-      class StateConnect < BinData::Record
+      class StateConnect < Payload
         endian :little
 
         string :auth_key, length: 32
       end
 
-      class Sub < BinData::Record
+      class Sub < Payload
         endian :little
 
         string :target, length: 8
@@ -29,7 +29,7 @@ module LIFX
         bool :device # 0 - Targets a device. 1 - Targets a tag.
       end
 
-      class Unsub < BinData::Record
+      class Unsub < Payload
         endian :little
 
         string :target, length: 8
@@ -37,7 +37,7 @@ module LIFX
         bool :device # 0 - Targets a device. 1 - Targets a tag.
       end
 
-      class StateSub < BinData::Record
+      class StateSub < Payload
         endian :little
 
         string :target, length: 8

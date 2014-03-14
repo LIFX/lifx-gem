@@ -5,6 +5,7 @@ require "bindata_ext/record"
 require "lifx/utilities"
 require "lifx/logging"
 
+require "lifx/protocol/payload"
 %w(device light sensor wan wifi message).each { |f| require "lifx/protocol/#{f}" }
 require "lifx/protocol/type"
 require "lifx/message"

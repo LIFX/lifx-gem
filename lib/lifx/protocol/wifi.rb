@@ -25,20 +25,20 @@ module LIFX
         OFF = 3
       end
 
-      class Get < BinData::Record
+      class Get < Payload
         endian :little
 
         uint8 :interface
       end
 
-      class Set < BinData::Record
+      class Set < Payload
         endian :little
 
         uint8 :interface
         bool :active
       end
 
-      class State < BinData::Record
+      class State < Payload
         endian :little
 
         uint8 :interface
@@ -47,12 +47,12 @@ module LIFX
         string :ipv6, length: 16
       end
 
-      class GetAccessPoint < BinData::Record
+      class GetAccessPoint < Payload
         endian :little
 
       end
 
-      class SetAccessPoint < BinData::Record
+      class SetAccessPoint < Payload
         endian :little
 
         uint8 :interface
@@ -61,7 +61,7 @@ module LIFX
         uint8 :security
       end
 
-      class StateAccessPoint < BinData::Record
+      class StateAccessPoint < Payload
         endian :little
 
         uint8 :interface
