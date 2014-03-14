@@ -84,6 +84,8 @@ module LIFX
 
     protected
 
+    # Due to an issue in the 1.1 firmware, we have to rate limit message sends
+    # otherwise it can cause the gateway to lock up.
     MINIMUM_TIME_BETWEEN_MESSAGE_SEND = 1 / 5.0
     MAXIMUM_QUEUE_LENGTH = 10
 
@@ -118,10 +120,12 @@ module LIFX
     def check_connections
       if @tcp_transport && !tcp_connected?
         @tcp_transport = nil
+        logger.info("#{self}: TCP connection dropped, clearing.")
       end
 
       if @udp_transport && !udp_connected?
         @udp_transport = nil
+        logger.info("#{self}: UDP connection dropped, clearing.")
       end
     end
 
@@ -129,7 +133,7 @@ module LIFX
       check_connections
 
       # TODO: Support force sending over UDP
-      if tcp_connected? && !message.use_udp
+      if tcp_connected?
         if @tcp_transport.write(message)
           logger.debug("-> #{self} #{@tcp_transport}: #{message}")
           return true
