@@ -103,15 +103,13 @@ module LIFX
           delay = [MINIMUM_TIME_BETWEEN_MESSAGE_SEND - (Time.now - @last_write), 0].max
           logger.debug("#{self}: Sleeping for #{delay}")
           sleep(delay)
-          Thread.exclusive do
-            message = @queue.pop
-            if !message.is_a?(Message)
-              raise ArgumentError.new("Unexpected object in message queue: #{message.inspect}")
-            end
-            if !actually_write(message)
-              logger.error("#{self}: Couldn't write, pushing back onto queue.")
-              @queue << message 
-            end
+          message = @queue.pop
+          if !message.is_a?(Message)
+            raise ArgumentError.new("Unexpected object in message queue: #{message.inspect}")
+          end
+          if !actually_write(message)
+            logger.error("#{self}: Couldn't write, pushing back onto queue.")
+            @queue << message
           end
           @last_write = Time.now
         end
