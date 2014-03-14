@@ -13,12 +13,6 @@ module LIFX
         !!@socket
       end
 
-      def close
-        return if !@socket
-        @socket.close
-        @socket = nil
-      end
-
       def write(message)
         data = message.pack
         @socket.send(data, 0, host, port)
@@ -55,6 +49,9 @@ module LIFX
 
       def close
         Thread.kill(@listener) if @listener
+        return if !@socket
+        @socket.close
+        @socket = nil
       end
 
       protected

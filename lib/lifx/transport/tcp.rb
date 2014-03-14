@@ -41,7 +41,6 @@ module LIFX
       HEADER_SIZE = 8
       def listen
         return if @listener
-        Thread.abort_on_exception = false
         @listener = Thread.new do
           while @socket do
             begin
