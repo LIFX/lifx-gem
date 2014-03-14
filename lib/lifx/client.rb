@@ -17,20 +17,6 @@ module LIFX
       def lan
         @lan ||= new
       end
-
-      # Returns a LIFX::Light that's set up to talk to the virtual bulb
-      # located at http://virtualbulb.lifx.co.
-      # 
-      # @note For this to work, you must have the page loaded and be accessing it
-      #   from the same public IP.
-      # @return [Light] A Light that represents your virtual bulb instance
-      def virtual_bulb
-        @virtual_bulb ||= begin
-          @virtual_bulb_client = new(transport: :virtual_bulb)
-          @virtual_bulb_client.discover
-          @virtual_bulb_client.lights.first
-        end
-      end
     end
 
     extend Forwardable
@@ -39,7 +25,7 @@ module LIFX
     # @return [NetworkContext] Enclosed network context
     attr_reader :context
 
-    # @param transport: [:lan, :virtual_bulb] Specify which transport to use
+    # @param transport: [:lan] Specify which transport to use
     def initialize(transport: :lan)
       @context = NetworkContext.new(transport: transport)
     end

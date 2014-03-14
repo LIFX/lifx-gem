@@ -20,8 +20,6 @@ module LIFX
       @transport_manager = case transport
       when :lan
         TransportManager::LAN.new
-      when :virtual_bulb
-        TransportManager::VirtualBulb.new
       else
         raise ArgumentError.new("Unknown transport method: #{transport}")
       end
