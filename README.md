@@ -14,7 +14,7 @@ This gem is in an alpha state. Expect breaking API changes.
 
 Add this line to your application's Gemfile:
 
-    gem 'lifx', git: "git@github.com:LifxLabs/lifx-gem.git"
+    gem 'lifx', git: "git@github.com:LIFX/lifx-gem.git"
 
 And then execute:
 
