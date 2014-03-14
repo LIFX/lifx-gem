@@ -3,10 +3,10 @@ require 'spec_helper'
 module LIFX
   describe "tags", integration: true do
     it 'Clearing, setting and using tags' do
-      light.add_tag('Test')
-      wait { light.tags.should include('Test') }
+      light.add_tag('Foo')
+      wait { light.tags.should include('Foo') }
 
-      test_tag = lights.with_tag('Test')
+      test_tag = lights.with_tag('Foo')
       test_tag.turn_on
       color = Color.hsb(rand(360), 0.3, 0.3)
       test_tag.set_color(color, duration: 0) 
@@ -16,18 +16,17 @@ module LIFX
       light.refresh
       wait { light.color.should == color }
 
-      light.remove_tag('Test')
+      light.remove_tag('Foo')
+      light.refresh
       flush
-      wait { light.tags.should_not include('Test') }
+      wait { light.tags.should_not include('Foo') }
     end
 
     it 'deletes tags when no longer assigned to a light' do
       light.add_tag('TempTag')
       light.remove_tag('TempTag')
-
       wait { lifx.unused_tags.should include('TempTag') }
       lifx.purge_unused_tags!
-
       wait { lifx.unused_tags.should be_empty }
     end
   end
