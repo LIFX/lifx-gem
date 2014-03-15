@@ -156,6 +156,7 @@ module LIFX
     def send_message!(payload, wait_for:, wait_timeout: 3, &return_block)
       result = nil
       begin
+        return_block ||= Proc.new { |msg| true }
         proc = -> (payload) {
           result = return_block.call(payload)
         }
@@ -191,7 +192,8 @@ module LIFX
       end
     end
 
-    # Attempts to add a tag to the Light
+    # Add tag to the Light
+    # @note This method is synchronous
     # @param tag [String] The tag to add
     # @return [Light] self
     def add_tag(tag)
@@ -199,7 +201,8 @@ module LIFX
       self
     end
 
-    # Attempts to remove a tag from the Light
+    # Remove tag from the Light
+    # @note This method is synchronous
     # @param tag [String] The tag to remove
     # @return [Light] self
     def remove_tag(tag)
