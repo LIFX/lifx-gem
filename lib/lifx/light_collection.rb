@@ -8,6 +8,8 @@ module LIFX
     include Enumerable
     extend Forwardable
 
+    class TagNotFound < ArgumentError; end
+
     # Refers to {NetworkContext} the instance belongs to
     # @return [NetworkContext]
     attr_reader :context
@@ -61,7 +63,11 @@ module LIFX
     # @param tag [String] Tag
     # @return [LightCollection]
     def with_tag(tag)
-      self.class.new(context: context, tag: tag)
+      if context.tags.include?(tag)
+        self.class.new(context: context, tag: tag)
+      else
+        raise TagNotFound.new("No such tag '#{tag}'")
+      end
     end
 
     # Returns an Array of {Light}s

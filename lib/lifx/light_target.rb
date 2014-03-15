@@ -43,5 +43,11 @@ module LIFX
       send_message(Protocol::Light::Get.new)
       self
     end
+
+    # Reboots the light(s).
+    # @return [Light, LightCollection] self for chaining
+    def reboot!
+      send_message(Protocol::Device::Reboot.new)
+    end
   end
 end
