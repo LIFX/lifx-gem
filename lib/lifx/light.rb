@@ -51,17 +51,6 @@ module LIFX
       end
     end
 
-    # Returns the label of the light
-    # @param refresh [Boolean] If true, will request for current label
-    # @return [String] Label
-    def label(refresh = false)
-      @label = nil if refresh
-      try_until -> { @label } do
-        send_message(Protocol::Light::Get.new)
-      end
-      @label
-    end
-
     # Adds a block to be run when a payload of class `payload_class` is received
     # @param payload_class [Class] Payload type to execute block on
     # @param &hook [Proc] Hook to run
@@ -76,6 +65,17 @@ module LIFX
     # @return [void]
     def remove_hook(payload_class, hook)
       @message_hooks[payload_class].delete(hook)
+    end
+
+    # Returns the label of the light
+    # @param refresh [Boolean] If true, will request for current label
+    # @return [String] Label
+    def label(refresh = false)
+      @label = nil if refresh
+      try_until -> { @label } do
+        send_message(Protocol::Light::Get.new)
+      end
+      @label
     end
 
     NSEC_IN_SEC = 1000_000_000
