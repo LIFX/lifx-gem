@@ -18,7 +18,7 @@ module LIFX
         end
       end
     rescue Timeout::Error
-      raise timeout_exception
+      raise timeout_exception if timeout_exception
     end
 
     def tag_ids_from_field(tags_field)

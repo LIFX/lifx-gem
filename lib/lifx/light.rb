@@ -153,7 +153,7 @@ module LIFX
     # @param block: [Proc] the block that is executed when the expected `wait_for` payload comes back. If the return value is false or nil, it will try to send the message again.
     # @return [Object] the truthy result of `block` is returned.
     # @raise [Timeout::Error]
-    def send_message!(payload, wait_for:, wait_timeout: 3, &block)
+    def send_message!(payload, wait_for:, wait_timeout: 3, timeout_exception: Timeout::Error, &block)
       result = nil
       begin
         block ||= Proc.new { |msg| true }
@@ -161,7 +161,7 @@ module LIFX
           result = block.call(payload)
         }
         add_hook(wait_for, &proc)
-        try_until -> { result }, signal: @message_signal do
+        try_until -> { result }, signal: @message_signal, timeout_exception: timeout_exception do
           send_message(payload)
         end
         result
@@ -182,6 +182,9 @@ module LIFX
 
     # @return [:unknown, :off, :on] Light power state
     def power
+      if !@power
+        send_message!(Protocol::Device::GetPower.new, wait_for: Protocol::Device::StatePower)
+      end
       case @power
       when nil
         :unknown
