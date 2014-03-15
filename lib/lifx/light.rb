@@ -193,7 +193,6 @@ module LIFX
     end
 
     # Add tag to the Light
-    # @note This method is synchronous
     # @param tag [String] The tag to add
     # @return [Light] self
     def add_tag(tag)
@@ -202,7 +201,6 @@ module LIFX
     end
 
     # Remove tag from the Light
-    # @note This method is synchronous
     # @param tag [String] The tag to remove
     # @return [Light] self
     def remove_tag(tag)
@@ -233,8 +231,8 @@ module LIFX
       self
     end
 
-    # Sets the site id of the light.
-    # Will clear label and tags
+    # Attempts to setthe site id of the light.
+    # Will clear label and tags. This method cannot guarantee message receipt.
     # @note Don't use this unless you know what you're doing.
     # @param site_id [String] Site ID
     # @return [void]
