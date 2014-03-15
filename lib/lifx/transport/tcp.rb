@@ -33,7 +33,7 @@ module LIFX
 
       def close
         return if !@socket
-        Thread.kill(@listener)
+        Thread.kill(@listener) if @listener
         @listener = nil
         @socket.close if !@socket.closed?
         @socket = nil

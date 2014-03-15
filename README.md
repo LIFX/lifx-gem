@@ -45,7 +45,7 @@ client.flush # Wait until all the packets have been sent
 
 ## Documentation
 
-Documentation is available at (http://rubydoc.info/gems/lifx)(http://rubydoc.info/gems/lifx). Please note that undocumented classes and methods are not intended for public use and will change.
+Documentation is available at http://rubydoc.info/gems/lifx. Please note that undocumented classes and methods are not intended for public use and will change.
 
 ## Examples
 
