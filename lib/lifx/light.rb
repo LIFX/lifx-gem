@@ -36,6 +36,7 @@ module LIFX
       @power = nil
       @message_hooks = Hash.new { |h, k| h[k] = [] }
       @context.register_device(self)
+      @message_signal = ConditionVariable.new
 
       add_hooks
     end
@@ -49,6 +50,7 @@ module LIFX
       @message_hooks[payload.class].each do |hook|
         hook.call(payload)
       end
+      @message_signal.broadcast
     end
 
     # Adds a block to be run when a payload of class `payload_class` is received
@@ -77,6 +79,23 @@ module LIFX
       end
       @label
     end
+
+    # Returns the local time of the light
+    # @return [Time]
+    def time
+      send_message!(Protocol::Device::GetTime.new, wait_for: Protocol::Device::StateTime) do |payload|
+        Time.at(payload.time.to_f / NSEC_IN_SEC)
+      end
+    end
+
+    # Returns the difference between the device time and time on the current machine
+    # Positive values means device time is further in the future.
+    # @return [Float]
+    def time_delta
+      device_time = time
+      delta = Time.now - device_time
+    end
+
 
     NSEC_IN_SEC = 1000_000_000
     # Returns the mesh firmware details
@@ -141,7 +160,7 @@ module LIFX
           result = return_block.call(payload)
         }
         add_hook(wait_for, &proc)
-        try_until -> { result } do
+        try_until -> { result }, signal: @message_signal do
           send_message(payload)
         end
         result
