@@ -9,6 +9,7 @@ module LIFX
     include Seen
     include LightTarget
     include Logging
+    include Utilities
 
     # @return [NetworkContext] NetworkContext the Light belongs to
     attr_reader :context
@@ -32,7 +33,10 @@ module LIFX
       @site_id = site_id
       @label = label
       @power = nil
+      @message_hooks = Hash.new { |h, k| h[k] = [] }
       @context.register_device(self)
+
+      add_hooks
     end
 
     # Handles updating the internal state of the Light from incoming
@@ -40,23 +44,55 @@ module LIFX
     # @api private
     def handle_message(message, ip, transport)
       payload = message.payload
-      case payload
-      when Protocol::Light::State
-        @label      = payload.label.to_s
-        @color      = Color.from_struct(payload.color.snapshot)
-        @power      = payload.power.to_i
-        @tags_field = payload.tags
-        seen!
-      when Protocol::Device::StatePower
-        @power = payload.level.to_i
-        send_message(Protocol::Light::Get.new) if !label
-        seen!
-      when Protocol::Device::StateLabel
-        @label = payload.label.to_s
-        seen!
-      when Protocol::Device::StateTags
-        @tags_field = payload.tags
-        seen!
+
+      @message_hooks[payload.class].each do |hook|
+        hook.call(payload)
+      end
+    end
+
+    # Returns the label of the light
+    # @param refresh [Boolean] If true, will request for current label
+    # @return [String] Label
+    def label(refresh = false)
+      @label = nil if refresh
+      try_until -> { @label } do
+        send_message(Protocol::Light::Get.new)
+      end
+      @label
+    end
+
+    # Adds a block to be run when a payload of class `payload_class` is received
+    # @param payload_class [Class] Payload type to execute block on
+    # @param &hook [Proc] Hook to run
+    # @return [void]
+    def add_hook(payload_class, &hook)
+      @message_hooks[payload_class] << hook
+    end
+
+    # Removes a hook added by {#add_hook}
+    # @param payload_class [Class] Payload type to delete hook from
+    # @param hook [Proc] The original hook passed into {#add_hook}
+    # @return [void]
+    def remove_hook(payload_class, hook)
+      @message_hooks[payload_class].delete(hook)
+    end
+
+    NSEC_IN_SEC = 1000_000_000
+    # Returns the mesh firmware details
+    # @return [Hash] firmware details
+    def mesh_firmware
+      send_message!(Protocol::Device::GetMeshFirmware.new,
+          wait_for: Protocol::Device::StateMeshFirmware) do |payload|
+        Firmware.new(payload)
+      end
+    end
+
+    # Returns the wifi firmware details
+    # @return [Hash] firmware details
+    def wifi_firmware
+      send_message!(Protocol::Device::GetWifiFirmware.new,
+          wait_for: Protocol::Device::StateWifiFirmware) do |payload|
+        Firmware.new(payload)
       end
     end
 
@@ -85,6 +121,29 @@ module LIFX
     def send_message(payload)
       context.send_message(target: Target.new(device_id: id, site_id: @site_id), payload: payload)
       self
+    end
+
+    # Queues a message to be sent to the Light and waits for a response
+    # @param payload [Protocol::Payload] the payload to send
+    # @param wait_for: [Class] the payload class to wait for
+    # @param wait_timeout: [Numeric] wait timeout
+    # @param return_block: [Proc] the block that is executed when the expected `wait_for` payload comes back
+    # @return [Object] the result of `return_block` is returned.
+    # @raise [Timeout::Error]
+    def send_message!(payload, wait_for:, wait_timeout: 3, &return_block)
+      result = nil
+      begin
+        proc = -> (payload) {
+          result = return_block.call(payload)
+        }
+        add_hook(wait_for, &proc)
+        try_until -> { result } do
+          send_message(payload)
+        end
+        result
+      ensure
+        remove_hook(wait_for, proc)
+      end
     end
 
     # @return [Boolean] Returns true if device is on
@@ -157,7 +216,7 @@ module LIFX
 
     # Returns a nice string representation of the Light
     def to_s
-      %Q{#<LIFX::Light id=#{id} label=#{label.to_s} power=#{power}>}.force_encoding(Encoding.default_external)
+      %Q{#<LIFX::Light id=#{id} label=#{@label.to_s} power=#{power}>}.force_encoding(Encoding.default_external)
     end
     alias_method :inspect, :to_s
 
@@ -168,5 +227,33 @@ module LIFX
       raise ArgumentError.new("Comparison of #{self} with #{other} failed") unless other.is_a?(LIFX::Light)
       [label, id, 0] <=> [other.label, other.id, 0]
     end
+
+    protected
+
+    def add_hooks
+      add_hook(Protocol::Device::StateLabel) do |payload|
+        @label = payload.label.to_s
+        seen!
+      end
+
+      add_hook(Protocol::Light::State) do |payload|
+        @label      = payload.label.to_s
+        @color      = Color.from_struct(payload.color.snapshot)
+        @power      = payload.power.to_i
+        @tags_field = payload.tags
+        seen!
+      end
+
+      add_hook(Protocol::Device::StateTags) do |payload|
+        @tags_field = payload.tags
+        seen!
+      end
+
+      add_hook(Protocol::Device::StatePower) do |payload|
+        @power = payload.level.to_i
+        seen!
+      end
+    end
+
   end
 end
