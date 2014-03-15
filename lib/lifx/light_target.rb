@@ -4,7 +4,8 @@ module LIFX
   module LightTarget
     MSEC_PER_SEC   = 1000
 
-    # Attempts to set the color of the light(s) to `color`
+    # Attempts to set the color of the light(s) to `color` asynchronously.
+    # This method cannot guarantee that the message was received.
     # @param color [Color] The color to be set
     # @param duration: [Numeric] Transition time in seconds
     # @return [Light, LightCollection] self for chaining
@@ -17,7 +18,8 @@ module LIFX
       self
     end
 
-    # Attempts to set the power state to `value`
+    # Attempts to set the power state to `value` asynchronously.
+    # This method cannot guarantee the message was received.
     # @param value [0, 1] 0 for off, 1 for on
     # @return [Light, LightCollection] self for chaining
     def set_power(value)
@@ -26,25 +28,29 @@ module LIFX
     end
 
     # Attempts to turn the light(s) on
+    # This method cannot guarantee the message was received.
     # @return [Light, LightCollection] self for chaining
     def turn_on
       set_power(1)
     end
 
     # Attempts to turn the light(s) off
+    # This method cannot guarantee the message was received.
     # @return [Light, LightCollection] self for chaining
     def turn_off
       set_power(0)
     end
 
     # Requests light(s) to report their state
+    # This method cannot guarantee the message was received.
     # @return [Light, LightCollection] self for chaining
     def refresh
       send_message(Protocol::Light::Get.new)
       self
     end
 
-    # Reboots the light(s).
+    # Attempts to reboots the light(s).
+    # This method cannot guarantee the message was received.
     # @return [Light, LightCollection] self for chaining
     def reboot!
       send_message(Protocol::Device::Reboot.new)
