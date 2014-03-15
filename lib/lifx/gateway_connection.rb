@@ -63,7 +63,7 @@ module LIFX
       end
       @tcp_transport.listen
       at_exit do
-        @tcp_transport.close
+        @tcp_transport.close if @tcp_transport
       end
     end
 
