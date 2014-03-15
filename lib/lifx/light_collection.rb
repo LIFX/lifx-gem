@@ -64,7 +64,7 @@ module LIFX
     # @return [LightCollection]
     def with_tag(tag)
       if context.tags.include?(tag)
-        self.class.new(context: context, tag: tag, lights: lights)
+        self.class.new(context: context, tag: tag)
       else
         raise TagNotFound.new("No such tag '#{tag}'")
       end
