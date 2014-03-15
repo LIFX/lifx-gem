@@ -113,6 +113,9 @@ module LIFX
     # @api private
     # @return [Integer]
     def tags_field
+      try_until -> { @tags_field } do
+        send_message(Protocol::Device::GetTags.new)
+      end
       @tags_field
     end
 
