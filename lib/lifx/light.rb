@@ -150,15 +150,15 @@ module LIFX
     # @param payload [Protocol::Payload] the payload to send
     # @param wait_for: [Class] the payload class to wait for
     # @param wait_timeout: [Numeric] wait timeout
-    # @param return_block: [Proc] the block that is executed when the expected `wait_for` payload comes back
-    # @return [Object] the result of `return_block` is returned.
+    # @param block: [Proc] the block that is executed when the expected `wait_for` payload comes back. If the return value is false or nil, it will try to send the message again.
+    # @return [Object] the truthy result of `block` is returned.
     # @raise [Timeout::Error]
-    def send_message!(payload, wait_for:, wait_timeout: 3, &return_block)
+    def send_message!(payload, wait_for:, wait_timeout: 3, &block)
       result = nil
       begin
-        return_block ||= Proc.new { |msg| true }
+        block ||= Proc.new { |msg| true }
         proc = -> (payload) {
-          result = return_block.call(payload)
+          result = block.call(payload)
         }
         add_hook(wait_for, &proc)
         try_until -> { result }, signal: @message_signal do

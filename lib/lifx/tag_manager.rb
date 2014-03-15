@@ -36,8 +36,8 @@ module LIFX
 
       device_tags_field = device.tags_field
       device_tags_field |= id_to_tags_field(tag_entry.tag_id)
-      while !device.tags.include?(tag) do
-        device.send_message!(Protocol::Device::SetTags.new(tags: device_tags_field), wait_for: Protocol::Device::StateTags)
+      device.send_message!(Protocol::Device::SetTags.new(tags: device_tags_field), wait_for: Protocol::Device::StateTags) do
+        device.tags.include?(tag)
       end
     end
 
@@ -47,8 +47,8 @@ module LIFX
 
       device_tags_field = device.tags_field
       device_tags_field &= ~id_to_tags_field(tag_entry.tag_id)
-      while device.tags.include?(tag) do
-        device.send_message!(Protocol::Device::SetTags.new(tags: device_tags_field), wait_for: Protocol::Device::StateTags)
+      device.send_message!(Protocol::Device::SetTags.new(tags: device_tags_field), wait_for: Protocol::Device::StateTags) do
+        !device.tags.include?(tag)
       end
     end
 
