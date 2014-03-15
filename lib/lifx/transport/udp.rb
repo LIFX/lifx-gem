@@ -17,10 +17,12 @@ module LIFX
       def write(message)
         data = message.pack
         @socket.send(data, 0, host, port)
+        true
       rescue => ex
-        logger.error("#{self}: Error on #write: #{ex}")
-        logger.error("#{self}: Backtrace: #{ex.backtrace.join("\n")}")
+        logger.warn("#{self}: Error on #write: #{ex}")
+        logger.warn("#{self}: Backtrace: #{ex.backtrace.join("\n")}")
         close
+        false
       end
 
       def listen(ip: self.host, port: self.port)

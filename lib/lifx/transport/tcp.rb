@@ -26,8 +26,8 @@ module LIFX
         @socket.setsockopt(Socket::IPPROTO_TCP, Socket::TCP_MAXSEG,   512)
         logger.info("#{self}: Connected.")
       rescue => ex
-        logger.error("#{self}: Exception occured in #connect - #{ex}")
-        logger.error("#{self}: Backtrace: #{ex.backtrace.join("\n")}")
+        logger.warn("#{self}: Exception occured in #connect - #{ex}")
+        logger.warn("#{self}: Backtrace: #{ex.backtrace.join("\n")}")
         @socket = nil
       end
 
@@ -54,11 +54,11 @@ module LIFX
               notify_observers(message: message, ip: host, transport: self)
             rescue Message::UnpackError
               if !@ignore_unpackable_messages
-                logger.error("#{self}: Exception occured - #{ex}")
+                logger.warn("#{self}: Exception occured - #{ex}")
               end
             rescue => ex
-              logger.error("#{self}: Exception occured in #listen - #{ex}")
-              logger.error("#{self}: Backtrace: #{ex.backtrace.join("\n")}")
+              logger.warn("#{self}: Exception occured in #listen - #{ex}")
+              logger.warn("#{self}: Backtrace: #{ex.backtrace.join("\n")}")
               close
             end
           end
@@ -73,8 +73,8 @@ module LIFX
         end
         true
       rescue => ex
-        logger.error("#{self}: Exception in #write: #{ex}")
-        logger.error("#{self}: Backtrace: #{ex.backtrace.join("\n")}")
+        logger.warn("#{self}: Exception in #write: #{ex}")
+        logger.warn("#{self}: Backtrace: #{ex.backtrace.join("\n")}")
         close
         false
       end
