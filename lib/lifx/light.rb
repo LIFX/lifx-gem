@@ -227,7 +227,9 @@ module LIFX
       if label.length > MAX_LABEL_LENGTH
         raise LabelTooLong.new("Label length must be below or equal to #{MAX_LABEL_LENGTH}")
       end
-      send_message(Protocol::Device::SetLabel.new(label: label))
+      while self.label != label
+        send_message!(Protocol::Device::SetLabel.new(label: label), wait_for: Protocol::Device::StateLabel)
+      end
       self
     end
 
