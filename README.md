@@ -5,7 +5,7 @@ This gem allows you to control your [LIFX](http://lifx.co) lights.
 It handles discovery, gateway connections, tags, and provides a object-based API
 for talking to Lights.
 
-Due to the nature of the current protocol, all commands are asynchronous and will return immediately.
+Due to the nature of the current protocol, some methods are asynchronous.
 
 This gem is in an early beta state. Expect breaking API changes.
 
@@ -33,7 +33,9 @@ client.lights.turn_on                      # Tell all lights to turn on
 light = client.lights.with_label('Office') # Get light with label 'Office'
 
 # Set the Office light to bright green over 5 seconds
-light.set_color(LIFX::Color.hsb(120, 1, 1), duration: 5)
+green = LIFX::Color.hsb(120, 1, 1)
+light.set_color(green, duration: 5) # Light#set_color is asynchronous
+
 light.set_label('My Office')
 
 light.add_tag('Offices')   # Add tag to light
