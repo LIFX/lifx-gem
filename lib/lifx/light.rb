@@ -146,6 +146,15 @@ module LIFX
       self
     end
 
+    # Sets the site id of the light.
+    # Will clear label and tags
+    # @note Don't use this unless you know what you're doing.
+    # @param site_id [String] Site ID
+    # @return [void]
+    def set_site_id(site_id)
+      send_message(Protocol::Device::SetSite.new(site: [site_id].pack('H*')))
+    end
+
     # Returns a nice string representation of the Light
     def to_s
       %Q{#<LIFX::Light id=#{id} label=#{label.to_s} power=#{power}>}.force_encoding(Encoding.default_external)
