@@ -49,7 +49,9 @@ Documentation is available at (http://rubydoc.info/gems/lifx)(http://rubydoc.inf
 
 ## Examples
 
-* TODO
+Examples are located in the `examples/` folder.
+
+* travis-build-light: Changes the colour of a light based on the build status of a project on Travis
 
 ## Testing
 
