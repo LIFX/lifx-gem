@@ -19,16 +19,24 @@ module LIFX
       payload = message.payload
       case payload
       when Protocol::Device::StatePanGateway
-        if !udp_connected? && payload.service == Protocol::Device::Service::UDP
+        if use_udp? && !udp_connected? && payload.service == Protocol::Device::Service::UDP
           # UDP transport here is only for sending directly to bulb
           # We receive responses via UDP transport listening to broadcast in Network
           connect_udp(ip, payload.port.to_i)
-        elsif !tcp_connected? && payload.service == Protocol::Device::Service::TCP && (port = payload.port.snapshot) > 0
+        elsif use_tcp? && !tcp_connected? && payload.service == Protocol::Device::Service::TCP && (port = payload.port.snapshot) > 0
           connect_tcp(ip, port)
         end
       else
         logger.error("#{self}: Unhandled message: #{message}")
       end
+    end
+
+    def use_udp?
+      Config.allowed_transports.include?(:udp)
+    end
+
+    def use_tcp?
+      Config.allowed_transports.include?(:tcp)
     end
 
     def udp_connected?
