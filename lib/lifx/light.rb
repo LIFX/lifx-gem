@@ -2,6 +2,7 @@ require 'lifx/seen'
 require 'lifx/color'
 require 'lifx/target'
 require 'lifx/light_target'
+require 'lifx/firmware'
 
 module LIFX
   # LIFX::Light represents a Light device
