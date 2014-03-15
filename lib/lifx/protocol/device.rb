@@ -7,85 +7,58 @@ module LIFX
         TCP = 2
       end
 
-      class SetSite < BinData::Record
+      class SetSite < Payload
         endian :little
 
         string :site, length: 6
       end
 
-      class GetPanGateway < BinData::Record
+      class GetPanGateway < Payload
         endian :little
 
       end
 
-      class StatePanGateway < BinData::Record
+      class StatePanGateway < Payload
         endian :little
 
         uint8 :service
         uint32 :port
       end
 
-      class GetTime < BinData::Record
+      class GetTime < Payload
         endian :little
 
       end
 
-      class SetTime < BinData::Record
-        endian :little
-
-        uint64 :time # Nanoseconds since epoch.
-      end
-
-      class StateTime < BinData::Record
+      class SetTime < Payload
         endian :little
 
         uint64 :time # Nanoseconds since epoch.
       end
 
-      class GetResetSwitch < BinData::Record
+      class StateTime < Payload
+        endian :little
+
+        uint64 :time # Nanoseconds since epoch.
+      end
+
+      class GetResetSwitch < Payload
         endian :little
 
       end
 
-      class StateResetSwitch < BinData::Record
+      class StateResetSwitch < Payload
         endian :little
 
         uint8 :position
       end
 
-      class GetMeshInfo < BinData::Record
+      class GetMeshInfo < Payload
         endian :little
 
       end
 
-      class StateMeshInfo < BinData::Record
-        endian :little
-
-        float :signal # Milliwatts.
-        uint32 :tx # Bytes.
-        uint32 :rx # Bytes.
-        int16 :mcu_temperature # Deci-celsius. 25.45 celsius is 2545
-      end
-
-      class GetMeshFirmware < BinData::Record
-        endian :little
-
-      end
-
-      class StateMeshFirmware < BinData::Record
-        endian :little
-
-        uint64 :build # Firmware build nanoseconds since epoch.
-        uint64 :install # Firmware install nanoseconds since epoch.
-        uint32 :version # Firmware human readable version.
-      end
-
-      class GetWifiInfo < BinData::Record
-        endian :little
-
-      end
-
-      class StateWifiInfo < BinData::Record
+      class StateMeshInfo < Payload
         endian :little
 
         float :signal # Milliwatts.
@@ -94,12 +67,12 @@ module LIFX
         int16 :mcu_temperature # Deci-celsius. 25.45 celsius is 2545
       end
 
-      class GetWifiFirmware < BinData::Record
+      class GetMeshFirmware < Payload
         endian :little
 
       end
 
-      class StateWifiFirmware < BinData::Record
+      class StateMeshFirmware < Payload
         endian :little
 
         uint64 :build # Firmware build nanoseconds since epoch.
@@ -107,83 +80,110 @@ module LIFX
         uint32 :version # Firmware human readable version.
       end
 
-      class GetPower < BinData::Record
+      class GetWifiInfo < Payload
         endian :little
 
       end
 
-      class SetPower < BinData::Record
+      class StateWifiInfo < Payload
+        endian :little
+
+        float :signal # Milliwatts.
+        uint32 :tx # Bytes.
+        uint32 :rx # Bytes.
+        int16 :mcu_temperature # Deci-celsius. 25.45 celsius is 2545
+      end
+
+      class GetWifiFirmware < Payload
+        endian :little
+
+      end
+
+      class StateWifiFirmware < Payload
+        endian :little
+
+        uint64 :build # Firmware build nanoseconds since epoch.
+        uint64 :install # Firmware install nanoseconds since epoch.
+        uint32 :version # Firmware human readable version.
+      end
+
+      class GetPower < Payload
+        endian :little
+
+      end
+
+      class SetPower < Payload
         endian :little
 
         uint16 :level # 0 Standby. > 0 On.
       end
 
-      class StatePower < BinData::Record
+      class StatePower < Payload
         endian :little
 
         uint16 :level # 0 Standby. > 0 On.
       end
 
-      class GetLabel < BinData::Record
+      class GetLabel < Payload
         endian :little
 
       end
 
-      class SetLabel < BinData::Record
-        endian :little
-
-        string :label, length: 32, trim_padding: true
-      end
-
-      class StateLabel < BinData::Record
+      class SetLabel < Payload
         endian :little
 
         string :label, length: 32, trim_padding: true
       end
 
-      class GetTags < BinData::Record
+      class StateLabel < Payload
         endian :little
 
-      end
-
-      class SetTags < BinData::Record
-        endian :little
-
-        uint64 :tags
-      end
-
-      class StateTags < BinData::Record
-        endian :little
-
-        uint64 :tags
-      end
-
-      class GetTagLabels < BinData::Record
-        endian :little
-
-        uint64 :tags
-      end
-
-      class SetTagLabels < BinData::Record
-        endian :little
-
-        uint64 :tags
         string :label, length: 32, trim_padding: true
       end
 
-      class StateTagLabels < BinData::Record
+      class GetTags < Payload
+        endian :little
+
+      end
+
+      class SetTags < Payload
+        endian :little
+
+        uint64 :tags
+      end
+
+      class StateTags < Payload
+        endian :little
+
+        uint64 :tags
+      end
+
+      class GetTagLabels < Payload
+        endian :little
+
+        uint64 :tags
+      end
+
+      class SetTagLabels < Payload
         endian :little
 
         uint64 :tags
         string :label, length: 32, trim_padding: true
       end
 
-      class GetVersion < BinData::Record
+      class StateTagLabels < Payload
+        endian :little
+
+        uint64 :tags
+        string :label, length: 32, trim_padding: true
+      end
+
+      class GetVersion < Payload
         endian :little
 
       end
 
-      class StateVersion < BinData::Record
+      class StateVersion < Payload
         endian :little
 
         uint32 :vendor
@@ -191,12 +191,12 @@ module LIFX
         uint32 :version
       end
 
-      class GetInfo < BinData::Record
+      class GetInfo < Payload
         endian :little
 
       end
 
-      class StateInfo < BinData::Record
+      class StateInfo < Payload
         endian :little
 
         uint64 :time # Nanoseconds since epoch.
@@ -204,18 +204,18 @@ module LIFX
         uint64 :downtime # Nanoseconds off last power cycle.
       end
 
-      class GetMcuRailVoltage < BinData::Record
+      class GetMcuRailVoltage < Payload
         endian :little
 
       end
 
-      class StateMcuRailVoltage < BinData::Record
+      class StateMcuRailVoltage < Payload
         endian :little
 
         uint32 :voltage
       end
 
-      class Reboot < BinData::Record
+      class Reboot < Payload
         endian :little
 
       end

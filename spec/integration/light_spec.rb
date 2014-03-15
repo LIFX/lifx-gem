@@ -16,6 +16,8 @@ module LIFX
       it "sets the label of the light" do
         label = light.label.sub(/\d+|$/, rand(100).to_s)
         light.set_label(label)
+        sleep 1
+        light.refresh
         wait { light.label.should == label }
       end
     end

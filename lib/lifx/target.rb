@@ -1,4 +1,6 @@
 module LIFX
+  # @api private
+
   class Target
     # Target is a high-level abstraction for the target of a Message
 

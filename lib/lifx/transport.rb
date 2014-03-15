@@ -1,6 +1,7 @@
 require 'lifx/observable'
 
 module LIFX
+  # @api private
   class Transport
     include Logging
     include Observable

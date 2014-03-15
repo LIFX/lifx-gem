@@ -2,6 +2,8 @@ require 'forwardable'
 require 'lifx/protocol_path'
 
 module LIFX
+  # @api private
+
   class Message
     include Logging
     extend Forwardable

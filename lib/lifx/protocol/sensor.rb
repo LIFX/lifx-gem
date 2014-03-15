@@ -2,23 +2,23 @@
 module LIFX
   module Protocol
     module Sensor
-      class GetAmbientLight < BinData::Record
+      class GetAmbientLight < Payload
         endian :little
 
       end
 
-      class StateAmbientLight < BinData::Record
+      class StateAmbientLight < Payload
         endian :little
 
         float :lux
       end
 
-      class GetDimmerVoltage < BinData::Record
+      class GetDimmerVoltage < Payload
         endian :little
 
       end
 
-      class StateDimmerVoltage < BinData::Record
+      class StateDimmerVoltage < Payload
         endian :little
 
         uint32 :voltage

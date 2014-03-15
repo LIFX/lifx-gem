@@ -5,30 +5,34 @@ This gem allows you to control your [LIFX](http://lifx.co) lights.
 It handles discovery, gateway connections, tags, and provides a object-based API
 for talking to Lights.
 
-Due to the nature of the protocol, all commands are asynchronous and will return immediately.
-A synchronous version can be built on top of this gem.
+Due to the nature of the current protocol, all commands are asynchronous and will return immediately.
 
-This gem is in an alpha state. Expect breaking API changes.
+This gem is in an early beta state. Expect breaking API changes.
 
 ## Installation
 
 Add this line to your application's Gemfile:
 
-    gem 'lifx', git: "git@github.com:LifxLabs/lifx-gem.git"
+```ruby
+gem 'lifx', git: "git@github.com:LIFX/lifx-gem.git"
+```
 
 And then execute:
 
-    $ bundle
+```shell
+$ bundle
+```
 
 ## Usage
 
 ```ruby
 client = LIFX::Client.lan                  # Talk to bulbs on the LAN
-client.discover                            # Discover lights
+client.discover                            # Discover lights.
+                                           # Blocks for a default of 10 seconds or until a light is found
 client.lights.turn_on                      # Tell all lights to turn on
 light = client.lights.with_label('Office') # Get light with label 'Office'
 
-# Set the first light to bright green over 5 seconds
+# Set the Office light to bright green over 5 seconds
 light.set_color(LIFX::Color.hsb(120, 1, 1), duration: 5)
 light.set_label('My Office')
 
@@ -38,6 +42,22 @@ client.lights.with_tag('Offices').turn_off
 
 client.flush # Wait until all the packets have been sent
 ```
+
+## Documentation
+
+Documentation is available at (http://rubydoc.info/gems/lifx)(http://rubydoc.info/gems/lifx). Please note that undocumented classes and methods are not intended for public use and will change.
+
+## Examples
+
+* TODO
+
+## Testing
+
+Run with `bundle exec rspec`.
+
+The integration specs rely on a least one device tagged with `Test` to function. At this point, they're semi-unreliable due to the async nature of the protocol, and there's not much coverage at the moment as the architecture is still in flux.
+
+A more comprehensive test suite is in the works.
 
 ## Contributing
 

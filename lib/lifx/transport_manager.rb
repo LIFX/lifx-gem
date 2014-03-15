@@ -1,13 +1,12 @@
 require 'lifx/observable'
 
 module LIFX
+  # @api private
   module TransportManager
     class Base
       include Logging
       include Observable
-      # TransportManager handles sending and receiving messages
-      # The LAN TM will handle discovery and connection management
-      # The Virtual Bulb will simply connect to the virtual bulb service
+
       def initialize(**args)
       end
 
@@ -33,4 +32,3 @@ module LIFX
 end
 
 require 'lifx/transport_manager/lan'
-require 'lifx/transport_manager/virtual_bulb'

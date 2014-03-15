@@ -2,6 +2,7 @@ require 'socket'
 
 module LIFX
   class Transport
+    # @api private
     class TCP < Transport
       include Logging
 
@@ -14,35 +15,33 @@ module LIFX
         @socket && !@socket.closed?
       end
 
+      CONNECT_TIMEOUT = 5
       def connect
-        @socket = TCPSocket.new(host, port) # Performs the connection
+        Timeout.timeout(CONNECT_TIMEOUT) do
+          @socket = TCPSocket.new(host, port) # Performs the connection
+        end
         @socket.setsockopt(Socket::SOL_SOCKET,  Socket::SO_SNDBUF,    1024)
         @socket.setsockopt(Socket::SOL_SOCKET,  Socket::SO_KEEPALIVE, true)
         @socket.setsockopt(Socket::IPPROTO_TCP, Socket::TCP_NODELAY,  1)
         @socket.setsockopt(Socket::IPPROTO_TCP, Socket::TCP_MAXSEG,   512)
+        logger.info("#{self}: Connected.")
       rescue => ex
-        logger.error("#{self}: Exception occured - #{ex}")
+        logger.error("#{self}: Exception occured in #connect - #{ex}")
         logger.error("#{self}: Backtrace: #{ex.backtrace.join("\n")}")
         @socket = nil
-      end
-
-      def reconnect
-        @socket.close
-        connect
       end
 
       def close
         return if !@socket
         Thread.kill(@listener)
         @listener = nil
-        @socket.close
+        @socket.close if !@socket.closed?
         @socket = nil
       end
 
       HEADER_SIZE = 8
       def listen
         return if @listener
-        Thread.abort_on_exception = true
         @listener = Thread.new do
           while @socket do
             begin
@@ -58,24 +57,26 @@ module LIFX
                 logger.error("#{self}: Exception occured - #{ex}")
               end
             rescue => ex
-              logger.error("#{self}: Exception occured - #{ex}")
+              logger.error("#{self}: Exception occured in #listen - #{ex}")
               logger.error("#{self}: Backtrace: #{ex.backtrace.join("\n")}")
-              if @socket
-                logger.error("#{self}: Reconnecting...")
-                reconnect
-              end
+              close
             end
           end
         end
       end
 
+      SEND_TIMEOUT = 2
       def write(message)
         data = message.pack
-        @socket.write(data)
+        Timeout.timeout(SEND_TIMEOUT) do
+          @socket.write(data)
+        end
+        true
       rescue => ex
         logger.error("#{self}: Exception in #write: #{ex}")
         logger.error("#{self}: Backtrace: #{ex.backtrace.join("\n")}")
-        reconnect
+        close
+        false
       end
     end
   end

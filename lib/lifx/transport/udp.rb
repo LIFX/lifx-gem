@@ -1,6 +1,7 @@
 require 'socket'
 module LIFX
   class Transport
+    # @api private
     class UDP < Transport
       BUFFER_SIZE = 128
 
@@ -9,9 +10,17 @@ module LIFX
         @socket = create_socket
       end
 
+      def connected?
+        !!@socket
+      end
+
       def write(message)
         data = message.pack
         @socket.send(data, 0, host, port)
+      rescue => ex
+        logger.error("#{self}: Error on #write: #{ex}")
+        logger.error("#{self}: Backtrace: #{ex.backtrace.join("\n")}")
+        close
       end
 
       def listen(ip: self.host, port: self.port)
@@ -41,6 +50,9 @@ module LIFX
 
       def close
         Thread.kill(@listener) if @listener
+        return if !@socket
+        @socket.close
+        @socket = nil
       end
 
       protected
