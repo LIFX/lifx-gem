@@ -5,6 +5,7 @@ module LIFX
     include LightTarget
     extend Forwardable
 
+    class TagNotFound < ArgumentError; end
     # Represents a collection of lights
     attr_reader :tag, :context
 
@@ -36,7 +37,11 @@ module LIFX
     end
 
     def with_tag(tag)
-      self.class.new(context: context, tag: tag, lights: lights)
+      if context.tags.include?(tag)
+        self.class.new(context: context, tag: tag, lights: lights)
+      else
+        raise TagNotFound.new("No such tag '#{tag}'")
+      end
     end
 
     def lights
