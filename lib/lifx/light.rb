@@ -75,7 +75,7 @@ module LIFX
     # @return [String] Label
     def label(refresh: false, fetch: true)
       @label = nil if refresh
-      send_message(Protocol::Light::Get.new, wait_for: Protocol::Light::Get) if fetch
+      send_message!(Protocol::Light::Get.new, wait_for: Protocol::Light::Get) if fetch
       @label
     end
 

@@ -53,9 +53,9 @@ module LIFX
     # @return [Light]
     def with_label(label)
       if label.is_a?(Regexp)
-        @lights.find { |l| l.label =~ label }
+        @lights.find { |l| l.label(fetch: false) =~ label }
       else
-        @lights.find { |l| l.label == label }
+        @lights.find { |l| l.label(fetch: false) == label }
       end
     end
 
