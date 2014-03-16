@@ -74,6 +74,11 @@ module LIFX
                                payload: payload)
         end
       end
+      Timeout.timeout(5) do
+        while !unused_tags.empty?
+          sleep 0.1
+        end
+      end
     end
     
     protected

@@ -4,7 +4,7 @@ module LIFX
   describe "tags", integration: true do
     it 'Clearing, setting and using tags' do
       light.add_tag('Foo')
-      wait { light.tags.should include('Foo') }
+      light.tags.should include('Foo')
 
       test_tag = lights.with_tag('Foo')
       test_tag.turn_on
@@ -17,17 +17,15 @@ module LIFX
       wait { light.color.should == color }
 
       light.remove_tag('Foo')
-      light.refresh
-      flush
       wait { light.tags.should_not include('Foo') }
     end
 
     it 'deletes tags when no longer assigned to a light' do
       light.add_tag('TempTag')
       light.remove_tag('TempTag')
-      wait { lifx.unused_tags.should include('TempTag') }
+      lifx.unused_tags.should include('TempTag')
       lifx.purge_unused_tags!
-      wait { lifx.unused_tags.should be_empty }
+      lifx.unused_tags.should be_empty
     end
   end
 end
