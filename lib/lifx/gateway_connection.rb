@@ -10,8 +10,10 @@ module LIFX
     include Logging
     include Observable
 
+    MAX_TCP_ATTEMPTS = 3
     def initialize
       @threads = []
+      @tcp_attempts = 0
       @threads << initialize_write_queue
     end
 
@@ -56,6 +58,11 @@ module LIFX
     end
 
     def connect_tcp(ip, port)
+      if @tcp_attempts > MAX_TCP_ATTEMPTS
+        logger.info("#{self}: Ignoring TCP service of #{ip}:#{port} due to too many failed attempts.")
+        return
+      end
+      @tcp_attempts += 1
       logger.info("#{self}: Establishing connection to #{ip}:#{port}")
       @tcp_transport = Transport::TCP.new(ip, port)
       @tcp_transport.add_observer(self) do |message:, ip:, transport:|

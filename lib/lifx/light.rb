@@ -70,14 +70,41 @@ module LIFX
     end
 
     # Returns the label of the light
-    # @param refresh [Boolean] If true, will request for current label
+    # @param refresh: [Boolean] If true, will request for current label
+    # @param fetch: [Boolean] If false, it will not request current label if it's not cached
     # @return [String] Label
-    def label(refresh = false)
+    def label(refresh: false, fetch: true)
       @label = nil if refresh
-      try_until -> { @label } do
-        send_message(Protocol::Light::Get.new)
-      end
+      send_message(Protocol::Light::Get.new, wait_for: Protocol::Light::Get) if fetch
       @label
+    end
+
+    # @return [Boolean] Returns true if device is on
+    def on?
+      power == :on
+    end
+
+    # @return [Boolean] Returns true if device is off
+    def off?
+      power == :off
+    end
+
+    # @param refresh: see #label
+    # @param fetch: see #label
+    # @return [:unknown, :off, :on] Light power state
+    def power(refresh: false, fetch: true)
+      @power = nil if refresh
+      if !@power && fetch
+        send_message!(Protocol::Device::GetPower.new, wait_for: Protocol::Device::StatePower)
+      end
+      case @power
+      when nil
+        :unknown
+      when 0
+        :off
+      else
+        :on
+      end
     end
 
     # Returns the local time of the light
@@ -95,7 +122,6 @@ module LIFX
       device_time = time
       delta = Time.now - device_time
     end
-
 
     NSEC_IN_SEC = 1000_000_000
     # Returns the mesh firmware details
@@ -136,63 +162,6 @@ module LIFX
         send_message(Protocol::Device::GetTags.new)
       end
       @tags_field
-    end
-
-    # Queues a message to be sent the Light
-    # @param payload [Protocol::Payload] the payload to send
-    # @return [Light] returns self for chaining
-    def send_message(payload)
-      context.send_message(target: Target.new(device_id: id, site_id: @site_id), payload: payload)
-      self
-    end
-
-    # Queues a message to be sent to the Light and waits for a response
-    # @param payload [Protocol::Payload] the payload to send
-    # @param wait_for: [Class] the payload class to wait for
-    # @param wait_timeout: [Numeric] wait timeout
-    # @param block: [Proc] the block that is executed when the expected `wait_for` payload comes back. If the return value is false or nil, it will try to send the message again.
-    # @return [Object] the truthy result of `block` is returned.
-    # @raise [Timeout::Error]
-    def send_message!(payload, wait_for:, wait_timeout: 3, timeout_exception: Timeout::Error, &block)
-      result = nil
-      begin
-        block ||= Proc.new { |msg| true }
-        proc = -> (payload) {
-          result = block.call(payload)
-        }
-        add_hook(wait_for, &proc)
-        try_until -> { result }, signal: @message_signal, timeout_exception: timeout_exception do
-          send_message(payload)
-        end
-        result
-      ensure
-        remove_hook(wait_for, proc)
-      end
-    end
-
-    # @return [Boolean] Returns true if device is on
-    def on?
-      power == :on
-    end
-
-    # @return [Boolean] Returns true if device is off
-    def off?
-      power == :off
-    end
-
-    # @return [:unknown, :off, :on] Light power state
-    def power
-      if !@power
-        send_message!(Protocol::Device::GetPower.new, wait_for: Protocol::Device::StatePower)
-      end
-      case @power
-      when nil
-        :unknown
-      when 0
-        :off
-      else
-        :on
-      end
     end
 
     # Add tag to the Light
@@ -245,7 +214,7 @@ module LIFX
 
     # Returns a nice string representation of the Light
     def to_s
-      %Q{#<LIFX::Light id=#{id} label=#{@label.to_s} power=#{power}>}.force_encoding(Encoding.default_external)
+      %Q{#<LIFX::Light id=#{id} label=#{label(fetch: false)} power=#{power(fetch: false)}>}.force_encoding(Encoding.default_external)
     end
     alias_method :inspect, :to_s
 
@@ -257,6 +226,37 @@ module LIFX
       [label, id, 0] <=> [other.label, other.id, 0]
     end
 
+    # Queues a message to be sent the Light
+    # @param payload [Protocol::Payload] the payload to send
+    # @return [Light] returns self for chaining
+    def send_message(payload)
+      context.send_message(target: Target.new(device_id: id, site_id: @site_id), payload: payload)
+      self
+    end
+
+    # Queues a message to be sent to the Light and waits for a response
+    # @param payload [Protocol::Payload] the payload to send
+    # @param wait_for: [Class] the payload class to wait for
+    # @param wait_timeout: [Numeric] wait timeout
+    # @param block: [Proc] the block that is executed when the expected `wait_for` payload comes back. If the return value is false or nil, it will try to send the message again.
+    # @return [Object] the truthy result of `block` is returned.
+    # @raise [Timeout::Error]
+    def send_message!(payload, wait_for:, wait_timeout: 3, timeout_exception: Timeout::Error, &block)
+      result = nil
+      begin
+        block ||= Proc.new { |msg| true }
+        proc = -> (payload) {
+          result = block.call(payload)
+        }
+        add_hook(wait_for, &proc)
+        try_until -> { result }, signal: @message_signal, timeout_exception: timeout_exception do
+          send_message(payload)
+        end
+        result
+      ensure
+        remove_hook(wait_for, proc)
+      end
+    end
     protected
 
     def add_hooks
