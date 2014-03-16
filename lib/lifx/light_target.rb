@@ -18,6 +18,46 @@ module LIFX
       self
     end
 
+    # Attempts to apply a waveform to the light(s) asynchronously.
+    # @note Don't use this directly.
+    # @api private
+    def set_waveform(color, waveform:,
+                            cycles:,
+                            stream: 0,
+                            transient: true,
+                            period: 1.0,
+                            duty_cycle: nil)
+      send_message(Protocol::Light::SetWaveform.new(
+        color: color.to_hsbk,
+        waveform: waveform,
+        cycles: cycles,
+        stream: stream,
+        transient: transient,
+        period: (period * 1_000).to_i,
+        duty_cycle: (duty_cycle * 65535).round - 32768
+      ))
+    end
+
+    # Attempts to make the light(s) pulse asynchronously.
+    # @param color [Color] Color to pulse
+    # @param duty_cycle: [Float] Percentage of a cycle the light(s) is set to `color`
+    # @param cycles: [Integer] Number of cycles
+    # @param transient: [Boolean] If false, the light will remain at the color the waveform is at when it ends
+    # @param period: [Integer] Number of seconds a cycle. Must be above 1.0 (?)
+    # @param stream: [Integer] Unused
+    def pulse(color, cycles: 1,
+                     duty_cycle: 0.5,
+                     transient: true,
+                     period: 1.0,
+                     stream: 0)
+      set_waveform(color, waveform: Protocol::Light::Waveform::PULSE,
+                          cycles: cycles,
+                          duty_cycle: duty_cycle,
+                          stream: stream,
+                          transient: transient,
+                          period: period)
+    end
+
     # Attempts to set the power state to `value` asynchronously.
     # This method cannot guarantee the message was received.
     # @param value [0, 1] 0 for off, 1 for on
