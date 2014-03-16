@@ -15,7 +15,7 @@ module LIFX
         @socket && !@socket.closed?
       end
 
-      CONNECT_TIMEOUT = 5
+      CONNECT_TIMEOUT = 3
       def connect
         Timeout.timeout(CONNECT_TIMEOUT) do
           @socket = TCPSocket.new(host, port) # Performs the connection
