@@ -27,14 +27,14 @@ module LIFX
       self
     end
 
-    # Attempts to turn the light(s) on
+    # Attempts to turn the light(s) on asynchronously.
     # This method cannot guarantee the message was received.
     # @return [Light, LightCollection] self for chaining
     def turn_on
       set_power(1)
     end
 
-    # Attempts to turn the light(s) off
+    # Attempts to turn the light(s) off asynchronously.
     # This method cannot guarantee the message was received.
     # @return [Light, LightCollection] self for chaining
     def turn_off

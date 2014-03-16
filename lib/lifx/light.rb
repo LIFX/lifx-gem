@@ -79,6 +79,33 @@ module LIFX
       @label
     end
 
+    # Set the power state to `level` synchronously.
+    # This method cannot guarantee the message was received.
+    # @param level [0, 1] 0 for off, 1 for on
+    # @return [Light, LightCollection] self for chaining
+    def set_power!(level)
+      send_message!(Protocol::Device::SetPower.new(level: level), wait_for: Protocol::Device::StatePower) do |payload|
+        if level.zero?
+          payload.level == 0
+        else
+          payload.level > 0
+        end
+      end
+      self
+    end
+
+    # Turns the light(s) on synchronously
+    # @return [Light, LightCollection] self for chaining
+    def turn_on!
+      set_power!(1)
+    end
+
+    # Turns the light(s) off synchronously
+    # @return [Light, LightCollection]
+    def turn_off!
+      set_power!(0)
+    end
+
     # @return [Boolean] Returns true if device is on
     def on?
       power == :on
