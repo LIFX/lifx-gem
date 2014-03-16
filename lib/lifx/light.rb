@@ -79,6 +79,20 @@ module LIFX
       @label
     end
 
+    # Sets the label of the light
+    # @param label [String] Desired label
+    # @raise [LabelTooLong] if label is greater than {MAX_LABEL_LENGTH}
+    # @return [Light] self
+    def set_label(label)
+      if label.length > MAX_LABEL_LENGTH
+        raise LabelTooLong.new("Label length must be below or equal to #{MAX_LABEL_LENGTH}")
+      end
+      while self.label != label
+        send_message!(Protocol::Device::SetLabel.new(label: label), wait_for: Protocol::Device::StateLabel)
+      end
+      self
+    end
+
     # Set the power state to `level` synchronously.
     # This method cannot guarantee the message was received.
     # @param level [0, 1] 0 for off, 1 for on
@@ -213,20 +227,6 @@ module LIFX
     
     MAX_LABEL_LENGTH = 32
     class LabelTooLong < ArgumentError; end
-
-    # Sets the label of the light
-    # @param label [String] Desired label
-    # @raise [LabelTooLong] if label is greater than {MAX_LABEL_LENGTH}
-    # @return [Light] self
-    def set_label(label)
-      if label.length > MAX_LABEL_LENGTH
-        raise LabelTooLong.new("Label length must be below or equal to #{MAX_LABEL_LENGTH}")
-      end
-      while self.label != label
-        send_message!(Protocol::Device::SetLabel.new(label: label), wait_for: Protocol::Device::StateLabel)
-      end
-      self
-    end
 
     # Attempts to setthe site id of the light.
     # Will clear label and tags. This method cannot guarantee message receipt.
