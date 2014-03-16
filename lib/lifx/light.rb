@@ -75,7 +75,7 @@ module LIFX
     # @return [String] Label
     def label(refresh: false, fetch: true)
       @label = nil if refresh
-      send_message!(Protocol::Light::Get.new, wait_for: Protocol::Light::Get) if fetch
+      send_message!(Protocol::Light::Get.new, wait_for: Protocol::Light::Get) if fetch && !@label
       @label
     end
 
@@ -94,9 +94,7 @@ module LIFX
     # @return [:unknown, :off, :on] Light power state
     def power(refresh: false, fetch: true)
       @power = nil if refresh
-      if !@power && fetch
-        send_message!(Protocol::Device::GetPower.new, wait_for: Protocol::Device::StatePower)
-      end
+      send_message!(Protocol::Device::GetPower.new, wait_for: Protocol::Device::StatePower) if !@power && fetch
       case @power
       when nil
         :unknown
