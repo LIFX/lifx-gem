@@ -41,7 +41,7 @@ module LIFX
     def discover(timeout: DISCOVERY_DEFAULT_TIMEOUT)
       Timeout.timeout(timeout) do
         @context.discover
-        while lights.empty?
+        while lights.empty? || lights.first.label(fetch: false).nil?
           sleep 0.1
         end
         lights
