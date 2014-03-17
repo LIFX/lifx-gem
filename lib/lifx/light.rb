@@ -170,7 +170,6 @@ module LIFX
       Time.now.to_f - start
     end
 
-    NSEC_IN_SEC = 1000_000_000
     # Returns the mesh firmware details
     # @return [Hash] firmware details
     def mesh_firmware
