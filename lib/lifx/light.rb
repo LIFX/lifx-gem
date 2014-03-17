@@ -146,6 +146,7 @@ module LIFX
       end
     end
 
+    NSEC_IN_SEC = 1_000_000_000
     # Returns the local time of the light
     # @return [Time]
     def time
