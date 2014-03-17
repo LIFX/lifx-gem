@@ -162,6 +162,14 @@ module LIFX
       delta = Time.now - device_time
     end
 
+    # Pings the device and measures response time.
+    # @return [Float] Latency from sending a message to receiving a response.
+    def latency
+      start = Time.now.to_f
+      send_message!(Protocol::Device::GetTime.new, wait_for: Protocol::Device::StateTime)
+      Time.now.to_f - start
+    end
+
     NSEC_IN_SEC = 1000_000_000
     # Returns the mesh firmware details
     # @return [Hash] firmware details
