@@ -18,12 +18,6 @@ module LIFX
     # @return [String] Device ID
     attr_reader :id
 
-    # @return [String] Label of the device
-    attr_reader :label
-
-    # @return [Color] Last known color of the Light
-    attr_reader :color
-
     # @param context: [NetworkContext] {NetworkContext} the Light belongs to
     # @param id: [String] Device ID of the Light
     # @param site_id: [String] Site ID of the Light. Avoid using when possible.
@@ -71,6 +65,16 @@ module LIFX
     # @return [void]
     def remove_hook(payload_class, hook)
       @message_hooks[payload_class].delete(hook)
+    end
+
+    # Returns the color of the device.
+    # @param refresh: [Boolean] If true, will request for current color
+    # @param fetch: [Boolean] If false, it will not request current color if it's not cached
+    # @return [Color] Color
+    def color(refresh: false, fetch: true)
+      @color = nil if refresh
+      send_message!(Protocol::Light::Get.new, wait_for: Protocol::Light::Get) if fetch && !@color
+      @color
     end
 
     # Returns the label of the light
@@ -316,6 +320,7 @@ module LIFX
     # Attempts to set the site id of the light.
     # Will clear label and tags. This method cannot guarantee message receipt.
     # @note Don't use this unless you know what you're doing.
+    # @api private
     # @param site_id [String] Site ID
     # @return [void]
     def set_site_id(site_id)
