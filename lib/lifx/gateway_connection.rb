@@ -98,6 +98,11 @@ module LIFX
       end
     end
 
+    def to_s
+      "#<LIFX::GatewayConnection tcp=#{@tcp_transport} tcp_attempts=#{@tcp_attempts} udp=#{@udp_transport}>"
+    end
+    alias_method :inspect, :to_s
+
     protected
 
     # Due to an issue in the 1.1 firmware, we have to rate limit message sends
