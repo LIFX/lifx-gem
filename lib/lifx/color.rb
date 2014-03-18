@@ -50,10 +50,35 @@ module LIFX
         new(hue, saturation, brightness, DEFAULT_KELVIN)
       end
 
-      # Creates an instance from a {Protocol::Light::Hsbk} struct
-      # @api private
-      # @param hsbk [Protocol::Light::Hsbk]
-      # @return [Color]
+      def rgb(r, g, b)
+        r = r / 255.0
+        g = g / 255.0
+        b = b / 255.0
+
+        max = [r, g, b].max
+        min = [r, g, b].min
+
+        h = s = v = max
+        d = max - min
+        s = max.zero? ? 0 : d / max
+
+        if max == min
+          h = 0
+        else
+          case max
+          when r
+            h = (g - b) / d + (g < b ? 6 : 0)
+          when g
+            h = (b - r) / d + 2
+          when b
+            h = (r - g) / d + 4
+          end
+          h = h * 60
+        end
+
+        new(h, s, v, DEFAULT_KELVIN)
+      end
+
       def from_struct(hsbk)
         new(
           (hsbk.hue.to_f / UINT16_MAX) * 360,
