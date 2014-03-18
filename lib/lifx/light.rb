@@ -57,7 +57,11 @@ module LIFX
     # @param payload_class [Class] Payload type to execute block on
     # @param &hook [Proc] Hook to run
     # @return [void]
-    def add_hook(payload_class, &hook)
+    def add_hook(payload_class, hook_arg = nil, &hook_block)
+      hook = block_given? ? hook_block : hook_arg
+      if !hook || !hook.is_a?(Proc)
+        raise "MUst pass a proc either as an argument or a block"
+      end
       @message_hooks[payload_class] << hook
     end
 
@@ -146,6 +150,7 @@ module LIFX
       end
     end
 
+    NSEC_IN_SEC = 1_000_000_000
     # Returns the local time of the light
     # @return [Time]
     def time
@@ -171,6 +176,7 @@ module LIFX
     end
 
     # Returns the mesh firmware details
+    # @api private
     # @return [Hash] firmware details
     def mesh_firmware
       send_message!(Protocol::Device::GetMeshFirmware.new,
@@ -180,11 +186,83 @@ module LIFX
     end
 
     # Returns the wifi firmware details
+    # @api private
     # @return [Hash] firmware details
     def wifi_firmware
       send_message!(Protocol::Device::GetWifiFirmware.new,
           wait_for: Protocol::Device::StateWifiFirmware) do |payload|
         Firmware.new(payload)
+      end
+    end
+
+    # Returns the temperature of the device
+    # @return [Float] Temperature in Celcius
+    def temperature
+      send_message!(Protocol::Light::GetTemperature.new,
+          wait_for: Protocol::Light::StateTemperature) do |payload|
+        payload.temperature / 100.0
+      end
+    end
+
+    # Returns mesh network info
+    # @api private
+    # @return [Hash] Mesh network info
+    def mesh_info
+      send_message!(Protocol::Device::GetMeshInfo.new,
+          wait_for: Protocol::Device::StateMeshInfo) do |payload|
+        {
+          signal: payload.signal, # This is in Milliwatts
+          tx: payload.tx,
+          rx: payload.rx
+        }
+      end
+    end
+
+    # Returns wifi network info
+    # @api private
+    # @return [Hash] wifi network info
+    def wifi_info
+      send_message!(Protocol::Device::GetWifiInfo.new,
+          wait_for: Protocol::Device::StateWifiInfo) do |payload|
+        {
+          signal: payload.signal, # This is in Milliwatts
+          tx: payload.tx,
+          rx: payload.rx
+        }
+      end
+    end
+
+    # Returns version info
+    # @api private
+    # @return [Hash] version info
+    def version
+      send_message!(Protocol::Device::GetVersion.new,
+         wait_for: Protocol::Device::StateVersion) do |payload|
+        {
+          vendor: payload.vendor,
+          product: payload.product,
+          version: payload.version
+        }
+      end
+    end
+
+    # Return device uptime
+    # @api private
+    # @return [Float] Device uptime in seconds
+    def uptime
+      send_message!(Protocol::Device::GetInfo.new,
+         wait_for: Protocol::Device::StateInfo) do |payload|
+        payload.uptime.to_f / NSEC_IN_SEC
+      end
+    end
+
+    # Return device last downtime
+    # @api private
+    # @return [Float] Device's last downtime in secodns
+    def last_downtime
+      send_message!(Protocol::Device::GetInfo.new,
+         wait_for: Protocol::Device::StateInfo) do |payload|
+        payload.downtime.to_f / NSEC_IN_SEC
       end
     end
 
@@ -280,7 +358,7 @@ module LIFX
         proc = -> (payload) {
           result = block.call(payload)
         }
-        add_hook(wait_for, &proc)
+        add_hook(wait_for, proc)
         try_until -> { result }, signal: @message_signal, timeout_exception: timeout_exception do
           send_message(payload)
         end

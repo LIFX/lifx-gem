@@ -56,6 +56,7 @@ module LIFX
       end
 
       def write(message)
+        check_transports
         if message.path.all_sites?
           @transport.write(message)
         else
@@ -87,8 +88,19 @@ module LIFX
         end
         @transport.listen(ip: @bind_ip)
 
+        create_peer_transport
+      end
+
+      def create_peer_transport
         @peer_transport = Transport::UDP.new('255.255.255.255', @peer_port)
       end
+
+      def check_transports
+        if !@peer_transport.connected?
+          create_peer_transport
+        end
+      end
+
 
       def handle_broadcast_message(message, ip, transport)
         payload = message.payload

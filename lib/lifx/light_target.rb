@@ -26,7 +26,7 @@ module LIFX
                             stream: 0,
                             transient: true,
                             period: 1.0,
-                            duty_cycle: nil)
+                            duty_cycle: 0.5)
       send_message(Protocol::Light::SetWaveform.new(
         color: color.to_hsbk,
         waveform: waveform,
@@ -38,7 +38,7 @@ module LIFX
       ))
     end
 
-    # Attempts to make the light(s) pulse asynchronously.
+    # Attempts to make the light(s) pulse `color` and then back to its original color. Asynchronous.
     # @param color [Color] Color to pulse
     # @param duty_cycle: [Float] Percentage of a cycle the light(s) is set to `color`
     # @param cycles: [Integer] Number of cycles
@@ -53,6 +53,75 @@ module LIFX
       set_waveform(color, waveform: Protocol::Light::Waveform::PULSE,
                           cycles: cycles,
                           duty_cycle: duty_cycle,
+                          stream: stream,
+                          transient: transient,
+                          period: period)
+    end
+
+    # Attempts to make the light(s) transition to `color` and back in a smooth sine wave. Asynchronous.
+    # @param color [Color] Color
+    # @param cycles: [Integer] Number of cycles
+    # @param transient: [Boolean] If false, the light will remain at the color the waveform is at when it ends
+    # @param period: [Integer] Number of seconds a cycle. Must be above 1.0 (?)
+    # @param stream: [Integer] Unused
+    def sine(color, cycles: 1,
+                    period: 1.0,
+                    transient: true,
+                    stream: 0)
+      set_waveform(color, waveform: Protocol::Light::Waveform::SINE,
+                          cycles: cycles,
+                          duty_cycle: 0,
+                          stream: stream,
+                          transient: transient,
+                          period: period)
+    end
+
+    # Attempts to make the light(s) transition to `color` smoothly, then immediately back to its original color. Asynchronous.
+    # @param color [Color] Color
+    # @param cycles: [Integer] Number of cycles
+    # @param transient: [Boolean] If false, the light will remain at the color the waveform is at when it ends
+    # @param period: [Integer] Number of seconds a cycle. Must be above 1.0 (?)
+    # @param stream: [Integer] Unused
+    def half_sine(color, cycles: 1,
+                         period: 1.0,
+                         transient: true,
+                         stream: 0)
+      set_waveform(color, waveform: Protocol::Light::Waveform::HALF_SINE,
+                          cycles: cycles,
+                          stream: stream,
+                          transient: transient,
+                          period: period)
+    end
+
+    # Attempts to make the light(s) transition to `color` linearly and back. Asynchronous.
+    # @param color [Color] Color to pulse
+    # @param cycles: [Integer] Number of cycles
+    # @param transient: [Boolean] If false, the light will remain at the color the waveform is at when it ends
+    # @param period: [Integer] Number of seconds a cycle. Must be above 1.0 (?)
+    # @param stream: [Integer] Unused
+    def triangle(color, cycles: 1,
+                     period: 1.0,
+                     transient: true,
+                     stream: 0)
+      set_waveform(color, waveform: Protocol::Light::Waveform::TRIANGLE,
+                          cycles: cycles,
+                          stream: stream,
+                          transient: transient,
+                          period: period)
+    end
+
+    # Attempts to make the light(s) transition to `color` linearly, then instantly back. Asynchronous.
+    # @param color [Color] Color to saw wave
+    # @param cycles: [Integer] Number of cycles
+    # @param transient: [Boolean] If false, the light will remain at the color the waveform is at when it ends
+    # @param period: [Integer] Number of seconds a cycle. Must be above 1.0 (?)
+    # @param stream: [Integer] Unused
+    def saw(color, cycles: 1,
+                   period: 1.0,
+                   transient: true,
+                   stream: 0)
+      set_waveform(color, waveform: Protocol::Light::Waveform::SAW,
+                          cycles: cycles,
                           stream: stream,
                           transient: transient,
                           period: period)
