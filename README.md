@@ -47,13 +47,15 @@ client.flush # Wait until all the packets have been sent
 
 ## Documentation
 
-Documentation is available at http://rubydoc.info/gems/lifx. Please note that undocumented classes and methods are not intended for public use and will change.
+Documentation is available at http://rubydoc.info/gems/lifx. Please note that undocumented classes/methods and methods marked private are not intended for public use.
 
 ## Examples
 
 Examples are located in the `examples/` folder.
 
 * travis-build-light: Changes the colour of a light based on the build status of a project on Travis
+* auto-off: Turns a light off after X seconds of it being detected turned on.
+
 
 ## Testing
 
