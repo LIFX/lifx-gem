@@ -2,18 +2,23 @@ module LIFX
   module Utilities
     def try_until(condition_proc, timeout_exception: Timeout::Error,
                                             timeout: 3,
-                                         retry_wait: 0.5,
+                                 condition_interval: 0.1,
+                                    action_interval: 0.5,
                                              signal: nil, &action_block)
       Timeout.timeout(timeout) do
         m = Mutex.new
+        time = 0
         while !condition_proc.call
-          action_block.call
+          if Time.now.to_f - time > action_interval
+            time = Time.now.to_f
+            action_block.call
+          end
           if signal
             m.synchronize do
-              signal.wait(m, retry_wait)
+              signal.wait(m, condition_interval)
             end
           else
-            sleep(retry_wait)
+            sleep(condition_interval)
           end
         end
       end
