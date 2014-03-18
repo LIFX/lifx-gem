@@ -313,13 +313,18 @@ module LIFX
     MAX_LABEL_LENGTH = 32
     class LabelTooLong < ArgumentError; end
 
-    # Attempts to setthe site id of the light.
+    # Attempts to set the site id of the light.
     # Will clear label and tags. This method cannot guarantee message receipt.
     # @note Don't use this unless you know what you're doing.
     # @param site_id [String] Site ID
     # @return [void]
     def set_site_id(site_id)
       send_message(Protocol::Device::SetSite.new(site: [site_id].pack('H*')))
+    end
+
+    # Sets the time on the device
+    def set_time(time = Time.now)
+      send_message(Protocol::Device::SetTime.new(time: (time.to_f * NSEC_IN_SEC).round))
     end
 
     # Returns a nice string representation of the Light
