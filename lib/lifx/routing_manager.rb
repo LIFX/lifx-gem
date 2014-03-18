@@ -72,9 +72,8 @@ module LIFX
         @routing_table.update_table(site_id: message.site_id,
                                     device_id: message.device_id,
                                     tag_ids: tag_ids_from_field(message.payload.tags))
-      else
-        @routing_table.update_table(site_id: message.site_id, device_id: message.device_id)
       end
+      @routing_table.update_table(site_id: message.site_id, device_id: message.device_id)
     end
 
     def refresh_site(site_id)
