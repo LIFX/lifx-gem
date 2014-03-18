@@ -53,9 +53,9 @@ Documentation is available at http://rubydoc.info/gems/lifx. Please note that un
 
 Examples are located in the `examples/` folder.
 
-* travis-build-light: Changes the colour of a light based on the build status of a project on Travis
-* auto-off: Turns a light off after X seconds of it being detected turned on.
-
+* [travis-build-light](examples/travis-build-light/build-light.rb): Changes the colour of a light based on the build status of a project on Travis
+* [auto-off](examples/auto-off/auto-off.rb): Turns a light off after X seconds of it being detected turned on.
+* [identify](examples/identify/identify.rb): Use divide-and-conquer search algorithm to identify a light visually.
 
 ## Testing
 
