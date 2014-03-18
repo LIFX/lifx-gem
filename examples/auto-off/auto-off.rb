@@ -9,7 +9,9 @@ Bundler.require
 AUTO_OFF_DELAY = 10
 
 lifx = LIFX::Client.lan
-lifx.discover
+lifx.discover! do
+  label ? lifx.lights.with_label(label) : lifx.lights.first
+end
 label = ARGV.first
 
 light = label ? lifx.lights.with_label(label) : lifx.lights.first

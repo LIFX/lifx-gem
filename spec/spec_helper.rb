@@ -9,13 +9,9 @@ shared_context 'integration', integration: true do
   def lifx
     $lifx ||= begin
       c = LIFX.client
-      c.discover
       begin
-        Timeout.timeout(5) do
-          while c.lights.with_tag('Test').empty?
-            c.lights.refresh
-            sleep 1
-          end
+        c.discover! do
+          c.tags.include?('Test') && c.lights.with_tag('Test').count > 0
         end
       rescue Timeout::Error
         raise "Could not find any lights with tag Test in #{c.lights.inspect}"

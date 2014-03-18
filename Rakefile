@@ -6,6 +6,8 @@ task :console do
   if ENV['DEBUG']
     LIFX::Config.logger = Yell.new(STDERR)
   end
-  LIFX.client.discover
-  LIFX.client.pry
+  LIFX::Client.lan.discover! do |c|
+    c.lights.count > 0
+  end
+  LIFX::Client.lan.pry
 end

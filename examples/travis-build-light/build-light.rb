@@ -7,8 +7,7 @@ require 'bundler'
 Bundler.require
 
 lifx = LIFX::Client.lan
-lifx.discover
-lifx.lights.refresh
+lifx.discover!
 sleep 2 # Wait for tag data to come back
 
 light = if lifx.tags.include?('Build Light')
