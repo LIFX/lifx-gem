@@ -9,6 +9,15 @@ Due to the nature of the current protocol, some methods are asynchronous.
 
 This gem is in an early beta state. Expect breaking API changes.
 
+## Hello private beta testers!
+
+Welcome to the private beta. I'd love some feedback on all aspects of using this gem. API, documentation, examples, bugs, etc etc. Please file an issue or hit me (@chendo) up on Twitter/IRC.
+
+## Requirements
+
+* Ruby 2.1.1
+* Bundler
+
 ## Installation
 
 Add this line to your application's Gemfile:

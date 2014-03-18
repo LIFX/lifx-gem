@@ -1,4 +1,4 @@
-Copyright (c) 2013 LIFX Labs
+Copyright (c) 2014 LIFX Labs
 
 MIT License
 
