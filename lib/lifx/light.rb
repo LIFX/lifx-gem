@@ -87,6 +87,9 @@ module LIFX
       @label
     end
 
+    MAX_LABEL_LENGTH = 32
+    class LabelTooLong < ArgumentError; end
+
     # Sets the label of the light
     # @param label [String] Desired label
     # @raise [LabelTooLong] if label is greater than {MAX_LABEL_LENGTH}
@@ -314,9 +317,6 @@ module LIFX
       context.tags_for_device(self)
     end
     
-    MAX_LABEL_LENGTH = 32
-    class LabelTooLong < ArgumentError; end
-
     # Attempts to set the site id of the light.
     # Will clear label and tags. This method cannot guarantee message receipt.
     # @note Don't use this unless you know what you're doing.
