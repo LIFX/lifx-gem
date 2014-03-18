@@ -50,6 +50,12 @@ module LIFX
         new(hue, saturation, brightness, DEFAULT_KELVIN)
       end
 
+      # Helper method to create from RGB.
+      # @note RGB is not the recommended way to create colors
+      # @param r [Integer] Red. Valid range: `0..255`
+      # @param g [Integer] Green. Valid range: `0..255`
+      # @param b [Integer] Blue. Valid range: `0..255`
+      # @return [Color]
       def rgb(r, g, b)
         r = r / 255.0
         g = g / 255.0
@@ -79,6 +85,10 @@ module LIFX
         new(h, s, v, DEFAULT_KELVIN)
       end
 
+      # Creates an instance from a {Protocol::Light::Hsbk} struct
+      # @api private
+      # @param hsbk [Protocol::Light::Hsbk]
+      # @return [Color]
       def from_struct(hsbk)
         new(
           (hsbk.hue.to_f / UINT16_MAX) * 360,
