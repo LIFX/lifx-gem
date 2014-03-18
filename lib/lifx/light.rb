@@ -211,7 +211,7 @@ module LIFX
       send_message!(Protocol::Device::GetMeshInfo.new,
           wait_for: Protocol::Device::StateMeshInfo) do |payload|
         {
-          signal: payload.signal,
+          signal: payload.signal, # This is in Milliwatts
           tx: payload.tx,
           rx: payload.rx
         }
@@ -225,7 +225,7 @@ module LIFX
       send_message!(Protocol::Device::GetWifiInfo.new,
           wait_for: Protocol::Device::StateWifiInfo) do |payload|
         {
-          signal: payload.signal,
+          signal: payload.signal, # This is in Milliwatts
           tx: payload.tx,
           rx: payload.rx
         }
@@ -252,7 +252,7 @@ module LIFX
     def uptime
       send_message!(Protocol::Device::GetInfo.new,
          wait_for: Protocol::Device::StateInfo) do |payload|
-        payload.uptime.to_f / NSEC_IN_SEC,
+        payload.uptime.to_f / NSEC_IN_SEC
       end
     end
 
@@ -262,7 +262,7 @@ module LIFX
     def last_downtime
       send_message!(Protocol::Device::GetInfo.new,
          wait_for: Protocol::Device::StateInfo) do |payload|
-        payload.downtime.to_f / NSEC_IN_SEC,
+        payload.downtime.to_f / NSEC_IN_SEC
       end
     end
 
