@@ -20,12 +20,7 @@ module LIFX
         subject.write(message)
         expect { subject.flush(timeout: 0.5) }.to raise_error(Timeout::Error)
       end
-
-      it 'sends over UDP if TCP is not available' do
-        subject.connect_udp(ip, port)
-        expect(subject.best_transport).to be_instance_of(Transport::UDP)
-      end
-
+      
       it 'pushes message back into queue if unable to write' do
         subject.connect_udp(ip, port)
         expect(subject).to receive(:actually_write).and_return(false, true)
