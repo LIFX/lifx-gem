@@ -25,7 +25,6 @@ module LIFX
     def initialize(context:, tag: nil)
       @context = context
       @tag = tag
-      @lights = tag ? context.all_lights.select { |l| l.tags.include?(tag) } : context.all_lights
     end
 
     # Queues a {Protocol::Payload} to be sent to bulbs in the collection
@@ -46,7 +45,7 @@ module LIFX
     # @param id [String] Device ID
     # @return [Light]
     def with_id(id)
-      @lights.find { |l| l.id == id}
+      lights.find { |l| l.id == id}
     end
 
     # Returns a {Light} with its label matching `label`
@@ -54,9 +53,9 @@ module LIFX
     # @return [Light]
     def with_label(label)
       if label.is_a?(Regexp)
-        @lights.find { |l| l.label(fetch: false) =~ label }
+        lights.find { |l| l.label(fetch: false) =~ label }
       else
-        @lights.find { |l| l.label(fetch: false) == label }
+        lights.find { |l| l.label(fetch: false) == label }
       end
     end
 
@@ -74,7 +73,11 @@ module LIFX
     # Returns an Array of {Light}s
     # @return [Array<Light>]
     def lights
-      @lights.dup
+      if tag
+        context.all_lights.select { |l| l.tags.include?(tag) }
+      else
+        context.all_lights
+      end
     end
 
     # Returns a nice string representation of itself
