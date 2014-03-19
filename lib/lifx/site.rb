@@ -68,6 +68,10 @@ module LIFX
       end
     end
 
+    def scan_lights
+      write(Message.new(path: ProtocolPath.new(tagged: true), payload: Protocol::Light::Get.new))
+    end
+
     protected
 
     def defer_lights_discovery
@@ -76,15 +80,8 @@ module LIFX
         while gateways.empty?
           sleep 0.1
         end
-        initialize_lights
-      end
-    end
-
-    LIGHT_STATE_REQUEST_INTERVAL = 30
-    def initialize_lights
-      timers.every(LIGHT_STATE_REQUEST_INTERVAL) do
         scan_lights
-      end.fire
+      end
     end
 
     STALE_GATEWAY_CHECK_INTERVAL = 10
@@ -102,8 +99,5 @@ module LIFX
       end
     end
 
-    def scan_lights
-      write(Message.new(path: ProtocolPath.new(tagged: true), payload: Protocol::Light::Get.new))
-    end
   end
 end

@@ -37,6 +37,7 @@ module LIFX
               DISCOVERY_INTERVAL
             if Time.now - @last_request_seen > interval
               write(message)
+              @sites.values.each(&:scan_lights)
             end
             sleep(interval / 2.0)
           end
