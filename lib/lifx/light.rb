@@ -157,7 +157,6 @@ module LIFX
       end
     end
 
-    NSEC_IN_SEC = 1_000_000_000
     # Returns the local time of the light
     # @return [Time]
     def time
@@ -171,7 +170,12 @@ module LIFX
     # @return [Float]
     def time_delta
       device_time = time
-      delta = Time.now - device_time
+      delta = device_time - Time.now
+    end
+
+    protected def calculate_device_at_time(local_time)
+      return nil if local_time.nil?
+      local_time + time_delta
     end
 
     # Pings the device and measures response time.
@@ -317,21 +321,6 @@ module LIFX
       context.tags_for_device(self)
     end
     
-    # Attempts to set the site id of the light.
-    # Will clear label and tags. This method cannot guarantee message receipt.
-    # @note Don't use this unless you know what you're doing.
-    # @api private
-    # @param site_id [String] Site ID
-    # @return [void]
-    def set_site_id(site_id)
-      send_message(Protocol::Device::SetSite.new(site: [site_id].pack('H*')))
-    end
-
-    # Sets the time on the device
-    def set_time(time = Time.now)
-      send_message(Protocol::Device::SetTime.new(time: (time.to_f * NSEC_IN_SEC).round))
-    end
-
     # Returns a nice string representation of the Light
     def to_s
       %Q{#<LIFX::Light id=#{id} label=#{label(fetch: false)} power=#{power(fetch: false)}>}.force_encoding(Encoding.default_external)
