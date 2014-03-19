@@ -173,11 +173,6 @@ module LIFX
       delta = device_time - Time.now
     end
 
-    protected def calculate_device_at_time(local_time)
-      return nil if local_time.nil?
-      local_time + time_delta
-    end
-
     # Pings the device and measures response time.
     # @return [Float] Latency from sending a message to receiving a response.
     def latency
@@ -355,7 +350,7 @@ module LIFX
       if Thread.current[:sync_enabled]
         raise "Cannot use synchronous methods inside a sync block"
       end
-      
+
       result = nil
       begin
         block ||= Proc.new { |msg| true }
