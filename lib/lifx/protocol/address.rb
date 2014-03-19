@@ -4,11 +4,9 @@ module LIFX
       def AddressFields.included(mod)
         mod.instance_eval do
           hide :_reserved2
-          hide :acknowledge # This isn't used yet
-
           string :raw_target, length: 8
           string :raw_site, length: 6
-          bit1le :acknowledge
+          bool_bit1 :acknowledge
           bit15le :_reserved2
         end
       end

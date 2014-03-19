@@ -26,7 +26,8 @@ module LIFX
                             stream: 0,
                             transient: true,
                             period: 1.0,
-                            duty_cycle: 0.5)
+                            duty_cycle: 0.5,
+                            acknowledge: false)
       send_message(Protocol::Light::SetWaveform.new(
         color: color.to_hsbk,
         waveform: waveform,
@@ -35,7 +36,7 @@ module LIFX
         transient: transient,
         period: (period * 1_000).to_i,
         duty_cycle: (duty_cycle * 65535).round - 32768
-      ))
+      ), acknowledge: acknowledge)
     end
 
     # Attempts to make the light(s) pulse `color` and then back to its original color. Asynchronous.

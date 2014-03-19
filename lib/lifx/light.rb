@@ -348,9 +348,10 @@ module LIFX
 
     # Queues a message to be sent the Light
     # @param payload [Protocol::Payload] the payload to send
+    # @param acknowledge: [Boolean] whether the device should respond
     # @return [Light] returns self for chaining
-    def send_message(payload)
-      context.send_message(target: Target.new(device_id: id, site_id: @site_id), payload: payload)
+    def send_message(payload, acknowledge: true)
+      context.send_message(target: Target.new(device_id: id, site_id: @site_id), payload: payload, acknowledge: acknowledge)
       self
     end
 

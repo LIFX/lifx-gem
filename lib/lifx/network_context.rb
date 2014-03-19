@@ -42,11 +42,15 @@ module LIFX
       end
     end
 
-    def send_message(target:, payload:)
+    # Sends a message to their destination(s)
+    # @param target: [Target] Target of the message
+    # @param payload: [Protocol::Payload] Message payload
+    # @param acknowledge: [Boolean] If recipients must acknowledge with a response
+    def send_message(target:, payload:, acknowledge: false)
       paths = @routing_manager.resolve_target(target)
 
       messages = paths.map do |path|
-        Message.new(path: path, payload: payload)
+        Message.new(path: path, payload: payload, acknowledge: acknowledge)
       end
       messages.each do |message|
         @transport_manager.write(message)

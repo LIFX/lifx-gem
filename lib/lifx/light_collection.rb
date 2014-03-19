@@ -30,13 +30,14 @@ module LIFX
 
     # Queues a {Protocol::Payload} to be sent to bulbs in the collection
     # @param payload [Protocol::Payload] Payload to be sent
+    # @param acknowledge: [Boolean] whether recipients should acknowledge message
     # @api private
     # @return [LightCollection] self for chaining
-    def send_message(payload)
+    def send_message(payload, acknowledge: false)
       if tag
-        context.send_message(target: Target.new(tag: tag), payload: payload)
+        context.send_message(target: Target.new(tag: tag), payload: payload, acknowledge: acknowledge)
       else
-        context.send_message(target: Target.new(broadcast: true), payload: payload)
+        context.send_message(target: Target.new(broadcast: true), payload: payload, acknowledge: acknowledge)
       end
       self
     end
