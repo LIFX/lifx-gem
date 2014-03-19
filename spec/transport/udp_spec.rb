@@ -1,8 +1,9 @@
 require 'spec_helper'
 
 describe LIFX::Transport::UDP do
+  let(:port) { 45828 }
   subject do
-    LIFX::Transport::UDP.new('localhost', 22222)
+    LIFX::Transport::UDP.new('localhost', port)
   end
 
   describe '#write' do
@@ -10,7 +11,7 @@ describe LIFX::Transport::UDP do
     let(:payload) { double }
     it 'writes a Message to specified host' do
       message.should_receive(:pack).and_return(payload)
-      UDPSocket.any_instance.should_receive(:send).with(payload, 0, 'localhost', 22222)
+      UDPSocket.any_instance.should_receive(:send).with(payload, 0, 'localhost', port)
       subject.write(message)
     end
   end
@@ -28,7 +29,7 @@ describe LIFX::Transport::UDP do
       subject.listen
 
       LIFX::Message.should_receive(:unpack).with(raw_message).and_return(message)
-      socket.send(raw_message, 0, 'localhost', 22222)
+      socket.send(raw_message, 0, 'localhost', port)
       sleep 0.01
       messages.should include(message)
     end
