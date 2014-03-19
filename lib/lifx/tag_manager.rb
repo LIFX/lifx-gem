@@ -71,7 +71,8 @@ module LIFX
         entries_with(label: tag).each do |entry|
           payload = Protocol::Device::SetTagLabels.new(tags: id_to_tags_field(entry.tag_id), label: '')
           context.send_message(target: Target.new(site_id: entry.site_id),
-                               payload: payload)
+                               payload: payload,
+                               acknowledge: true)
         end
       end
       Timeout.timeout(5) do
