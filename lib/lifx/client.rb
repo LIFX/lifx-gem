@@ -42,6 +42,9 @@ module LIFX
 
     # This method tells the {NetworkContext} to look for devices, and will block
     # until there's at least one device.
+    #
+    # @example Wait until at least three lights have been found
+    #   client.discover! { |c| c.lights.count >= 3 }
     # 
     # @param timeout: [Numeric] How long to try to wait for before returning
     # @param condition_interval: [Numeric] Seconds between evaluating the block
@@ -71,8 +74,18 @@ module LIFX
     #
     # @note This method is in alpha and might go away. Use tags for better group messaging.
     # @yield Block of commands to synchronize
+    # @return [Float] Number of seconds until commands are executed
     def sync(&block)
       @context.sync(&block)
+    end
+
+    # This is the same as {#sync}, except it will block until the commands have been executed.
+    # @see #sync
+    # @return [Float] Number of seconds slept
+    def sync!(&block)
+      sync(&block).tap do |delay|
+        sleep(delay)
+      end
     end
 
     # @return [LightCollection] Lights available to the client
