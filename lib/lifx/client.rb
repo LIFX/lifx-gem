@@ -48,7 +48,7 @@ module LIFX
     # @yield [Client] This block is evaluated every `condition_interval` seconds. If true, method returns. If no block is supplied, it will block until it finds at least one light.
     # @return [Client] self
     def discover!(timeout: DISCOVERY_DEFAULT_TIMEOUT, condition_interval: 0.1, &block)
-      block ||= -> { c.lights.count > 0 }
+      block ||= -> { self.lights.count > 0 }
       try_until -> { block.arity == 1 ? block.call(self) : block.call }, timeout: timeout, condition_interval: condition_interval do
         discover
       end
