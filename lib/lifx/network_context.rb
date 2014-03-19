@@ -9,6 +9,7 @@ module LIFX
   class NetworkContext
     include Timers
     include Logging
+    include Utilities
     extend Forwardable
 
     # NetworkContext stores lights and ties together TransportManager, TagManager and RoutingManager
@@ -33,6 +34,7 @@ module LIFX
 
     def discover
       @transport_manager.discover
+      @routing_manager.refresh
     end
 
     def stop
@@ -52,9 +54,52 @@ module LIFX
       messages = paths.map do |path|
         Message.new(path: path, payload: payload, acknowledge: acknowledge)
       end
+
+      if within_sync?
+        Thread.current[:sync_messages].push(*messages)
+        return
+      end
+
       messages.each do |message|
         @transport_manager.write(message)
       end
+    end
+
+    protected def within_sync?
+      !!Thread.current[:sync_enabled]
+    end
+
+    # Synchronize asynchronous set_color, set_waveform and set_power messages to multiple devices.
+    # You cannot use synchronous methods in the block
+    # @note This is alpha
+    # @yield Block to synchronize commands in
+    # @return [Float] Delay before messages are executed
+    def sync(&block)
+      if within_sync?
+        raise "You cannot nest sync"
+      end
+      messages = Thread.new do
+        Thread.current[:sync_enabled] = true
+        Thread.current[:sync_messages] = messages = []
+        block.call
+        Thread.current[:sync_enabled] = false
+        messages
+      end.join.value
+
+      time = nil
+      try_until -> { time } do
+        light = lights.first
+        time = light && light.time
+      end
+
+      delay = messages.count * (1 / 5.0) + 0.25
+      at_time = ((time.to_f + delay) * 1_000_000_000).to_i
+      messages.each do |m|
+        m.at_time = at_time
+        @transport_manager.write(m)
+      end
+      flush
+      delay
     end
 
     def flush(**options)

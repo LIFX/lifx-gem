@@ -146,6 +146,7 @@ module LIFX
       hash[:type] = payload.class.to_s.sub('LIFX::Protocol::', '')
       hash[:addressable] = addressable? ? 'true' : 'false'
       hash[:tagged] = path.tagged? ? 'true' : 'false'
+      hash[:at_time] = @message.at_time if @message.at_time && @message.at_time > 0
       hash[:protocol] = protocol
       hash[:payload] = payload.snapshot if payload
       attrs = hash.map { |k, v| "#{k}=#{v}" }.join(' ')

@@ -8,7 +8,7 @@ require 'lifx/utilities'
 shared_context 'integration', integration: true do
   def lifx
     $lifx ||= begin
-      c = LIFX.client
+      c = LIFX::Client.lan
       begin
         c.discover! do
           c.tags.include?('Test') && c.lights.with_tag('Test').count > 0

@@ -55,6 +55,26 @@ module LIFX
       self
     end
 
+    # This method takes a block consisting of multiple asynchronous color or power changing targets
+    # and it will try to schedule them so they run at the same time.
+    #
+    # You cannot nest `sync` calls, nor call synchronous methods inside a `sync` block.
+    #
+    # Due to messaging rate constraints, the amount of messages determine the delay before 
+    # the commands are executed. This method also assumes all the lights have the same time.
+    # @example This example sets all the lights to a random colour at the same time.
+    #   client.sync do
+    #     client.lights.each do |light|
+    #       light.set_color(rand(4) * 90, 1, 1)
+    #     end
+    #   end
+    #
+    # @note This method is in alpha and might go away. Use tags for better group messaging.
+    # @yield Block of commands to synchronize
+    def sync(&block)
+      @context.sync(&block)
+    end
+
     # @return [LightCollection] Lights available to the client
     # @see [NetworkContext#lights]
     def lights

@@ -76,6 +76,12 @@ module LIFX
       @routing_table.update_table(site_id: message.site_id, device_id: message.device_id)
     end
 
+    def refresh
+      @routing_table.site_ids.each do |site_id|
+        refresh_site(site_id)
+      end
+    end
+
     def refresh_site(site_id)
       context.send_message(target: Target.new(site_id: site_id), payload: Protocol::Device::GetTagLabels.new(tags: UINT64_MAX))
       context.send_message(target: Target.new(site_id: site_id), payload: Protocol::Device::GetTags.new)

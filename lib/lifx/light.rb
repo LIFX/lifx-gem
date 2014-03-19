@@ -352,6 +352,10 @@ module LIFX
     # @return [Object] the truthy result of `block` is returned.
     # @raise [Timeout::Error]
     def send_message!(payload, wait_for:, wait_timeout: 3, timeout_exception: Timeout::Error, &block)
+      if Thread.current[:sync_enabled]
+        raise "Cannot use synchronous methods inside a sync block"
+      end
+      
       result = nil
       begin
         block ||= Proc.new { |msg| true }
