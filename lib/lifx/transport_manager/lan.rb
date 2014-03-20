@@ -56,16 +56,34 @@ module LIFX
       end
 
       def write(message)
-        check_transports
+        return unless on_network?
         if message.path.all_sites?
-          @transport.write(message)
+          broadcast(message)
         else
           site = @sites[message.path.site_id]
           if site
             site.write(message)
           else
-            @transport.write(message)
+            broadcast(message)
           end
+        end
+        broadcast_to_peers(message)
+      end
+
+      def on_network?
+        Socket.getifaddrs.any? { |ifaddr| ifaddr.broadaddr }
+      end
+
+      def broadcast(message)
+        if !@transport.connected?
+          create_broadcast_transport
+        end
+        @transport.write(message)
+      end
+
+      def broadcast_to_peers(message)
+        if !@peer_transport.connected?
+          create_peer_transport
         end
         @peer_transport.write(message)
       end
@@ -81,14 +99,17 @@ module LIFX
       protected
 
       def initialize_transports
+        create_broadcast_transport
+        create_peer_transport
+      end
+
+      def create_broadcast_transport
         @transport = Transport::UDP.new(@send_ip, @port)
         @transport.add_observer(self) do |message:, ip:, transport:|
           handle_broadcast_message(message, ip, @transport)
           notify_observers(message: message, ip: ip, transport: transport)
         end
         @transport.listen(ip: @bind_ip)
-
-        create_peer_transport
       end
 
       def create_peer_transport
@@ -97,12 +118,6 @@ module LIFX
           notify_observers(message: message, ip: ip, transport: transport)
         end
         @peer_transport.listen(ip: @bind_ip)
-      end
-
-      def check_transports
-        if !@peer_transport.connected?
-          create_peer_transport
-        end
       end
 
       def handle_broadcast_message(message, ip, transport)
