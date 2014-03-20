@@ -80,6 +80,19 @@ module LIFX
       end
     end
 
+    DEFAULT_ALIVE_THRESHOLD = 30 # seconds
+    # Returns an Array of {Light}s considered alive
+    # @param threshold: The maximum number of seconds a {Light} was last seen to be considered alive
+    def alive(threshold: DEFAULT_ALIVE_THRESHOLD)
+      lights.select { |l| l.seconds_since_seen <= threshold }
+    end
+
+    # Returns an Array of {Light}s considered stale
+    # @param threshold: The minimum number of seconds since a {Light} was last seen to be considered stale
+    def stale(threshold: DEFAULT_ALIVE_THRESHOLD)
+      lights.select { |l| l.seconds_since_seen <= threshold }
+    end
+
     # Returns a nice string representation of itself
     # @return [String]
     def to_s

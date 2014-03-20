@@ -4,7 +4,7 @@ module LIFX
       @last_seen
     end
 
-    def age
+    def seconds_since_seen
       Time.now - (last_seen || Time.at(0))
     end
 
