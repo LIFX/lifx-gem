@@ -58,6 +58,12 @@ module LIFX
       self
     end
 
+    # Sends a request to refresh devices and tags.
+    # @return [void]
+    def refresh
+      @context.refresh
+    end
+
     # This method takes a block consisting of multiple asynchronous color or power changing targets
     # and it will try to schedule them so they run at the same time.
     #

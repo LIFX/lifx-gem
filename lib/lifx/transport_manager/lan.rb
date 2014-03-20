@@ -37,7 +37,6 @@ module LIFX
               DISCOVERY_INTERVAL
             if Time.now - @last_request_seen > interval
               write(message)
-              @sites.values.each(&:scan_lights)
             end
             sleep(interval / 2.0)
           end
@@ -94,6 +93,10 @@ module LIFX
 
       def create_peer_transport
         @peer_transport = Transport::UDP.new('255.255.255.255', @peer_port)
+        @peer_transport.add_observer(self) do |message:, ip:, transport:|
+          notify_observers(message: message, ip: ip, transport: transport)
+        end
+        @peer_transport.listen(ip: @bind_ip)
       end
 
       def check_transports
@@ -101,7 +104,6 @@ module LIFX
           create_peer_transport
         end
       end
-
 
       def handle_broadcast_message(message, ip, transport)
         payload = message.payload

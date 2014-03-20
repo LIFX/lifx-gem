@@ -28,16 +28,25 @@ module LIFX
         handle_message(message, ip, transport)
       end
 
-      @routing_manager = RoutingManager.new(context: self)
-      @tag_manager = TagManager.new(context: self, tag_table: @routing_manager.tag_table)
+      reset!
+
       @threads = []
       @threads << initialize_timer_thread
+      initialize_periodic_refresh
       initialize_message_rate_updater
     end
 
     def discover
       @transport_manager.discover
+    end
+
+    def refresh
       @routing_manager.refresh
+    end
+
+    def reset!
+      @routing_manager = RoutingManager.new(context: self)
+      @tag_manager = TagManager.new(context: self, tag_table: @routing_manager.tag_table)
     end
 
     def stop
@@ -152,6 +161,12 @@ module LIFX
 
     def gateway_connections
       transport_manager.gateways.map(&:values).flatten
+    end
+
+    def initialize_periodic_refresh
+      timers.every(10) do
+        refresh
+      end
     end
 
     def initialize_message_rate_updater

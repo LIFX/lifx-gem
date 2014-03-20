@@ -18,7 +18,6 @@ module LIFX
       @gateways      = {}
       @gateways_mutex = Mutex.new
       @threads       = []
-      @threads << defer_lights_discovery
       @threads << initialize_timer_thread
       initialize_stale_gateway_check
     end
@@ -68,21 +67,8 @@ module LIFX
       end
     end
 
-    def scan_lights
-      write(Message.new(path: ProtocolPath.new(tagged: true), payload: Protocol::Light::Get.new))
-    end
 
     protected
-
-    def defer_lights_discovery
-      # We wait a bit so the TCP transport has a chance to connect
-      Thread.new do
-        while gateways.empty?
-          sleep 0.1
-        end
-        scan_lights
-      end
-    end
 
     STALE_GATEWAY_CHECK_INTERVAL = 10
     def initialize_stale_gateway_check

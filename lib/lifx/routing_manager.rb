@@ -14,6 +14,7 @@ module LIFX
       @context = context
       @routing_table = RoutingTable.new
       @tag_table = TagTable.new
+      @last_refresh_seen = {}
     end
 
     def resolve_target(target)
@@ -50,7 +51,15 @@ module LIFX
     end
 
     def update_from_message(message)
-      return if message.tagged?
+      if message.tagged?
+        case message.payload
+        when Protocol::Light::Get
+          if message.path.all_tags?
+            @last_refresh_seen[message.site_id] = Time.now
+          end
+        end
+        return
+      end
 
       payload = message.payload
 
@@ -76,15 +85,16 @@ module LIFX
       @routing_table.update_table(site_id: message.site_id, device_id: message.device_id)
     end
 
+    MINIMUM_REFRESH_INTERVAL = 15
     def refresh
       @routing_table.site_ids.each do |site_id|
-        refresh_site(site_id)
+        refresh_site(site_id) if (seen = @last_refresh_seen[site_id]) && Time.now - seen > MINIMUM_REFRESH_INTERVAL
       end
     end
 
     def refresh_site(site_id)
+      context.send_message(target: Target.new(site_id: site_id), payload: Protocol::Light::Get.new)
       context.send_message(target: Target.new(site_id: site_id), payload: Protocol::Device::GetTagLabels.new(tags: UINT64_MAX))
-      context.send_message(target: Target.new(site_id: site_id), payload: Protocol::Device::GetTags.new)
     end
   end
 end
