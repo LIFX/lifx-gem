@@ -3,8 +3,6 @@ module LIFX
   class Transport
     # @api private
     class UDP < Transport
-      BUFFER_SIZE = 128
-
       def initialize(*args)
         super
         @socket = create_socket
@@ -20,7 +18,7 @@ module LIFX
         true
       rescue => ex
         logger.warn("#{self}: Error on #write: #{ex}")
-        logger.warn("#{self}: Backtrace: #{ex.backtrace.join("\n")}")
+        logger.debug("#{self}: Backtrace: #{ex.backtrace.join("\n")}")
         close
         false
       end

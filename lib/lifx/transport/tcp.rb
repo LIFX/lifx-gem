@@ -25,7 +25,7 @@ module LIFX
         logger.info("#{self}: Connected.")
       rescue => ex
         logger.warn("#{self}: Exception occured in #connect - #{ex}")
-        logger.warn("#{self}: Backtrace: #{ex.backtrace.join("\n")}")
+        logger.debug("#{self}: Backtrace: #{ex.backtrace.join("\n")}")
         @socket = nil
       end
 
@@ -56,7 +56,7 @@ module LIFX
               end
             rescue => ex
               logger.warn("#{self}: Exception occured in #listen - #{ex}")
-              logger.warn("#{self}: Backtrace: #{ex.backtrace.join("\n")}")
+              logger.debug("#{self}: Backtrace: #{ex.backtrace.join("\n")}")
               close
             end
           end
@@ -72,7 +72,7 @@ module LIFX
         true
       rescue => ex
         logger.warn("#{self}: Exception in #write: #{ex}")
-        logger.warn("#{self}: Backtrace: #{ex.backtrace.join("\n")}")
+        logger.debug("#{self}: Backtrace: #{ex.backtrace.join("\n")}")
         close
         false
       end
