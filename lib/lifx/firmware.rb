@@ -1,13 +1,31 @@
 module LIFX
   # LIFX::Firmware handles decoding firmware payloads
   class Firmware < Struct.new(:build_time, :major, :minor)
-    attr_reader :build_time, :major, :minor
+    include Comparable
 
     def initialize(payload)
       self.build_time = decode_time(payload.build)
       self.major  = (payload.version >> 0x10)
       self.minor  = (payload.version &  0xFF)
     end
+
+    def to_s
+      "#<Firmware version=#{self.major}.#{self.minor}>"
+    end
+    alias_method :inspect, :to_s
+
+    def <=>(obj)
+      case obj
+      when String
+        major, minor = obj.split('.', 2).map(&:to_i)
+        [self.major, self.minor] <=> [major, minor]
+      when Firmware
+        [self.major, self.minor] <=> [obj.major, obj.minor]
+      else
+        nil
+      end
+    end
+
 
     protected
 
