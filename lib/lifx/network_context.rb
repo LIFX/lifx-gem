@@ -156,11 +156,19 @@ module LIFX
 
     def initialize_message_rate_updater
       timers.every(5) do
-        @message_rate = lights.all? do |light|
-          light.mesh_firmware >= '1.2' && light.wifi_firmware >= '1.2'
-        end ? 50 : 5
-        gateway_connections.each do |connection|
-          connection.set_message_rate(@message_rate)
+        missing_mesh_firmware = lights.select { |l| l.mesh_firmware(fetch: false).nil? }
+        if missing_mesh_firmware.count > 10
+          send_message(target: Target.new(broadcast: true), payload: Protocol::Device::GetMeshFirmware.new)
+        elsif missing_mesh_firmware.count > 0
+          missing_mesh_firmware.each { |l| l.send_message(Protocol::Device::GetMeshFirmware.new) }
+        else
+          @message_rate = lights.all? do |light|
+            m = light.mesh_firmware(fetch: false)
+            m && m >= '1.2'
+          end ? 50 : 5
+          gateway_connections.each do |connection|
+            connection.set_message_rate(@message_rate)
+          end
         end
       end
     end
