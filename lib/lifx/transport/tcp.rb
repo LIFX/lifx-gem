@@ -21,9 +21,7 @@ module LIFX
           @socket = TCPSocket.new(host, port) # Performs the connection
         end
         @socket.setsockopt(Socket::SOL_SOCKET,  Socket::SO_SNDBUF,    1024)
-        @socket.setsockopt(Socket::SOL_SOCKET,  Socket::SO_KEEPALIVE, true)
         @socket.setsockopt(Socket::IPPROTO_TCP, Socket::TCP_NODELAY,  1)
-        @socket.setsockopt(Socket::IPPROTO_TCP, Socket::TCP_MAXSEG,   512)
         logger.info("#{self}: Connected.")
       rescue => ex
         logger.warn("#{self}: Exception occured in #connect - #{ex}")
