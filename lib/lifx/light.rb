@@ -33,6 +33,7 @@ module LIFX
       @message_signal = ConditionVariable.new
 
       add_hooks
+      query_version
     end
 
     # Handles updating the internal state of the Light from incoming
@@ -185,7 +186,7 @@ module LIFX
     # @api private
     # @return [Hash] firmware details
     def mesh_firmware
-      send_message!(Protocol::Device::GetMeshFirmware.new,
+      @mesh_firmware ||= send_message!(Protocol::Device::GetMeshFirmware.new,
           wait_for: Protocol::Device::StateMeshFirmware) do |payload|
         Firmware.new(payload)
       end
@@ -195,7 +196,7 @@ module LIFX
     # @api private
     # @return [Hash] firmware details
     def wifi_firmware
-      send_message!(Protocol::Device::GetWifiFirmware.new,
+      @wifi_firmware ||= send_message!(Protocol::Device::GetWifiFirmware.new,
           wait_for: Protocol::Device::StateWifiFirmware) do |payload|
         Firmware.new(payload)
       end
@@ -366,6 +367,7 @@ module LIFX
         remove_hook(wait_for, proc)
       end
     end
+
     protected
 
     def add_hooks
@@ -391,6 +393,19 @@ module LIFX
         @power = payload.level.to_i
         seen!
       end
+
+      add_hook(Protocol::Device::StateMeshFirmware) do |payload|
+        @mesh_firmware = Firmware.new(payload)
+      end
+
+      add_hook(Protocol::Device::StateWifiFirmware) do |payload|
+        @wifi_firmware = Firmware.new(payload)
+      end
+    end
+
+    def query_version
+      send_message(Protocol::Device::GetMeshFirmware.new)
+      send_message(Protocol::Device::GetWifiFirmware.new)
     end
 
   end

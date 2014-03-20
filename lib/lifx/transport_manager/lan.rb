@@ -108,7 +108,7 @@ module LIFX
         case payload
         when Protocol::Device::StatePanGateway
           if !@sites.has_key?(message.path.site_id)
-            @sites[message.path.site_id] = Site.new(message.path.site_id)
+            @sites[message.path.site_id] = Site.new(id: message.path.site_id)
             @sites[message.path.site_id].add_observer(self) do |**args|
               notify_observers(**args)
             end

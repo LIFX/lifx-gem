@@ -30,6 +30,9 @@ module LIFX
 
       @routing_manager = RoutingManager.new(context: self)
       @tag_manager = TagManager.new(context: self, tag_table: @routing_manager.tag_table)
+      @threads = []
+      @threads << initialize_timer_thread
+      initialize_message_rate_updater
     end
 
     def discover
@@ -88,7 +91,7 @@ module LIFX
 
       time = nil
       try_until -> { time } do
-        light = lights.first
+        light = lights.to_a.sample
         time = light && light.time
       end
 
@@ -145,6 +148,26 @@ module LIFX
         device = @devices[message.device_id]
         device.handle_message(message, ip, transport)
       end
+    end
+
+    def gateway_connections
+      transport_manager.gateways.map(&:values).flatten
+    end
+
+    def initialize_message_rate_updater
+      timers.every(5) do
+        @message_rate = lights.all? do |light|
+          light.mesh_firmware >= '1.2' && light.wifi_firmware >= '1.2'
+        end ? 50 : 5
+        gateway_connections.each do |connection|
+          connection.set_message_rate(@message_rate)
+        end
+      end
+    end
+
+    DEFAULT_MESSAGING_RATE = 5 # per second
+    def message_rate
+      @message_rate || 5
     end
   end
 end

@@ -103,12 +103,16 @@ module LIFX
     end
     alias_method :inspect, :to_s
 
+    def set_message_rate(rate)
+      @message_rate = rate
+    end
     protected
 
-    # Due to an issue in the 1.1 firmware, we have to rate limit message sends
-    # otherwise it can cause the gateway to lock up.
-    MINIMUM_TIME_BETWEEN_MESSAGE_SEND = 1 / 5.0
-    MAXIMUM_QUEUE_LENGTH = 10
+    MAXIMUM_QUEUE_LENGTH   = 10
+    DEFAULT_MESSAGE_RATE = 5
+    def message_rate
+      @message_rate || DEFAULT_MESSAGE_RATE
+    end
 
     def initialize_write_queue
       @queue = SizedQueue.new(MAXIMUM_QUEUE_LENGTH)
@@ -120,7 +124,7 @@ module LIFX
             sleep 0.1
             next
           end
-          delay = [MINIMUM_TIME_BETWEEN_MESSAGE_SEND - (Time.now - @last_write), 0].max
+          delay = [(1.0 / message_rate) - (Time.now - @last_write), 0].max
           logger.debug("#{self}: Sleeping for #{delay}")
           sleep(delay)
           message = @queue.pop

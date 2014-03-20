@@ -13,7 +13,7 @@ module LIFX
     
     attr_reader :id, :gateways, :tag_manager
 
-    def initialize(id)
+    def initialize(id:)
       @id            = id
       @gateways      = {}
       @gateways_mutex = Mutex.new
