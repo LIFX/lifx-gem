@@ -95,7 +95,7 @@ module LIFX
         time = light && light.time
       end
 
-      delay = messages.count * (1 / 5.0) + 0.25
+      delay = (messages.count + 1) * (1.0 / message_rate) 
       at_time = ((time.to_f + delay) * 1_000_000_000).to_i
       messages.each do |m|
         m.at_time = at_time
@@ -165,7 +165,7 @@ module LIFX
           @message_rate = lights.all? do |light|
             m = light.mesh_firmware(fetch: false)
             m && m >= '1.2'
-          end ? 50 : 5
+          end ? 20 : 5
           gateway_connections.each do |connection|
             connection.set_message_rate(@message_rate)
           end
