@@ -1,21 +1,40 @@
 module LIFX
+  module Colors
+    DEFAULT_KELVIN = 3500
+
+    {
+      red: 0,
+      orange: 36,
+      yellow: 60,
+      green: 120,
+      cyan: 195,
+      blue: 250,
+      purple: 280,
+      pink: 325
+    }.each do |color, hue|
+      define_method(color) do |saturation: 1.0, brightness: 1.0, kelvin: DEFAULT_KELVIN|
+        Color.new(hue, saturation, brightness, kelvin)
+      end
+    end
+
+    # Helper to create a white {Color}
+    # @param brightness: [Float] Valid range: `0..1`
+    # @param kelvin: [Integer] Valid range: `2500..10000`
+    # @return [Color]
+    def white(brightness: 1.0, kelvin: DEFAULT_KELVIN)
+      Color.new(0, 0, brightness, kelvin)
+    end
+  end
+
   # LIFX::Color represents a color intervally by HSBK (Hue, Saturation, Brightness/Value, Kelvin).
   # It has methods to construct a LIFX::Color instance from various color representations.
   class Color < Struct.new(:hue, :saturation, :brightness, :kelvin)
+    extend Colors
     UINT16_MAX = 65535
-    DEFAULT_KELVIN = 3500
     KELVIN_MIN = 2500
     KELVIN_MAX = 10000
 
     class << self
-      # Helper to create a white {Color}
-      # @param brightness: [Float] Valid range: `0..1`
-      # @param kelvin: [Integer] Valid range: `2500..10000`
-      # @return [Color]
-      def white(brightness: 1.0, kelvin: DEFAULT_KELVIN)
-        new(0, 0, brightness, kelvin)
-      end
-
       # Helper method to create from HSB/HSV
       # @param hue [Float] Valid range: `0..360`
       # @param saturation [Float] Valid range: `0..1`
