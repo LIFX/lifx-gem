@@ -24,6 +24,11 @@ module LIFX
     def white(brightness: 1.0, kelvin: DEFAULT_KELVIN)
       Color.new(0, 0, brightness, kelvin)
     end
+
+    # Helper to create a random {Color}
+    def random_color(hue: rand(360), saturation: rand, brightness: rand, kelvin: DEFAULT_KELVIN)
+      Color.new(hue, saturation, brightness, kelvin)
+    end
   end
 
   # LIFX::Color represents a color intervally by HSBK (Hue, Saturation, Brightness/Value, Kelvin).
