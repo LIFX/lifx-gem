@@ -73,7 +73,7 @@ Examples are located in the `examples/` folder.
 
 Run with `bundle exec rspec`.
 
-The integration specs rely on a least one device tagged with `Test` to function. At this point, they're semi-unreliable due to the async nature of the protocol, and there's not much coverage at the moment as the architecture is still in flux.
+The integration specs rely on a least one device tagged with `Test` to function. At this point, they can fail occasionally due to the async nature of the protocol, and there's not much coverage at the moment as the architecture is still in flux.
 
 A more comprehensive test suite is in the works.
 
@@ -84,3 +84,7 @@ A more comprehensive test suite is in the works.
 3. Commit your changes (`git commit -am 'Add some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)
 5. Create new Pull Request
+
+## License
+
+MIT. See `LICENSE.txt`
