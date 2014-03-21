@@ -100,7 +100,7 @@ module LIFX
 
       time = nil
       try_until -> { time } do
-        light = lights.to_a.sample
+        light = gateways.sample
         time = light && light.time
       end
 
@@ -143,6 +143,14 @@ module LIFX
       @routing_manager.tags_for_device_id(device.id)
     end
 
+    def gateways
+      transport_manager.gateways.map(&:keys).flatten.map { |id| lights.with_id(id) }
+    end
+
+    def gateway_connections
+      transport_manager.gateways.map(&:values).flatten
+    end
+
     protected
 
     def handle_message(message, ip, transport)
@@ -157,10 +165,6 @@ module LIFX
         device = @devices[message.device_id]
         device.handle_message(message, ip, transport)
       end
-    end
-
-    def gateway_connections
-      transport_manager.gateways.map(&:values).flatten
     end
 
     def initialize_periodic_refresh
