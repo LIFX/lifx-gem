@@ -1,4 +1,18 @@
 #!/usr/bin/env ruby
+# lifx-snoop is a utility that snoops on LIFX UDP traffic on both the broadcast port
+# and the peer broadcast port.
+#
+# Usage:
+#   lifx-snoop [regexp, ...]
+#
+# By default, it will show all messages. Any arguments passed in will become
+# regular expressions, which will then match on the string representation of the
+# message.
+#
+# Example:
+#   lifx-snoop Light::Get                      # Shows only Light::Get messages
+#   lifx-snoop Light::State site=d073d5000000  # Shows only Light::State messages matching site d073d5000000
+
 $LOAD_PATH << File.join(File.dirname(__FILE__), "..", "lib")
 require 'lifx'
 require 'time'
@@ -14,7 +28,7 @@ end
 begin
   light_udp = LIFX::Transport::UDP.new('0.0.0.0', 56700)
   light_udp.add_observer(self) do |message:, ip:, transport:|
-    if matchers.any? { |m| message.to_s =~ m }
+    if matchers.all? { |m| message.to_s =~ m }
       puts "#{Time.now.iso8601(5)} BROADCAST: #{ip} #{message}"
     end
   end
@@ -22,7 +36,7 @@ begin
 
   peer_udp = LIFX::Transport::UDP.new('0.0.0.0', 56750)
   peer_udp.add_observer(self) do |message:, ip:, transport:|
-    if matchers.any? { |m| message.to_s =~ m }
+    if matchers.all? { |m| message.to_s =~ m }
       puts "#{Time.now.iso8601(5)} PEER:      #{ip} #{message}"
     end
   end
