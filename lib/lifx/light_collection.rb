@@ -90,7 +90,7 @@ module LIFX
     # Returns an Array of {Light}s considered stale
     # @param threshold: The minimum number of seconds since a {Light} was last seen to be considered stale
     def stale(threshold: DEFAULT_ALIVE_THRESHOLD)
-      lights.select { |l| l.seconds_since_seen <= threshold }
+      lights.select { |l| l.seconds_since_seen > threshold }
     end
 
     # Returns a nice string representation of itself
