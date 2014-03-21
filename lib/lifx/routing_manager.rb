@@ -102,6 +102,7 @@ module LIFX
       context.send_message(target: Target.new(site_id: site_id), payload: Protocol::Light::Get.new)
     end
 
+    UINT64_MAX = 2 ** 64 - 1
     def get_tag_labels(site_id)
       context.send_message(target: Target.new(site_id: site_id), payload: Protocol::Device::GetTagLabels.new(tags: UINT64_MAX))
     end

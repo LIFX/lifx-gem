@@ -15,10 +15,5 @@ require "lifx/config"
 require "lifx/client"
 
 module LIFX
-  UINT64_MAX = 2 ** 64 - 1
-  module_function
 
-  def client
-    @client ||= Client.new
-  end
 end
