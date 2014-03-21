@@ -85,15 +85,24 @@ module LIFX
       @routing_table.update_table(site_id: message.site_id, device_id: message.device_id)
     end
 
-    MINIMUM_REFRESH_INTERVAL = 15
+    MINIMUM_REFRESH_INTERVAL = 20
     def refresh
       @routing_table.site_ids.each do |site_id|
-        refresh_site(site_id) if (seen = @last_refresh_seen[site_id]) && Time.now - seen > MINIMUM_REFRESH_INTERVAL
+        next if (seen = @last_refresh_seen[site_id]) && Time.now - seen < MINIMUM_REFRESH_INTERVAL
+        refresh_site(site_id)
       end
     end
 
     def refresh_site(site_id)
+      get_lights(site_id)
+      get_tag_labels(site_id)
+    end
+
+    def get_lights(site_id)
       context.send_message(target: Target.new(site_id: site_id), payload: Protocol::Light::Get.new)
+    end
+
+    def get_tag_labels(site_id)
       context.send_message(target: Target.new(site_id: site_id), payload: Protocol::Device::GetTagLabels.new(tags: UINT64_MAX))
     end
   end

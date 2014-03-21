@@ -64,9 +64,8 @@ module LIFX
       site_id == "000000000000"
     end
 
-    MAX_TAGS = 64
     def all_tags?
-      tagged? && tag_ids.count == MAX_TAGS
+      tagged? && tag_ids.empty?
     end
 
     protected
