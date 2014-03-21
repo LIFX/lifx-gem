@@ -128,6 +128,34 @@ module LIFX
       super(hue, saturation, brightness, kelvin)
     end
 
+    # Returns a new Color with the hue changed while keeping other attributes
+    # @param hue [Float] Hue in degrees. `0..360`
+    # @return [Color]
+    def with_hue(hue)
+      Color.new(hue, saturation, brightness, kelvin)
+    end
+
+    # Returns a new Color with the saturaiton changed while keeping other attributes
+    # @param saturaiton [Float] Saturation as float. `0..1`
+    # @return [Color]
+    def with_saturation(saturation)
+      Color.new(hue, saturation, brightness, kelvin)
+    end
+
+    # Returns a new Color with the brightness changed while keeping other attributes
+    # @param brightness [Float] Brightness as float. `0..1`
+    # @return [Color]
+    def with_brightness(brightness)
+      Color.new(hue, saturation, brightness, kelvin)
+    end
+
+    # Returns a new Color with the kelvin changed while keeping other attributes
+    # @param kelvin [Integer] Kelvin. `2500..10000`
+    # @return [Color]
+    def with_kelvin(kelvin)
+      Color.new(hue, saturation, brightness, kelvin)
+    end
+
     # Returns a struct for use by the protocol
     # @api private
     # @return [Protocol::Light::Hsbk]
