@@ -43,8 +43,8 @@ end
 client.lights.turn_on                      # Tell all lights to turn on
 light = client.lights.with_label('Office') # Get light with label 'Office'
 
-# Set the Office light to bright green over 5 seconds
-green = LIFX::Color.hsb(120, 1, 1)
+# Set the Office light to pale green over 5 seconds
+green = LIFX::Color.green(saturation: 0.5)
 light.set_color(green, duration: 5)        # Light#set_color is asynchronous
 
 sleep 5                                    # Wait for light to finish changing
