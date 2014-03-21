@@ -24,7 +24,7 @@ thr = Thread.new do
       puts "Light detected on. Turning off in #{AUTO_OFF_DELAY}"
       @off_thr = Thread.new do
         sleep AUTO_OFF_DELAY
-        light.on!
+        light.turn_off
         puts "Turning off"
       end
     end
