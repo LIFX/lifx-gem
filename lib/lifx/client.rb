@@ -40,6 +40,7 @@ module LIFX
       @context.discover
     end
 
+    class DiscoveryTimeout < Timeout::Error; end
     # This method tells the {NetworkContext} to look for devices, and will block
     # until there's at least one device.
     #
@@ -49,10 +50,14 @@ module LIFX
     # @param timeout: [Numeric] How long to try to wait for before returning
     # @param condition_interval: [Numeric] Seconds between evaluating the block
     # @yield [Client] This block is evaluated every `condition_interval` seconds. If true, method returns. If no block is supplied, it will block until it finds at least one light.
+    # @raise [DiscoveryTimeout] If discovery times out
     # @return [Client] self
     def discover!(timeout: DISCOVERY_DEFAULT_TIMEOUT, condition_interval: 0.1, &block)
       block ||= -> { self.lights.count > 0 }
-      try_until -> { block.arity == 1 ? block.call(self) : block.call }, timeout: timeout, condition_interval: condition_interval do
+      try_until -> { block.arity == 1 ? block.call(self) : block.call },
+        timeout: timeout,
+        timeout_exception: DiscoveryTimeout,
+        condition_interval: condition_interval do
         discover
       end
       self
