@@ -151,6 +151,11 @@ module LIFX
       transport_manager.gateways.map(&:values).flatten
     end
 
+    def to_s
+      %Q{#<LIFX::NetworkContext connections=#{gateway_connections}>}
+    end
+    alias_method :inspect, :to_s
+
     protected
 
     def handle_message(message, ip, transport)
