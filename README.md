@@ -9,10 +9,6 @@ Due to the nature of the current protocol, some methods are asynchronous.
 
 This gem is in an early beta state. Expect breaking API changes.
 
-## Hello private beta testers!
-
-Welcome to the private beta. I'd love some feedback on all aspects of using this gem. API, documentation, examples, bugs, etc etc. Please file an issue or hit me (@chendo) up on Twitter/IRC.
-
 ## Requirements
 
 * Ruby 2.1.1
@@ -65,9 +61,14 @@ Documentation is available at http://rubydoc.info/gems/lifx. Please note that un
 
 Examples are located in the `examples/` folder.
 
-* [travis-build-light](examples/travis-build-light/build-light.rb): Changes the colour of a light based on the build status of a project on Travis
+* [travis-build-light](examples/travis-build-light/build-light.rb): Changes the colour of a light based on the build status of a project on Travis.
 * [auto-off](examples/auto-off/auto-off.rb): Turns a light off after X seconds of it being detected turned on.
 * [identify](examples/identify/identify.rb): Use divide-and-conquer search algorithm to identify a light visually.
+
+## Useful utilities
+
+* [lifx-console](http://github.com/chendo/lifx-console): A Pry-enabled REPL to play with LIFX easily.
+* [lifx-http](http://github.com/chendo/lifx-http): A HTTP API for LIFX.
 
 ## Testing
 
@@ -77,13 +78,9 @@ The integration specs rely on a least one device tagged with `Test` to function.
 
 A more comprehensive test suite is in the works.
 
-## Contributing
+## Feedback
 
-1. Fork it
-2. Create your feature branch (`git checkout -b my-new-feature`)
-3. Commit your changes (`git commit -am 'Add some feature'`)
-4. Push to the branch (`git push origin my-new-feature`)
-5. Create new Pull Request
+Please file an issue for general feedback, bugs, clarification, examples, etc etc. Feel free to hit me up on Twitter, too: [@chendo](https://twitter.com/chendo).
 
 ## License
 
