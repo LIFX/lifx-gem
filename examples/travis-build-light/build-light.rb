@@ -43,6 +43,7 @@ def update_light(light, repository)
     LIFX::Color.hsb(0, 1, 1)
   end
 
+  light.turn_on!
   light.set_color(color, duration: 0.2)
   puts "#{Time.now}: Build ##{repository.last_build.number} is #{repository.color}."
 end
