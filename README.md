@@ -19,13 +19,19 @@ This gem is in an early beta state. Expect breaking API changes.
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'lifx', git: "git@github.com:LIFX/lifx-gem.git"
+gem 'lifx'
 ```
 
 And then execute:
 
 ```shell
 $ bundle
+```
+
+Or install the gem with:
+
+```shell
+gem install lifx
 ```
 
 ## Usage
