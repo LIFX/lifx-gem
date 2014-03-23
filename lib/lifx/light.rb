@@ -133,13 +133,13 @@ module LIFX
     end
 
     # @return [Boolean] Returns true if device is on
-    def on?
-      power == :on
+    def on?(**kwargs)
+      power(**kwargs) == :on
     end
 
     # @return [Boolean] Returns true if device is off
-    def off?
-      power == :off
+    def off?(**kwargs)
+      power(**kwargs) == :off
     end
 
     # @param refresh: see #label
