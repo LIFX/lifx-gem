@@ -55,7 +55,7 @@ client.flush                               # Wait until all the packets have bee
 
 ## Documentation
 
-Documentation is available at http://rubydoc.info/gems/lifx. Please note that undocumented classes/methods and methods marked private are not intended for public use.
+Documentation is available at http://rubydoc.info/gems/lifx. Please note that undocumented classes/methods and classes/methods marked private are not intended for public use.
 
 ## Examples
 
