@@ -1,6 +1,6 @@
 module LIFX
   module Protocol
-    # @private
+    # @api private
     module Light
       module Waveform
         SAW = 0

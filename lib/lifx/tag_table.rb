@@ -1,6 +1,5 @@
 module LIFX
   # @api private
-  # @private
   class TagTable
     class Entry < Struct.new(:tag_id, :label, :site_id); end
 

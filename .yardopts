@@ -1,2 +1,3 @@
 --markup markdown
 --no-private
+--query "@api.text != 'private'"

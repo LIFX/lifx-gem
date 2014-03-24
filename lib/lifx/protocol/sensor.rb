@@ -1,6 +1,6 @@
 module LIFX
   module Protocol
-    # @private
+    # @api private
     module Sensor
       class GetAmbientLight < Payload
         endian :little

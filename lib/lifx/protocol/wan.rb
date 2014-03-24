@@ -1,6 +1,6 @@
 module LIFX
   module Protocol
-    # @private
+    # @api private
     module Wan
       class ConnectPlain < Payload
         endian :little

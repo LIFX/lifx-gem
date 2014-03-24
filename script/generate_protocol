@@ -38,7 +38,7 @@ end
 template = Erubis::Eruby.new(<<-ERB)
 module LIFX
   module Protocol
-    # @private
+    # @api private
     module <%= protocol_namespace %>
       <% enums.each do |enum| %>
       module <%= class_name(enum) %>

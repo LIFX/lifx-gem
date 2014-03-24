@@ -1,6 +1,6 @@
 module LIFX
   module Protocol
-    # @private
+    # @api private
     module Device
       module Service
         UDP = 1

@@ -1,6 +1,6 @@
 module LIFX
   module Protocol
-    # @private
+    # @api private
     module Wifi
       module Interface
         SOFT_AP = 1
