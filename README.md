@@ -61,7 +61,7 @@ client.flush                               # Wait until all the packets have bee
 
 ## Documentation
 
-Documentation is available at http://rubydoc.info/gems/lifx. Please note that undocumented classes/methods and classes/methods marked private are not intended for public use.
+Documentation is available at http://rubydoc.info/github/lifx/lifx-gem/master/frames. Please note that undocumented classes/methods and classes/methods marked private are not intended for public use.
 
 LIFX uses the `HSBK` colour representation. `HSB` stands for [hue, saturation, brightness](http://en.wikipedia.org/wiki/HSV_color_space), and `K` refers to [kelvin](http://en.wikipedia.org/wiki/Color_temperature).
 
