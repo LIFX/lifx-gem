@@ -1,6 +1,6 @@
-# Generated code ahoy!
 module LIFX
   module Protocol
+    # @private
     module Sensor
       class GetAmbientLight < Payload
         endian :little

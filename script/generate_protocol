@@ -36,9 +36,9 @@ def field_entry(field)
 end
 
 template = Erubis::Eruby.new(<<-ERB)
-# Generated code ahoy!
 module LIFX
   module Protocol
+    # @private
     module <%= protocol_namespace %>
       <% enums.each do |enum| %>
       module <%= class_name(enum) %>

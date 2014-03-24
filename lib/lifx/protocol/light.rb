@@ -1,6 +1,6 @@
-# Generated code ahoy!
 module LIFX
   module Protocol
+    # @private
     module Light
       module Waveform
         SAW = 0

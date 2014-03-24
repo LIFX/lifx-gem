@@ -1,6 +1,6 @@
-# Generated code ahoy!
 module LIFX
   module Protocol
+    # @private
     module Wan
       class ConnectPlain < Payload
         endian :little

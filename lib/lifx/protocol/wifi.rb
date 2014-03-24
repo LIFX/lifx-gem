@@ -1,6 +1,6 @@
-# Generated code ahoy!
 module LIFX
   module Protocol
+    # @private
     module Wifi
       module Interface
         SOFT_AP = 1
