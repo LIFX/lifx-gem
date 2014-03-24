@@ -33,7 +33,7 @@ module LIFX
         @listener = Thread.new do
           reader = UDPSocket.new
           reader.setsockopt(Socket::SOL_SOCKET, Socket::SO_REUSEADDR, true)
-          reader.setsockopt(Socket::SOL_SOCKET, Socket::SO_REUSEPORT, true)
+          reader.setsockopt(Socket::SOL_SOCKET, Socket::SO_REUSEPORT, true) if Socket.const_defined?('SO_REUSEPORT')
           reader.bind(ip, port)
           loop do
             begin
