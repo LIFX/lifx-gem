@@ -46,6 +46,8 @@ module LIFX
     # @param transient: [Boolean] If false, the light will remain at the color the waveform is at when it ends
     # @param period: [Integer] Number of seconds a cycle. Must be above 1.0 (?)
     # @param stream: [Integer] Unused
+    # @api private
+    # @note Marked as private pending bug fixes in firmware
     def pulse(color, cycles: 1,
                      duty_cycle: 0.5,
                      transient: true,
@@ -65,6 +67,8 @@ module LIFX
     # @param transient: [Boolean] If false, the light will remain at the color the waveform is at when it ends
     # @param period: [Integer] Number of seconds a cycle. Must be above 1.0 (?)
     # @param stream: [Integer] Unused
+    # @api private
+    # @note Marked as private pending bug fixes in firmware
     def sine(color, cycles: 1,
                     period: 1.0,
                     transient: true,
@@ -83,6 +87,8 @@ module LIFX
     # @param transient: [Boolean] If false, the light will remain at the color the waveform is at when it ends
     # @param period: [Integer] Number of seconds a cycle. Must be above 1.0 (?)
     # @param stream: [Integer] Unused
+    # @api private
+    # @note Marked as private pending bug fixes in firmware
     def half_sine(color, cycles: 1,
                          period: 1.0,
                          transient: true,
@@ -100,6 +106,8 @@ module LIFX
     # @param transient: [Boolean] If false, the light will remain at the color the waveform is at when it ends
     # @param period: [Integer] Number of seconds a cycle. Must be above 1.0 (?)
     # @param stream: [Integer] Unused
+    # @api private
+    # @note Marked as private pending bug fixes in firmware
     def triangle(color, cycles: 1,
                      period: 1.0,
                      transient: true,
@@ -117,6 +125,8 @@ module LIFX
     # @param transient: [Boolean] If false, the light will remain at the color the waveform is at when it ends
     # @param period: [Integer] Number of seconds a cycle. Must be above 1.0 (?)
     # @param stream: [Integer] Unused
+    # @api private
+    # @note Marked as private pending bug fixes in firmware
     def saw(color, cycles: 1,
                    period: 1.0,
                    transient: true,
