@@ -2,6 +2,7 @@ require 'lifx/observable'
 
 module LIFX
   # @api private
+  # @private
   module TransportManager
     class Base
       include Logging

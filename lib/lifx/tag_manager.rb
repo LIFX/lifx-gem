@@ -1,5 +1,6 @@
 module LIFX
   # @api private
+  # @private
   class TagManager
     # TagManager handles discovery of tags, resolving tags to [site_id, tags_field] pairs,
     # creating, setting and removing tags.

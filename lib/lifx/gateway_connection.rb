@@ -3,6 +3,7 @@ require 'lifx/timers'
 
 module LIFX
   # @api private
+  # @private
   class GatewayConnection
     # GatewayConnection handles the UDP and TCP connections to the gateway
     # A GatewayConnection is created when a new device sends a StatePanGateway

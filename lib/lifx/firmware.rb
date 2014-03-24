@@ -1,5 +1,6 @@
 module LIFX
   # LIFX::Firmware handles decoding firmware payloads
+  # @private
   class Firmware < Struct.new(:build_time, :major, :minor)
     include Comparable
 

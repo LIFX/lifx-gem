@@ -1,3 +1,4 @@
+# @private
 module BinData
   class Bool < Primitive
     uint8 :_value

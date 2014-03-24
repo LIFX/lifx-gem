@@ -5,6 +5,7 @@ require 'lifx/gateway_connection'
 
 module LIFX
   # @api private
+  # @private
   class Site
     include Seen
     include Timers

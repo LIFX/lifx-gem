@@ -3,6 +3,7 @@ require 'lifx/tag_table'
 require 'lifx/utilities'
 
 module LIFX
+  # @private
   class RoutingManager
     include Utilities
     # RoutingManager manages a routing table of site <-> device

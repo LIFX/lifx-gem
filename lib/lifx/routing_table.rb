@@ -1,4 +1,5 @@
 module LIFX
+  # @private
   class RoutingTable
     class Entry < Struct.new(:site_id, :device_id, :tag_ids, :last_seen); end
     # RoutingTable stores the device <-> site mapping

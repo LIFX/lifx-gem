@@ -1,6 +1,7 @@
 require 'lifx/utilities'
 
 module LIFX
+  # @private
   class ProtocolPath
     # ProtocolPath contains all the addressable information that is required
     # for the protocol.

@@ -1,4 +1,5 @@
 module LIFX
+  # @private
   module Observable
     class ObserverCallbackMismatch < ArgumentError; end
     def add_observer(obj, &callback)

@@ -1,5 +1,6 @@
 require 'timers'
 module LIFX
+  # @private
   module Timers
     protected
     def initialize_timer_thread

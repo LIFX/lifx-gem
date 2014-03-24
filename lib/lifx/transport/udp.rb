@@ -2,6 +2,7 @@ require 'socket'
 module LIFX
   class Transport
     # @api private
+    # @private
     class UDP < Transport
       def initialize(*args)
         super

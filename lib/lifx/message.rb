@@ -3,7 +3,7 @@ require 'lifx/protocol_path'
 
 module LIFX
   # @api private
-
+  # @private
   class Message
     include Logging
     extend Forwardable

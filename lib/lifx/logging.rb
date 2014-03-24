@@ -1,4 +1,5 @@
 module LIFX
+  # @private
   module Logging
     def self.included(mod)
       mod.extend(self)

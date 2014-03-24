@@ -3,6 +3,7 @@ require 'socket'
 module LIFX
   class Transport
     # @api private
+    # @private
     class TCP < Transport
       include Logging
 
