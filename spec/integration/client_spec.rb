@@ -4,13 +4,13 @@ module LIFX
   describe Client, integration: true do
     describe '#sync' do
       it 'schedules sending all messages to be executed at the same time' do
+        if lights.count < 3
+          pending "This test requires 3 or more lights tagged under Test"
+          return
+        end
 
         lifx.discover! do
           lights.count >= 3
-        end
-
-        if lights.count < 3
-          fail "This test requires 3 or more lights tagged under Test"
         end
 
         white = LIFX::Color.white(brightness: 0.5)
