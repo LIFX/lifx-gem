@@ -51,6 +51,7 @@ module LIFX
     # Adds a block to be run when a payload of class `payload_class` is received
     # @param payload_class [Class] Payload type to execute block on
     # @param &hook [Proc] Hook to run
+    # @api private
     # @return [void]
     def add_hook(payload_class, hook_arg = nil, &hook_block)
       hook = block_given? ? hook_block : hook_arg
@@ -63,6 +64,7 @@ module LIFX
     # Removes a hook added by {#add_hook}
     # @param payload_class [Class] Payload type to delete hook from
     # @param hook [Proc] The original hook passed into {#add_hook}
+    # @api private
     # @return [void]
     def remove_hook(payload_class, hook)
       @message_hooks[payload_class].delete(hook)
@@ -132,14 +134,16 @@ module LIFX
       set_power!(0)
     end
 
+    # @see #power
     # @return [Boolean] Returns true if device is on
-    def on?(**kwargs)
-      power(**kwargs) == :on
+    def on?(refresh: false, fetch: true)
+      power(refresh: refresh, fetch: fetch) == :on
     end
 
+    # @see #power
     # @return [Boolean] Returns true if device is off
-    def off?(**kwargs)
-      power(**kwargs) == :off
+    def off?(refresh: false, fetch: true)
+      power(refresh: refresh, fetch: fetch) == :off
     end
 
     # @param refresh: see #label
@@ -322,6 +326,7 @@ module LIFX
     end
     
     # Returns a nice string representation of the Light
+    # @return [String]
     def to_s
       %Q{#<LIFX::Light id=#{id} label=#{label(fetch: false)} power=#{power(fetch: false)}>}.force_encoding(Encoding.default_external)
     end
