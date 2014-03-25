@@ -13,6 +13,7 @@ This gem is in an early beta state. Expect breaking API changes.
 
 * Ruby 2.1.1
 * Bundler
+* Tested on OS X Mavericks, but should work other *nix platforms. Please file an issue if you have any problems.
 
 ## Installation
 
