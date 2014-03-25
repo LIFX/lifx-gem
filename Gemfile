@@ -10,5 +10,9 @@ group :development do
   gem 'yard'
 end
 
+group :test do
+  gem 'rake'
+end
+
 # Specify your gem's dependencies in lifx.gemspec
 gemspec
