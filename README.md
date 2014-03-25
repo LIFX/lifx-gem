@@ -1,5 +1,7 @@
 # LIFX
 
+[![Gem Version](https://badge.fury.io/rb/lifx.png)](https://rubygems.org/gems/lifx) [![Build Status](https://travis-ci.org/LIFX/lifx-gem.png)](https://travis-ci.org/LIFX/lifx-gem)
+
 This gem allows you to control your [LIFX](http://lifx.co) lights.
 
 It handles discovery, gateway connections, tags, and provides a object-based API
