@@ -1,6 +1,9 @@
 require 'bundler'
 Bundler.require
-require 'pry'
+begin
+  require 'pry'
+rescue LoadError
+end
 
 require 'lifx'
 require 'lifx/utilities'
