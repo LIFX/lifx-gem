@@ -41,12 +41,9 @@ shared_context 'integration', integration: true do
   let(:light) { lights.first }
 end
 
-if ENV['DEBUG']
-  LIFX::Config.logger = Yell.new(STDERR)
-end
+LIFX::Config.logger = Yell.new(STDERR) if ENV['DEBUG']
 
 RSpec.configure do |config|
   config.formatter = 'documentation'
   config.color = true
 end
-

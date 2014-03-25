@@ -3,41 +3,41 @@ require 'spec_helper'
 module LIFX
   describe Light, integration: true do
     describe '#set_power' do
-      it "sets the power of the light asynchronously" do
+      it 'sets the power of the light asynchronously' do
         light.set_power(0)
-        wait { light.off?.should == true }
+        wait { expect(light).to be_off }
         light.set_power(1)
-        wait { light.on?.should == true }
+        wait { expect(light).to be_on }
       end
     end
 
     describe '#set_power!' do
-      it "sets the power of the light synchronously" do
+      it 'sets the power of the light synchronously' do
         light.set_power!(0)
-        light.off?.should == true
+        expect(light).to be_off
         light.set_power!(1)
-        light.on?.should == true
+        expect(light).to be_on
       end
     end
 
     describe '#set_color' do
-      it "sets the color of the light asynchronously" do
-        color = Color.hsb(rand(360), rand, rand)
+      let(:color) { Color.hsb(rand(360), rand, rand) }
+
+      it 'sets the color of the light asynchronously' do
         light.set_color(color, duration: 0)
         sleep 1
         light.refresh
-        wait { light.color.should == color }
+        wait { expect(light.color).to eq color }
       end
     end
 
     describe '#set_label' do
-      it "sets the label of the light synchronously" do
-        label = light.label.sub(/\d+|$/, rand(100).to_s)
+      let(:label) { light.label.sub(/\d+|$/, rand(100).to_s) }
+
+      it 'sets the label of the light synchronously' do
         light.set_label(label)
-        light.label.should == label
+        expect(light.label).to eq label
       end
     end
-
-
   end
 end

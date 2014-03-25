@@ -6,9 +6,9 @@ describe LIFX::Transport do
 
   describe 'initialize' do
     it 'takes an host and port' do
-      transport = LIFX::Transport.new('127.0.0.1', 31337)
-      transport.host.should == '127.0.0.1'
-      transport.port.should == 31337
+      transport = LIFX::Transport.new('127.0.0.1', 31_337)
+      expect(transport.host).to eq '127.0.0.1'
+      expect(transport.port).to eq 31_337
     end
   end
 end

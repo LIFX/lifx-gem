@@ -2,30 +2,26 @@ require 'spec_helper'
 
 module LIFX
   describe GatewayConnection do
-    subject do
-      GatewayConnection.new
-    end
+    subject(:gateway) { GatewayConnection.new }
 
-    let(:message) { double(Message).tap { |m| m.stub(:is_a?).and_return(true); m.stub(:pack) } }
+    let(:message) { double(Message, is_a?: true, pack: '') }
     let(:ip) { '127.0.0.1' }
-    let(:port) { 35003 }
+    let(:port) { 35_003 }
 
-    after do
-      subject.close
-    end
+    after { gateway.close }
 
     context 'write queue resiliency' do
       it 'does not send if there is no available connection' do
-        expect(subject).to_not receive(:actually_write)
-        subject.write(message)
-        expect { subject.flush(timeout: 0.5) }.to raise_error(Timeout::Error)
+        expect(gateway).to_not receive(:actually_write)
+        gateway.write(message)
+        expect { gateway.flush(timeout: 0.5) }.to raise_error(Timeout::Error)
       end
-      
+
       it 'pushes message back into queue if unable to write' do
-        subject.connect_udp(ip, port)
-        expect(subject).to receive(:actually_write).and_return(false, true)
-        subject.write(message)
-        subject.flush
+        gateway.connect_udp(ip, port)
+        expect(gateway).to receive(:actually_write).and_return(false, true)
+        gateway.write(message)
+        gateway.flush
       end
     end
   end

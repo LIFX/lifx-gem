@@ -2,53 +2,58 @@ require 'spec_helper'
 
 describe LIFX::Message do
   context 'unpacking' do
-    let(:data) { "\x39\x00\x00\x34\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x31\x6c\x69\x66\x78\x31\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x67\x00\x00\x00\x00\x01\x00\x00\xff\xff\xff\xff\xac\x0d\xc8\x00\x00\x00\x00\x00\x80\x3f\x00\x00\x00".b }
+    let(:data) do
+      "\x39\x00\x00\x34\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x31" \
+      "\x6c\x69\x66\x78\x31\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x67\x00" \
+      "\x00\x00\x00\x01\x00\x00\xff\xff\xff\xff\xac\x0d\xc8\x00\x00\x00\x00" \
+      "\x00\x80\x3f\x00\x00\x00".b
+    end
     let(:msg) { LIFX::Message.unpack(data) }
 
     it 'unpacks without errors' do
-      msg.should_not be_nil
+      expect(msg).not_to be_nil
     end
 
     it 'returns the correct frame data' do
-      msg.msg_size.should == 57
-      msg.protocol.should == 1024
-      msg.addressable?.should == true
+      expect(msg.msg_size).to eq 57
+      expect(msg.protocol).to eq 1024
+      expect(msg).to be_addressable
     end
 
     it 'returns the correct address data' do
-      msg.raw_site.should == '1lifx1'
-      msg.raw_target.should == "\x00" * 8
+      expect(msg.raw_site).to eq '1lifx1'
+      expect(msg.raw_target).to eq "\x00" * 8
     end
 
     it 'has correct ProtocolPath data' do
-      msg.path.should be_instance_of(LIFX::ProtocolPath)
-      msg.path.site_id.should == '316c69667831'
-      msg.path.tag_ids.should == []
-      msg.path.device_id.should == nil
+      expect(msg.path).to be_a(LIFX::ProtocolPath)
+      expect(msg.path.site_id).to eq '316c69667831'
+      expect(msg.path.tag_ids).to eq []
+      expect(msg.path.device_id).to be_nil
     end
 
     it 'returns the correct metadata' do
-      msg.at_time.should == 0
-      msg.type.should == 103
+      expect(msg.at_time).to eq 0
+      expect(msg.type).to eq 103
     end
 
     let(:payload) { msg.payload }
     it 'returns the payload' do
-      payload.class.should == LIFX::Protocol::Light::SetWaveform
-      payload.stream.should == 0
-      payload.transient.should be_true
-      payload.color.hue.should == 0
-      payload.color.saturation.should == 65535
-      payload.color.brightness.should == 65535
-      payload.color.kelvin.should == 3500
-      payload.period.should == 200
-      payload.cycles.should == 1.0
-      payload.duty_cycle.should == 0
-      payload.waveform.should == 0
+      expect(payload.class).to eq LIFX::Protocol::Light::SetWaveform
+      expect(payload.stream).to eq 0
+      expect(payload.transient).to be_true
+      expect(payload.color.hue).to eq 0
+      expect(payload.color.saturation).to eq 65_535
+      expect(payload.color.brightness).to eq 65_535
+      expect(payload.color.kelvin).to eq 3_500
+      expect(payload.period).to eq 200
+      expect(payload.cycles).to eq 1.0
+      expect(payload.duty_cycle).to eq 0
+      expect(payload.waveform).to eq 0
     end
 
     it 'repacks to the same data' do
-      msg.pack.should == data
+      expect(msg.pack).to eq data
     end
   end
 
@@ -72,42 +77,50 @@ describe LIFX::Message do
     context 'passed in via hash' do
       let(:msg) do
         LIFX::Message.new({
-          path: LIFX::ProtocolPath.new(tagged: false, raw_target: "abcdefgh"),
+          path: LIFX::ProtocolPath.new(tagged: false, raw_target: 'abcdefgh'),
           at_time: 9001,
           payload: LIFX::Protocol::Wifi::SetAccessPoint.new(
             interface: 1,
-            ssid: "who let the dogs out",
-            pass: "woof, woof, woof woof!",
+            ssid: 'who let the dogs out',
+            pass: 'woof, woof, woof woof!',
             security: 1
           )
         })
       end
+      # let(:unpacked) { LIFX::Message.unpack(msg.pack) }
 
       it 'sets the size' do
-        msg.msg_size.should == 134
+        expect(msg.msg_size).to eq 134
       end
 
       it 'packs correctly' do
-        msg.pack.should == "\x86\x00\x00\x14\x00\x00\x00\x00abcdefgh\x00\x00\x00\x00\x00\x00\x00\x00)#\x00\x00\x00\x00\x00\x001\x01\x00\x00\x01who let the dogs out\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00woof, woof, woof woof!\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x01".b
-        unpacked = LIFX::Message.unpack(msg.pack)
-        msg.protocol.should == 1024
-        msg.path.tagged?.should == false
-        msg.addressable?.should == true
-        msg.path.raw_target.should == 'abcdefgh'
-        msg.at_time.should == 9001
-        msg.type.should == 305
-        msg.payload.class.should == LIFX::Protocol::Wifi::SetAccessPoint
-        msg.payload.interface.should == 1
-        msg.payload.ssid.should == "who let the dogs out"
-        msg.payload.pass.should == "woof, woof, woof woof!"
-        msg.payload.security.should == 1
+        expect(msg.pack).to eq "\x86\x00\x00\x14\x00\x00\x00\x00abcdefgh\x00" \
+                               "\x00\x00\x00\x00\x00\x00\x00)#\x00\x00\x00"   \
+                               "\x00\x00\x001\x01\x00\x00\x01who let the "    \
+                               "dogs out\x00\x00\x00\x00\x00\x00\x00\x00\x00" \
+                               "\x00\x00\x00woof, woof, woof woof!\x00\x00"   \
+                               "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00" \
+                               "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00" \
+                               "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00" \
+                               "\x00\x00\x00\x00\x00\x00\x00\x01".b
+        expect(msg.protocol).to eq 1024
+        expect(msg.path).not_to be_tagged
+        expect(msg).to be_addressable
+        expect(msg.path.raw_target).to eq 'abcdefgh'
+        expect(msg.at_time).to eq 9001
+        expect(msg.type).to eq 305
+        expect(msg.payload.class).to eq LIFX::Protocol::Wifi::SetAccessPoint
+        expect(msg.payload.interface).to eq 1
+        expect(msg.payload.ssid).to eq 'who let the dogs out'
+        expect(msg.payload.pass).to eq 'woof, woof, woof woof!'
+        expect(msg.payload.security).to eq 1
       end
     end
 
     context 'packing with tags' do
       let(:msg) do
         LIFX::Message.new({
-          path: LIFX::ProtocolPath.new(tag_ids: [0,1]),
+          path: LIFX::ProtocolPath.new(tag_ids: [0, 1]),
           at_time: 9001,
           payload: LIFX::Protocol::Device::GetTime.new
         })
@@ -116,19 +129,22 @@ describe LIFX::Message do
       let(:unpacked) { LIFX::Message.unpack(msg.pack) }
 
       it 'packs the tag correctly' do
-        msg.pack.should == "$\x00\x004\x00\x00\x00\x00\x03\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00)#\x00\x00\x00\x00\x00\x00\x04\x00\x00\x00".b
+        expect(msg.pack).to eq "$\x00\x004\x00\x00\x00\x00\x03\x00\x00\x00"   \
+                               "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00" \
+                               "\x00)#\x00\x00\x00\x00\x00\x00\x04\x00\x00"   \
+                               "\x00".b
       end
 
       it 'sets tagged' do
-        unpacked.path.tagged?.should == true
+        expect(unpacked.path).to be_tagged
       end
 
       it 'sets tags' do
-        unpacked.path.tag_ids.should == [0, 1]
+        expect(unpacked.path.tag_ids).to eq [0, 1]
       end
 
       it 'device should be nil' do
-        unpacked.path.device_id.should == nil
+        expect(unpacked.path.device_id).to be_nil
       end
     end
 
@@ -144,19 +160,21 @@ describe LIFX::Message do
       let(:unpacked) { LIFX::Message.unpack(msg.pack) }
 
       it 'packs the tag correctly' do
-        msg.pack.should == "$\x00\x00\x14\x00\x00\x00\x00\x01#Eg\x89\xAB\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00)#\x00\x00\x00\x00\x00\x00\x04\x00\x00\x00".b
+        expect(msg.pack).to eq "$\x00\x00\x14\x00\x00\x00\x00\x01#Eg\x89\xAB" \
+                               "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00)#"   \
+                               "\x00\x00\x00\x00\x00\x00\x04\x00\x00\x00".b
       end
 
       it 'sets tagged to false' do
-        unpacked.path.tagged?.should == false
+        expect(unpacked.path).not_to be_tagged
       end
 
       it 'sets device' do
-        unpacked.path.device_id.should == '0123456789ab'
+        expect(unpacked.path.device_id).to eq '0123456789ab'
       end
 
       it 'tags should be nil' do
-        unpacked.path.tag_ids.should == nil
+        expect(unpacked.path.tag_ids).to be_nil
       end
     end
   end
