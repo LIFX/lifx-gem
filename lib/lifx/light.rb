@@ -83,7 +83,7 @@ module LIFX
     # Returns the label of the light
     # @param refresh: [Boolean] If true, will request for current label
     # @param fetch: [Boolean] If false, it will not request current label if it's not cached
-    # @return [String] Label
+    # @return [String, nil] Label
     def label(refresh: false, fetch: true)
       @label = nil if refresh
       send_message!(Protocol::Light::Get.new, wait_for: Protocol::Light::Get) if fetch && !@label
@@ -385,7 +385,7 @@ module LIFX
       end
 
       add_hook(Protocol::Light::State) do |payload|
-        @label      = payload.label.to_s
+        @label      = payload.label.snapshot
         @color      = Color.from_struct(payload.color.snapshot)
         @power      = payload.power.to_i
         @tags_field = payload.tags
