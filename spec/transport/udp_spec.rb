@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe LIFX::Transport::UDP do
+describe LIFX::Transport::UDP, integration: true do
   subject(:udp) { LIFX::Transport::UDP.new(host, port) }
 
   let(:host) { 'localhost' }
