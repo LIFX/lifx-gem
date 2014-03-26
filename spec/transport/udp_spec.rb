@@ -33,8 +33,7 @@ describe LIFX::Transport::UDP do
                                .with(raw_message)
                                .and_return(message)
       socket.send(raw_message, 0, host, port)
-      sleep 0.01
-      expect(messages).to include(message)
+      wait { expect(messages).to include(message) }
     end
   end
 end

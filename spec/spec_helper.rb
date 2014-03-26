@@ -27,6 +27,11 @@ shared_context 'integration', integration: true do
     lifx.flush
   end
 
+  let(:lights) { lifx.lights.with_tag('Test') }
+  let(:light) { lights.first }
+end
+
+module SpecHelpers
   def wait(timeout: 5, retry_wait: 0.1, &block)
     Timeout.timeout(timeout) do
       begin
@@ -39,14 +44,12 @@ shared_context 'integration', integration: true do
   rescue Timeout::Error
     block.call
   end
-
-  let(:lights) { lifx.lights.with_tag('Test') }
-  let(:light) { lights.first }
 end
 
 LIFX::Config.logger = Yell.new(STDERR) if ENV['DEBUG']
 
 RSpec.configure do |config|
+  config.include(SpecHelpers)
   config.formatter = 'documentation'
   config.color = true
 end
