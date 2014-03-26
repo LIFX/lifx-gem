@@ -4,18 +4,18 @@ module LIFX
   describe Light, integration: true do
     describe '#set_power' do
       it 'sets the power of the light asynchronously' do
-        light.set_power(0)
+        light.set_power(:off)
         wait { expect(light).to be_off }
-        light.set_power(1)
+        light.set_power(:on)
         wait { expect(light).to be_on }
       end
     end
 
     describe '#set_power!' do
       it 'sets the power of the light synchronously' do
-        light.set_power!(0)
+        light.set_power!(:off)
         expect(light).to be_off
-        light.set_power!(1)
+        light.set_power!(:on)
         expect(light).to be_on
       end
     end

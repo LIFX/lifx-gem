@@ -138,12 +138,20 @@ module LIFX
                           period: period)
     end
 
-    # Attempts to set the power state to `value` asynchronously.
+    # Attempts to set the power state to `state` asynchronously.
     # This method cannot guarantee the message was received.
-    # @param value [0, 1] 0 for off, 1 for on
+    # @param state [:on, :off] 
     # @return [Light, LightCollection] self for chaining
-    def set_power(value)
-      send_message(Protocol::Device::SetPower.new(level: value))
+    def set_power(state)
+      level = case state
+      when :on
+        1
+      when :off
+        0
+      else
+        raise ArgumentError.new("Must pass in either :on or :off")
+      end
+      send_message(Protocol::Device::SetPower.new(level: level))
       self
     end
 
@@ -151,14 +159,14 @@ module LIFX
     # This method cannot guarantee the message was received.
     # @return [Light, LightCollection] self for chaining
     def turn_on
-      set_power(1)
+      set_power(:on)
     end
 
     # Attempts to turn the light(s) off asynchronously.
     # This method cannot guarantee the message was received.
     # @return [Light, LightCollection] self for chaining
     def turn_off
-      set_power(0)
+      set_power(:off)
     end
 
     # Requests light(s) to report their state

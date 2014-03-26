@@ -1,6 +1,7 @@
 # 0.4.5
 
 - Light#label can be nil
+- Light#set_power and Light#set_power! now take :on and :off rather than magic number
 
 # 0.4.4
 
