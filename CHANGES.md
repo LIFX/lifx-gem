@@ -2,6 +2,7 @@
 
 - Light#label can be nil
 - Light#set_power and Light#set_power! now take :on and :off rather than magic number
+- Use timers 1.x so no compilation is required
 
 # 0.4.4
 
