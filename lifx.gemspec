@@ -7,7 +7,7 @@ Gem::Specification.new do |spec|
   spec.name          = "lifx"
   spec.version       = LIFX::VERSION
   spec.authors       = ["Jack Chen (chendo)"]
-  spec.email         = ["chendo@lifx.co"]
+  spec.email         = ["chendo+lifx-gem@lifx.co"]
   spec.description   = %q{A Ruby gem that allows easy interaction with LIFX devices.}
   spec.summary       = %q{A Ruby gem that allows easy interaction with LIFX devices. Handles discovery, rate limiting, tags, gateway connections and provides an object-based API for interacting with LIFX devices. }
   spec.homepage      = "https://github.com/LIFX/lifx-gem"
@@ -17,7 +17,7 @@ Gem::Specification.new do |spec|
   spec.executables   = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = ["lib"]
-  spec.required_ruby_version = ">= 2.1"
+  spec.required_ruby_version = ">= 2.0"
 
   spec.add_dependency "bindata", "~> 2.0"
   spec.add_dependency "yell", "~> 2.0"
