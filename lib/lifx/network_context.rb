@@ -10,6 +10,7 @@ module LIFX
     include Timers
     include Logging
     include Utilities
+    include RequiredKeywordArguments
     extend Forwardable
 
     # NetworkContext stores lights and ties together TransportManager, TagManager and RoutingManager
