@@ -1,5 +1,6 @@
 # 0.4.5
 
+- Now supports Ruby 2.0
 - Light#label can be nil
 - Light#set_power and Light#set_power! now take :on and :off rather than magic number
 - Use timers 1.x so no compilation is required
