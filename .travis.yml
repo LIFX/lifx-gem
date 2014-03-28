@@ -4,4 +4,5 @@ notifications:
   slack: lifx:z9PYWaIkFUpHw0aFu9mMQXDl
   email: false
 rvm:
+  - 2.0.0
   - 2.1.1
