@@ -128,6 +128,7 @@ module LIFX
       end
 
       def handle_broadcast_message(message, ip, transport)
+        return if message.nil?
         payload = message.payload
         case payload
         when Protocol::Device::StatePanGateway
