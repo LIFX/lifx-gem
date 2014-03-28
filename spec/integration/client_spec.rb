@@ -19,7 +19,7 @@ module LIFX
         sleep 1
 
         msgs = []
-        udp.add_observer(self) do |message:, ip:, transport:|
+        udp.add_observer(self) do |message: nil, ip: nil, transport: nil|
           msgs << message if message.payload.is_a?(Protocol::Light::SetWaveform)
         end
         udp.listen

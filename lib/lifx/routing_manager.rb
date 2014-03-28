@@ -6,12 +6,14 @@ module LIFX
   # @private
   class RoutingManager
     include Utilities
+    include RequiredKeywordArguments
+
     # RoutingManager manages a routing table of site <-> device
     # It can resolve a target to ProtocolPaths and manages the TagTable
 
     attr_reader :context, :tag_table, :routing_table
 
-    def initialize(context:)
+    def initialize(context: required!(:context))
       @context = context
       @routing_table = RoutingTable.new
       @tag_table = TagTable.new

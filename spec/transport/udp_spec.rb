@@ -24,7 +24,7 @@ describe LIFX::Transport::UDP, integration: true do
 
     it 'listens to the specified socket data, unpacks it and notifies observers' do
       messages = []
-      udp.add_observer(self) do |message:, ip:, transport:|
+      udp.add_observer(self) do |message: nil, ip: nil, transport: nil|
         messages << message
       end
       udp.listen

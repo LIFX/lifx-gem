@@ -32,7 +32,7 @@ module LIFX
     alias_method :inspect, :to_s
 
     def observer_callback_definition
-      -> (message:, ip: nil, transport: nil) {}
+      -> (message: nil, ip: nil, transport: nil) {}
     end
   end
 end

@@ -21,8 +21,8 @@ module LIFX
     # Attempts to apply a waveform to the light(s) asynchronously.
     # @note Don't use this directly.
     # @api private
-    def set_waveform(color, waveform:,
-                            cycles:,
+    def set_waveform(color, waveform: required!(:waveform),
+                            cycles: required!(:cycles),
                             stream: 0,
                             transient: true,
                             period: 1.0,

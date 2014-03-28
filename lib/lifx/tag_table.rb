@@ -24,7 +24,7 @@ module LIFX
       entries_with(**args).first
     end
 
-    def update_table(tag_id:, label:, site_id:)
+    def update_table(tag_id: tag_id, label: label, site_id: site_id)
       entry = @entries[site_id][tag_id] ||= Entry.new(tag_id, label, site_id)
       entry.label = label
     end
