@@ -22,8 +22,6 @@ module LIFX
     PROTOCOL_VERSION = 1024
 
     class << self
-      attr_accessor :log_invalid_messages
-
       def unpack(data)
         raise InvalidFrame if data.length < 2
 
@@ -35,7 +33,7 @@ module LIFX
         path = ProtocolPath.new(raw_site: message.raw_site, raw_target: message.raw_target, tagged: message.tagged)
         payload_class = message_type_for_id(message.type.snapshot)
         if payload_class.nil?
-          if self.log_invalid_messages
+          if Config.log_invalid_messages
             logger.error("Message.unpack: Unrecognised payload ID: #{message.type}")
             logger.error("Message.unpack: Message: #{message}")
           end
@@ -48,7 +46,7 @@ module LIFX
           if message.raw_site == "\x00" * 6
             logger.info("Message.unpack: Ignoring malformed message from virgin bulb")
           else
-            if self.log_invalid_messages
+            if Config.log_invalid_messages
               logger.error("Message.unpack: Exception while unpacking payload of type #{payload_class}: #{ex}")
               logger.error("Message.unpack: Data: #{data.inspect}")
             end
@@ -56,7 +54,7 @@ module LIFX
         end
         new(path, message, payload)
       rescue => ex
-        if self.log_invalid_messages
+        if Config.log_invalid_messages
           logger.debug("Message.unpack: Exception while unpacking #{data.inspect}")
           logger.debug("Message.unpack: #{ex} - #{ex.backtrace.join("\n")}")
         end

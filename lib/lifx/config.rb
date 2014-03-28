@@ -5,6 +5,7 @@ module LIFX
 
   Config.default_duration = 1
   Config.allowed_transports = [:udp, :tcp]
+  Config.log_invalid_messages = false
   Config.logger = Yell.new do |logger|
     logger.level = 'gte.warn'
     logger.adapter STDERR, format: '%d [%5L] %p/%t : %m'
