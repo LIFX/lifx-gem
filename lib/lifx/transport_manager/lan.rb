@@ -71,7 +71,14 @@ module LIFX
       end
 
       def on_network?
-        Socket.getifaddrs.any? { |ifaddr| ifaddr.broadaddr }
+        if Socket.respond_to?(:getifaddrs) # Ruby 2.1+
+          Socket.getifaddrs.any? { |ifaddr| ifaddr.broadaddr }
+        else # Ruby 2.0
+          Socket.ip_address_list.any? do |addrinfo|
+            # Not entirely sure how to check if on a LAN with IPv6
+            addrinfo.ipv4_private? || addrinfo.ipv6_unique_local?
+          end
+        end
       end
 
       def broadcast(message)
