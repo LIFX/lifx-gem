@@ -24,7 +24,7 @@ module LIFX
       else
         raise ArgumentError.new("Unknown transport method: #{transport}")
       end
-      @transport_manager.add_observer(self) do |message:, ip:, transport:|
+      @transport_manager.add_observer(self) do |message: nil, ip: nil, transport: nil|
         handle_message(message, ip, transport)
       end
 
@@ -60,7 +60,7 @@ module LIFX
     # @param target: [Target] Target of the message
     # @param payload: [Protocol::Payload] Message payload
     # @param acknowledge: [Boolean] If recipients must acknowledge with a response
-    def send_message(target:, payload:, acknowledge: false)
+    def send_message(target: required!(:target), payload: required!(:payload), acknowledge: false)
       paths = @routing_manager.resolve_target(target)
 
       messages = paths.map do |path|
@@ -77,9 +77,10 @@ module LIFX
       end
     end
 
-    protected def within_sync?
+    def within_sync?
       !!Thread.current[:sync_enabled]
     end
+    protected :within_sync?
 
     # Synchronize asynchronous set_color, set_waveform and set_power messages to multiple devices.
     # You cannot use synchronous methods in the block

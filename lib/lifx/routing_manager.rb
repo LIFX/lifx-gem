@@ -11,7 +11,7 @@ module LIFX
 
     attr_reader :context, :tag_table, :routing_table
 
-    def initialize(context:)
+    def initialize(context: required!(:context))
       @context = context
       @routing_table = RoutingTable.new
       @tag_table = TagTable.new

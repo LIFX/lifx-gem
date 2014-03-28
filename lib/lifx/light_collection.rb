@@ -6,6 +6,7 @@ module LIFX
   class LightCollection
     include LightTarget
     include Enumerable
+    include RequiredKeywordArguments
     extend Forwardable
 
     class TagNotFound < ArgumentError; end
@@ -22,7 +23,7 @@ module LIFX
     # @api private
     # @param context: [NetworkContext] NetworkContext this collection belongs to
     # @param tag: [String] Tag 
-    def initialize(context:, tag: nil)
+    def initialize(context: required!(:context), tag: nil)
       @context = context
       @tag = tag
     end

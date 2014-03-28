@@ -10,10 +10,11 @@ module LIFX
     include Timers
     include Logging
     include Observable
+    include RequiredKeywordArguments
     
     attr_reader :id, :gateways, :tag_manager
 
-    def initialize(id:)
+    def initialize(id: required!(:id))
       @id            = id
       @gateways      = {}
       @gateways_mutex = Mutex.new

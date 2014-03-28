@@ -8,17 +8,18 @@ module LIFX
     # Stores site <-> [tag_name, tag_id]
     include Utilities
     include Logging
+    include RequiredKeywordArguments
 
     attr_reader :context
 
     class TagLimitReached < StandardError; end
 
-    def initialize(context:, tag_table:)
+    def initialize(context: required!(:context), tag_table: required!(:tag_table))
       @context = context
       @tag_table = tag_table
     end
 
-    def create_tag(label:, site_id:)
+    def create_tag(label: required!(:label), site_id: required!(:site_id))
       id = next_unused_id_on_site_id(site_id)
       raise TagLimitReached if id.nil?
       # Add the entry for the tag we're about to create to prevent a case where
@@ -28,7 +29,7 @@ module LIFX
                            payload: Protocol::Device::SetTagLabels.new(tags: id_to_tags_field(id), label: label))
     end
 
-    def add_tag_to_device(tag:, device:)
+    def add_tag_to_device(tag: required!(:tag), device: required!(:device))
       tag_entry = entry_with(label: tag, site_id: device.site_id)
       if !tag_entry
         create_tag(label: tag, site_id: device.site_id)
@@ -42,7 +43,7 @@ module LIFX
       end
     end
 
-    def remove_tag_from_device(tag:, device:)
+    def remove_tag_from_device(tag: required!(:tag), device: required!(:device))
       tag_entry = entry_with(label: tag, site_id: device.site_id)
       return if !tag_entry
 

@@ -2,6 +2,8 @@ require "lifx/version"
 require "bindata"
 require "bindata_ext/bool"
 require "bindata_ext/record"
+
+require "lifx/required_keyword_arguments"
 require "lifx/utilities"
 require "lifx/logging"
 
