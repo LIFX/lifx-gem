@@ -13,8 +13,7 @@ This gem is in an early beta state. Expect breaking API changes.
 
 ## Requirements
 
-* Ruby 2.1.1
-* Bundler
+* Ruby 2.0+
 * Tested on OS X Mavericks, but should work other *nix platforms. Please file an issue if you have any problems.
 
 ## Installation
@@ -34,7 +33,7 @@ $ bundle
 Or install the gem with:
 
 ```shell
-gem install lifx
+gem install lifx        # Add sudo if required.
 ```
 
 ## Usage
