@@ -3,7 +3,7 @@ require 'lifx/site'
 module LIFX
   module TransportManager
     class LAN < Base
-      def initialize(bind_ip: '0.0.0.0', send_ip: '255.255.255.255', port: 56700, peer_port: 56750)
+      def initialize(bind_ip: '0.0.0.0', send_ip: Config.broadcast_ip, port: 56700, peer_port: 56750)
         super
         @bind_ip   = bind_ip
         @send_ip   = send_ip
