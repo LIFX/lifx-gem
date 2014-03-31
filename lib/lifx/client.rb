@@ -1,6 +1,5 @@
 require 'socket'
 require 'timeout'
-require 'yell'
 
 require 'lifx/network_context'
 require 'lifx/light_collection'

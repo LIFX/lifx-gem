@@ -20,7 +20,6 @@ Gem::Specification.new do |spec|
   spec.required_ruby_version = ">= 2.0"
 
   spec.add_dependency "bindata", "~> 2.0"
-  spec.add_dependency "yell", "~> 2.0"
   spec.add_dependency "timers", "~> 1.0"
   spec.add_dependency "configatron", "~> 3.0"
   spec.add_development_dependency "bundler", "~> 1.3"
