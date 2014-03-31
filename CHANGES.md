@@ -1,3 +1,10 @@
+# 0.4.6
+
+- Removed Yell gem. Use stdlib Logger instead
+- Broadcast IP configurable through `LIFX::Config.broadcast_ip`
+- Uninitialized lights no longer shows up in `Client#lights`
+- Handle Rubies that don't have IPv6 enabled
+
 # 0.4.5
 
 - Now supports Ruby 2.0
