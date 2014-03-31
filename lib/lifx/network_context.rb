@@ -171,6 +171,7 @@ module LIFX
           register_device(device)
         end
         device = @devices[message.device_id]
+        return if !device # Virgin bulb
         device.handle_message(message, ip, transport)
       end
     end
