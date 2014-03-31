@@ -54,6 +54,7 @@ module LIFX
     end
 
     def update_from_message(message)
+      return if message.site_id == NULL_SITE_ID
       if message.tagged?
         case message.payload
         when Protocol::Light::Get
