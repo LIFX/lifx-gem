@@ -17,5 +17,5 @@ require "lifx/config"
 require "lifx/client"
 
 module LIFX
-
+  NULL_SITE_ID = "000000000000"
 end

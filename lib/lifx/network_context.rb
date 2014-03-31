@@ -121,6 +121,7 @@ module LIFX
     end
 
     def register_device(device)
+      return if device.site_id == NULL_SITE_ID
       device_id = device.id
       @devices[device_id] = device # What happens when there's already one registered?
     end
