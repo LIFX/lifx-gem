@@ -57,8 +57,10 @@ module LIFX
       try_until -> { block.arity == 1 ? block.call(self) : block.call },
         timeout: timeout,
         timeout_exception: DiscoveryTimeout,
-        condition_interval: condition_interval do
+        condition_interval: condition_interval,
+        action_interval: 1 do
         discover
+        refresh
       end
       self
     end
