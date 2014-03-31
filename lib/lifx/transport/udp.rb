@@ -41,7 +41,7 @@ module LIFX
               message = Message.unpack(bytes)
               notify_observers(message: message, ip: ip, transport: self)
             rescue Message::UnpackError
-              if !@ignore_unpackable_messages
+              if Config.log_invalid_messages
                 logger.warn("#{self}: Unrecognised bytes: #{bytes.bytes.map { |b| '%02x ' % b }.join}")
               end
             end
