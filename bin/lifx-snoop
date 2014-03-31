@@ -27,7 +27,7 @@ end
 
 begin
   light_udp = LIFX::Transport::UDP.new('0.0.0.0', 56700)
-  light_udp.add_observer(self) do |message:, ip:, transport:|
+  light_udp.add_observer(self) do |message: nil, ip: nil, transport: nil|
     if matchers.all? { |m| message.to_s =~ m }
       puts "#{Time.now.iso8601(5)} BROADCAST: #{ip} #{message}"
     end
@@ -35,7 +35,7 @@ begin
   light_udp.listen
 
   peer_udp = LIFX::Transport::UDP.new('0.0.0.0', 56750)
-  peer_udp.add_observer(self) do |message:, ip:, transport:|
+  peer_udp.add_observer(self) do |message: nil, ip: nil, transport: nil|
     if matchers.all? { |m| message.to_s =~ m }
       puts "#{Time.now.iso8601(5)} PEER:      #{ip} #{message}"
     end
