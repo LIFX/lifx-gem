@@ -52,8 +52,9 @@ module LIFX
               
               notify_observers(message: message, ip: host, transport: self)
             rescue Message::UnpackError
-              if !@ignore_unpackable_messages
-                logger.warn("#{self}: Exception occured - #{ex}")
+              if Config.log_invalid_messages
+                logger.info("#{self}: Exception occured while decoding message - #{ex}")
+                logger.info("Data: #{data.inspect}")
               end
             rescue => ex
               logger.warn("#{self}: Exception occured in #listen - #{ex}")
