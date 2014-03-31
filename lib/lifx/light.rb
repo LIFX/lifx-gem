@@ -354,8 +354,10 @@ module LIFX
     # @return [Light] returns self for chaining
     def send_message(payload, acknowledge: true)
       context.send_message(target: Target.new(device_id: id, site_id: @site_id), payload: payload, acknowledge: acknowledge)
-      self
     end
+
+    # An exception for when synchronous messages take too long to receive a response
+    class MessageTimeout < StandardError; end
 
     # Queues a message to be sent to the Light and waits for a response
     # @param payload [Protocol::Payload] the payload to send
@@ -363,8 +365,8 @@ module LIFX
     # @param wait_timeout: [Numeric] wait timeout
     # @param block: [Proc] the block that is executed when the expected `wait_for` payload comes back. If the return value is false or nil, it will try to send the message again.
     # @return [Object] the truthy result of `block` is returned.
-    # @raise [Timeout::Error]
-    def send_message!(payload, wait_for: wait_for, wait_timeout: 3, timeout_exception: Timeout::Error, &block)
+    # @raise [MessageTimeout] if the device doesn't respond in time
+    def send_message!(payload, wait_for: wait_for, wait_timeout: 3, &block)
       if Thread.current[:sync_enabled]
         raise "Cannot use synchronous methods inside a sync block"
       end
@@ -376,10 +378,16 @@ module LIFX
           result = block.call(payload)
         }
         add_hook(wait_for, proc)
-        try_until -> { result }, signal: @message_signal, timeout_exception: timeout_exception do
+        try_until -> { result }, signal: @message_signal do
           send_message(payload)
         end
         result
+      rescue Timeout::Error
+        backtrace = caller_locations(2).map { |c| c.to_s }
+        caller_method = caller_locations(2, 1).first.label
+        ex = MessageTimeout.new("#{caller_method}: Timeout exceeded waiting for response from #{self}")
+        ex.set_backtrace(backtrace)
+        raise ex
       ensure
         remove_hook(wait_for, proc)
       end
