@@ -76,7 +76,7 @@ module LIFX
         else # Ruby 2.0
           Socket.ip_address_list.any? do |addrinfo|
             # Not entirely sure how to check if on a LAN with IPv6
-            addrinfo.ipv4_private? || addrinfo.ipv6_unique_local?
+            addrinfo.ipv4_private? || (addrinfo.respond_to?(:ipv6_unique_local?) && addrinfo.ipv6_unique_local?)
           end
         end
       end
