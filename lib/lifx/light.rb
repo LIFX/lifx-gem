@@ -46,7 +46,6 @@ module LIFX
         hook.call(payload)
       end
       @message_signal.broadcast
-      seen!
     end
 
     # Adds a block to be run when a payload of class `payload_class` is received
@@ -398,6 +397,7 @@ module LIFX
     def add_hooks
       add_hook(Protocol::Device::StateLabel) do |payload|
         @label = payload.label.to_s
+        seen!
       end
 
       add_hook(Protocol::Light::State) do |payload|
@@ -405,22 +405,27 @@ module LIFX
         @color      = Color.from_struct(payload.color.snapshot)
         @power      = payload.power.to_i
         @tags_field = payload.tags
+        seen!
       end
 
       add_hook(Protocol::Device::StateTags) do |payload|
         @tags_field = payload.tags
+        seen!
       end
 
       add_hook(Protocol::Device::StatePower) do |payload|
         @power = payload.level.to_i
+        seen!
       end
 
       add_hook(Protocol::Device::StateMeshFirmware) do |payload|
         @mesh_firmware = Firmware.new(payload)
+        seen!
       end
 
       add_hook(Protocol::Device::StateWifiFirmware) do |payload|
         @wifi_firmware = Firmware.new(payload)
+        seen!
       end
     end
   end
