@@ -27,7 +27,7 @@ module LIFX
         light.set_color(color, duration: 0)
         sleep 1
         light.refresh
-        wait { expect(light.color).to eq color }
+        wait { expect(light.color).to be_similar_to(color) }
       end
     end
 

@@ -174,16 +174,23 @@ module LIFX
       [hue, saturation, brightness, kelvin]
     end
 
-    EQUALITY_THRESHOLD = 0.001 # 0.1% variance
+    DEFAULT_SIMILAR_THRESHOLD = 0.001 # 0.1% variance
     # Checks if colours are equal to 0.1% variance
     # @param other [Color] Color to compare to
+    # @param threshold: [Float] 0..1. Threshold to consider it similar
     # @return [Boolean]
-    def ==(other)
+    def similar_to?(other, threshold: DEFAULT_SIMILAR_THRESHOLD)
       return false unless other.is_a?(Color)
       conditions = []
-      conditions << ((hue - other.hue).abs < (EQUALITY_THRESHOLD * 360)) 
-      conditions << ((saturation - other.saturation).abs < EQUALITY_THRESHOLD)
-      conditions << ((brightness - other.brightness).abs < EQUALITY_THRESHOLD)
+
+      conditions << (((hue - other.hue).abs < (threshold * 360)) || begin
+        # FIXME: Surely there's a better way. 
+        hues = [hue, other.hue].sort
+        hues[0] += 360
+        (hues[0] - hues[1]).abs < (threshold * 360)
+      end)
+      conditions << ((saturation - other.saturation).abs < threshold)
+      conditions << ((brightness - other.brightness).abs < threshold)
       conditions.all?
     end
   end

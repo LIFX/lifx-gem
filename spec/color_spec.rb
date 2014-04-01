@@ -22,5 +22,20 @@ module LIFX
         it_behaves_like 'translating color', 'black',  [0, 0, 0],       [0, 0, 0]
       end
     end
+
+    describe '#similar_to?' do
+      it 'matches reds on on either end of hue spectrums' do
+        expect(Color.hsb(359.9, 1, 1)).to be_similar_to(Color.hsb(0, 1, 1))
+        expect(Color.hsb(0, 1, 1)).to be_similar_to(Color.hsb(359.9, 1, 1))
+      end
+
+      it 'does not match different colours' do
+        expect(Color.hsb(120, 1, 1)).to_not be_similar_to(Color.hsb(0, 1, 1))
+      end
+
+      it 'matches similar colours' do
+        expect(Color.hsb(120, 1, 1)).to be_similar_to(Color.hsb(120.3, 1, 1))
+      end
+    end
   end
 end

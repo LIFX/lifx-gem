@@ -16,7 +16,7 @@ module LIFX
               # It also returns the current light state rather than the
               # final state
       light.refresh
-      wait { expect(light.color).to eq color }
+      wait { expect(light.color).to be_similar_to(color) }
 
       light.remove_tag('Foo')
       wait { expect(light.tags).not_to include('Foo') }
