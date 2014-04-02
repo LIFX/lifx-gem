@@ -1,3 +1,5 @@
+require 'time'
+
 module LIFX
   # LIFX::Firmware handles decoding firmware payloads
   # @private

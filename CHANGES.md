@@ -1,3 +1,7 @@
+### 0.4.6.1
+
+- Fix `Time.parse` issue
+
 ### 0.4.6
 
 - `Color#==` has been renamed to `Color#similar_to?`
