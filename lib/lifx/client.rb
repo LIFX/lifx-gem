@@ -14,7 +14,7 @@ module LIFX
       #
       # @return [Client] A LAN LIFX::Client
       def lan
-        @lan ||= new
+        @lan ||= new(transport_manager: TransportManager::LAN.new)
       end
     end
 
@@ -25,9 +25,9 @@ module LIFX
     # @return [NetworkContext] Enclosed network context
     attr_reader :context
 
-    # @param transport: [:lan] Specify which transport to use
-    def initialize(transport: :lan)
-      @context = NetworkContext.new(transport: transport)
+    # @param transport_manager: [TransportManager] Specify the {TransportManager}
+    def initialize(transport_manager: required!('transport_manager'))
+      @context = NetworkContext.new(transport_manager: transport_manager)
     end
 
     # Default timeout in seconds for discovery

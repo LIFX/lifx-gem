@@ -16,15 +16,10 @@ module LIFX
     # NetworkContext stores lights and ties together TransportManager, TagManager and RoutingManager
     attr_reader :transport_manager, :tag_manager, :routing_manager
     
-    def initialize(transport: :lan)
+    def initialize(transport_manager: required!('transport_manager'))
       @devices = {}
 
-      @transport_manager = case transport
-      when :lan
-        TransportManager::LAN.new
-      else
-        raise ArgumentError.new("Unknown transport method: #{transport}")
-      end
+      @transport_manager = transport_manager
       @transport_manager.add_observer(self) do |message: nil, ip: nil, transport: nil|
         handle_message(message, ip, transport)
       end
