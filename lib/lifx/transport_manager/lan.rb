@@ -3,6 +3,8 @@ require 'lifx/site'
 module LIFX
   module TransportManager
     class LAN < Base
+      include Timers
+      attr_accessor :context
       def initialize(bind_ip: '0.0.0.0', send_ip: Config.broadcast_ip, port: 56700, peer_port: 56750)
         super
         @bind_ip   = bind_ip
@@ -11,7 +13,11 @@ module LIFX
         @peer_port = peer_port
         
         @sites = {}
+        @threads = []
+        @threads << initialize_timer_thread
         initialize_transports
+        initialize_periodic_refresh
+        initialize_message_rate_updater
       end
 
       def flush(**options)
@@ -49,6 +55,7 @@ module LIFX
 
       def stop
         stop_discovery
+        @threads.each(&:kill)
         @transport.close
         @sites.values.each do |site|
           site.stop
@@ -103,7 +110,41 @@ module LIFX
         @sites.values.map(&:gateways)
       end
 
+      def gateway_connections
+        gateways.map(&:values).flatten
+      end
+
       protected
+
+      def initialize_periodic_refresh
+        timers.every(10) do
+          context.refresh
+        end
+      end
+
+      def initialize_message_rate_updater
+        timers.every(5) do
+          missing_mesh_firmware = context.lights.select { |l| l.mesh_firmware(fetch: false).nil? }
+          if missing_mesh_firmware.count > 10
+            context.send_message(target: Target.new(broadcast: true), payload: Protocol::Device::GetMeshFirmware.new)
+          elsif missing_mesh_firmware.count > 0
+            missing_mesh_firmware.each { |l| l.send_message(Protocol::Device::GetMeshFirmware.new) }
+          else
+            @message_rate = context.lights.all? do |light|
+              m = light.mesh_firmware(fetch: false)
+              m && m >= '1.2'
+            end ? 20 : 5
+            gateway_connections.each do |connection|
+              connection.set_message_rate(@message_rate)
+            end
+          end
+        end
+      end
+
+      DEFAULT_MESSAGING_RATE = 5 # per second
+      def message_rate
+        @message_rate || 5
+      end
 
       def initialize_transports
         create_broadcast_transport

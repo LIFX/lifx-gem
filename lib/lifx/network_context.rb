@@ -7,7 +7,6 @@ require 'lifx/protocol_path'
 
 module LIFX
   class NetworkContext
-    include Timers
     include Logging
     include Utilities
     include RequiredKeywordArguments
@@ -20,6 +19,7 @@ module LIFX
       @devices = {}
 
       @transport_manager = transport_manager
+      @transport_manager.context = self
       @transport_manager.add_observer(self) do |message: nil, ip: nil, transport: nil|
         handle_message(message, ip, transport)
       end
@@ -27,9 +27,6 @@ module LIFX
       reset!
 
       @threads = []
-      @threads << initialize_timer_thread
-      initialize_periodic_refresh
-      initialize_message_rate_updater
     end
 
     def discover
@@ -169,36 +166,6 @@ module LIFX
         return if !device # Virgin bulb
         device.handle_message(message, ip, transport)
       end
-    end
-
-    def initialize_periodic_refresh
-      timers.every(10) do
-        refresh
-      end
-    end
-
-    def initialize_message_rate_updater
-      timers.every(5) do
-        missing_mesh_firmware = lights.select { |l| l.mesh_firmware(fetch: false).nil? }
-        if missing_mesh_firmware.count > 10
-          send_message(target: Target.new(broadcast: true), payload: Protocol::Device::GetMeshFirmware.new)
-        elsif missing_mesh_firmware.count > 0
-          missing_mesh_firmware.each { |l| l.send_message(Protocol::Device::GetMeshFirmware.new) }
-        else
-          @message_rate = lights.all? do |light|
-            m = light.mesh_firmware(fetch: false)
-            m && m >= '1.2'
-          end ? 20 : 5
-          gateway_connections.each do |connection|
-            connection.set_message_rate(@message_rate)
-          end
-        end
-      end
-    end
-
-    DEFAULT_MESSAGING_RATE = 5 # per second
-    def message_rate
-      @message_rate || 5
     end
   end
 end
