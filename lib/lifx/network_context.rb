@@ -138,16 +138,8 @@ module LIFX
       @routing_manager.tags_for_device_id(device.id)
     end
 
-    def gateways
-      transport_manager.gateways.map(&:keys).flatten.map { |id| lights.with_id(id) }
-    end
-
-    def gateway_connections
-      transport_manager.gateways.map(&:values).flatten
-    end
-
     def to_s
-      %Q{#<LIFX::NetworkContext connections=#{gateway_connections}>}
+      %Q{#<LIFX::NetworkContext transport_manager=#{transport_manager}>}
     end
     alias_method :inspect, :to_s
 
@@ -160,7 +152,6 @@ module LIFX
       if !message.tagged?
         if @devices[message.device_id].nil?
           device = Light.new(context: self, id: message.device_id, site_id: message.site_id)
-          register_device(device)
         end
         device = @devices[message.device_id]
         return if !device # Virgin bulb

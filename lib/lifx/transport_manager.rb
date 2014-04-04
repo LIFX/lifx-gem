@@ -6,6 +6,7 @@ module LIFX
     class Base
       include Logging
       include Observable
+      attr_accessor :context
 
       def initialize(**args)
       end
