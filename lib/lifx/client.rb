@@ -133,5 +133,10 @@ module LIFX
     def flush(timeout: nil)
       context.flush(timeout: timeout)
     end
+
+    # Stops everything and cleans up.
+    def stop
+      context.stop
+    end
   end
 end
