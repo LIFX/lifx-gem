@@ -69,8 +69,10 @@ describe LIFX::Message do
     context 'no path' do
       let(:msg) { LIFX::Message.new(payload: LIFX::Protocol::Device::SetPower.new) }
 
-      it 'throws an exception' do
-        expect { msg.pack }.to raise_error(LIFX::Message::NoPath)
+      it 'defaults to null site and target' do
+        unpacked = LIFX::Message.unpack(msg.pack)
+        expect(unpacked.path.site_id).to eq('000000000000')
+        expect(unpacked.path.device_id).to eq('000000000000')
       end
     end
 

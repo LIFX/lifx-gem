@@ -10,7 +10,6 @@ module LIFX
     class MessageError < StandardError; end
     class UnpackError < MessageError; end
     class PackError < MessageError; end
-    class NoPath < MessageError; end
 
     class InvalidFrame < UnpackError; end
     class UnsupportedProtocolVersion < UnpackError; end
@@ -88,13 +87,13 @@ module LIFX
     alias_method :addressable?, :addressable
 
     def_delegators :path, :device_id, :site_id, :tagged
-    
+
     attr_accessor :path, :payload
     def initialize(*args)
-      if args.count == 3 
+      if args.count == 3
         @path, @message, @payload = args
       elsif (hash = args.first).is_a?(Hash)
-        path = hash.delete(:path)
+        path = hash.delete(:path) || ProtocolPath.new
         payload = hash.delete(:payload)
 
         check_valid_fields!(hash)
@@ -124,7 +123,6 @@ module LIFX
 
     def pack
       raise NoPayload if !payload
-      raise NoPath if !path
       @message.raw_site = path.raw_site
       @message.raw_target = path.raw_target
       @message.tagged = path.tagged?
@@ -150,7 +148,7 @@ module LIFX
       %Q{#<LIFX::Message #{attrs}>}
     end
     alias_method :inspect, :to_s
-    
+
     protected
 
     def check_valid_fields!(hash)
