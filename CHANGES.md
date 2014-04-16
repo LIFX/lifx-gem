@@ -1,3 +1,8 @@
+### 0.4.7
+
+- Only create Light devices when a Light::State is received
+- Message rate checker only checks lights considered alive
+
 ### 0.4.6.1
 
 - Fix `Time.parse` issue
