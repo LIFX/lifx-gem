@@ -14,7 +14,7 @@ module LIFX
 
     # NetworkContext stores lights and ties together TransportManager, TagManager and RoutingManager
     attr_reader :transport_manager, :tag_manager, :routing_manager
-    
+
     def initialize(transport_manager: required!('transport_manager'))
       @devices = {}
 
@@ -98,7 +98,7 @@ module LIFX
         time = light && light.time
       end
 
-      delay = (messages.count + 1) * (1.0 / message_rate) 
+      delay = (messages.count + 1) * (1.0 / message_rate)
       at_time = ((time.to_f + delay) * 1_000_000_000).to_i
       messages.each do |m|
         m.at_time = at_time
@@ -150,7 +150,7 @@ module LIFX
 
       @routing_manager.update_from_message(message)
       if !message.tagged?
-        if @devices[message.device_id].nil?
+        if @devices[message.device_id].nil? && message.payload.is_a?(Protocol::Light::State)
           device = Light.new(context: self, id: message.device_id, site_id: message.site_id)
         end
         device = @devices[message.device_id]
