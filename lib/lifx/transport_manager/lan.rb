@@ -10,7 +10,7 @@ module LIFX
         @send_ip   = send_ip
         @port      = port
         @peer_port = peer_port
-        
+
         @sites = {}
         @threads = []
         @threads << initialize_timer_thread
@@ -123,13 +123,13 @@ module LIFX
 
       def initialize_message_rate_updater
         timers.every(5) do
-          missing_mesh_firmware = context.lights.select { |l| l.mesh_firmware(fetch: false).nil? }
+          missing_mesh_firmware = context.lights.alive.select { |l| l.mesh_firmware(fetch: false).nil? }
           if missing_mesh_firmware.count > 10
             context.send_message(target: Target.new(broadcast: true), payload: Protocol::Device::GetMeshFirmware.new)
           elsif missing_mesh_firmware.count > 0
             missing_mesh_firmware.each { |l| l.send_message(Protocol::Device::GetMeshFirmware.new) }
           else
-            @message_rate = context.lights.all? do |light|
+            @message_rate = context.lights.alive.all? do |light|
               m = light.mesh_firmware(fetch: false)
               m && m >= '1.2'
             end ? 20 : 5
