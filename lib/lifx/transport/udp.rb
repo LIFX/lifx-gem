@@ -28,7 +28,7 @@ module LIFX
         if @listener
           raise "Socket already being listened to"
         end
-        
+
         Thread.abort_on_exception = true
         @listener = Thread.new do
           reader = UDPSocket.new
@@ -50,10 +50,10 @@ module LIFX
       end
 
       def close
-        Thread.kill(@listener) if @listener
         return if !@socket
         @socket.close
         @socket = nil
+        Thread.kill(@listener) if @listener
       end
 
       protected

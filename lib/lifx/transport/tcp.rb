@@ -13,7 +13,7 @@ module LIFX
       end
 
       def connected?
-        @socket && !@socket.closed?
+        !!(@socket && !@socket.closed?)
       end
 
       CONNECT_TIMEOUT = 3
@@ -32,10 +32,10 @@ module LIFX
 
       def close
         return if !@socket
-        Thread.kill(@listener) if @listener
-        @listener = nil
         @socket.close if !@socket.closed?
         @socket = nil
+        Thread.kill(@listener) if @listener
+        @listener = nil
       end
 
       HEADER_SIZE = 8
@@ -49,7 +49,7 @@ module LIFX
               size        = header.msg_size
               data        = @socket.recv(size)
               message     = Message.unpack(data)
-              
+
               notify_observers(message: message, ip: host, transport: self)
             rescue Message::UnpackError
               if Config.log_invalid_messages
