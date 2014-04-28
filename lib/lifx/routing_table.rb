@@ -7,10 +7,10 @@ module LIFX
       @device_site_mapping = entries
     end
 
-    def update_table(site_id: site_id, device_id: device_id, tag_ids: nil)
+    def update_table(site_id: site_id, device_id: device_id, tag_ids: nil, last_seen: Time.now)
       device_mapping = @device_site_mapping[device_id] ||= Entry.new(site_id, device_id, [])
       device_mapping.site_id = site_id
-      device_mapping.last_seen = Time.now
+      device_mapping.last_seen = last_seen
       device_mapping.tag_ids = tag_ids if tag_ids
     end
 
@@ -29,6 +29,12 @@ module LIFX
 
     def entries
       @device_site_mapping.values
+    end
+
+    def clear_stale_entries(threshold: 60 * 5)
+      @device_site_mapping.reject! do |device_id, entry|
+        entry.last_seen < Time.now - threshold
+      end
     end
   end
 end

@@ -4,12 +4,14 @@ require 'lifx/routing_manager'
 require 'lifx/tag_manager'
 require 'lifx/light'
 require 'lifx/protocol_path'
+require 'lifx/timers'
 
 module LIFX
   class NetworkContext
     include Logging
     include Utilities
     include RequiredKeywordArguments
+    include Timers
     extend Forwardable
 
     # NetworkContext stores lights and ties together TransportManager, TagManager and RoutingManager
@@ -27,6 +29,7 @@ module LIFX
       reset!
 
       @threads = []
+      @threads << initialize_timer_thread
     end
 
     def discover

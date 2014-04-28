@@ -13,11 +13,16 @@ module LIFX
 
     attr_reader :context, :tag_table, :routing_table
 
+    STALE_ROUTING_TABLE_PURGE_INTERVAL = 60
+
     def initialize(context: required!(:context))
       @context = context
       @routing_table = RoutingTable.new
       @tag_table = TagTable.new
       @last_refresh_seen = {}
+      context.timers.every(STALE_ROUTING_TABLE_PURGE_INTERVAL) do
+        routing_table.clear_stale_entries
+      end
     end
 
     def resolve_target(target)

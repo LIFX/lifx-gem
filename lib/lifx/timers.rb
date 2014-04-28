@@ -12,6 +12,7 @@ module LIFX
       end
     end
 
+    public
     def timers
       @timers ||= ::Timers.new
     end
