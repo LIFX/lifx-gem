@@ -85,8 +85,9 @@ module LIFX
         @routing_table.update_table(site_id: message.site_id,
                                     device_id: message.device_id,
                                     tag_ids: tag_ids_from_field(message.payload.tags))
+      when Protocol::Device::StatePanGateway, Protocol::Device::StatePower
+        @routing_table.update_table(site_id: message.site_id, device_id: message.device_id)
       end
-      @routing_table.update_table(site_id: message.site_id, device_id: message.device_id)
     end
 
     MINIMUM_REFRESH_INTERVAL = 20
