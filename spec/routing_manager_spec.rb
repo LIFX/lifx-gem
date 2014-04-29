@@ -3,7 +3,7 @@ require 'spec_helper'
 module LIFX
   describe RoutingManager do
     describe '#tags_for_device_id' do
-      subject(:manager) { RoutingManager.new(context: double) }
+      subject(:manager) { RoutingManager.new(context: double(timers: double(every: double))) }
 
       before do
         ['Some label', 'Another label', 'Much label'].each_with_index do |lbl, i|
