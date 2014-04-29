@@ -76,7 +76,7 @@ module LIFX
     # @return [Color] Color
     def color(refresh: false, fetch: true)
       @color = nil if refresh
-      send_message!(Protocol::Light::Get.new, wait_for: Protocol::Light::Get) if fetch && !@color
+      send_message!(Protocol::Light::Get.new, wait_for: Protocol::Light::State) if fetch && !@color
       @color
     end
 
@@ -86,7 +86,7 @@ module LIFX
     # @return [String, nil] Label
     def label(refresh: false, fetch: true)
       @label = nil if refresh
-      send_message!(Protocol::Light::Get.new, wait_for: Protocol::Light::Get) if fetch && !@label
+      send_message!(Protocol::Light::Get.new, wait_for: Protocol::Light::State) if fetch && !@label
       @label
     end
 
@@ -331,7 +331,7 @@ module LIFX
     def tags
       context.tags_for_device(self)
     end
-    
+
     # Returns a nice string representation of the Light
     # @return [String]
     def to_s
