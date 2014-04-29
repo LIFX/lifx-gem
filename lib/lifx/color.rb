@@ -19,7 +19,7 @@ module LIFX
 
     # Helper to create a white {Color}
     # @param brightness: [Float] Valid range: `0..1`
-    # @param kelvin: [Integer] Valid range: `2500..10000`
+    # @param kelvin: [Integer] Valid range: `2500..9000`
     # @return [Color]
     def white(brightness: 1.0, kelvin: DEFAULT_KELVIN)
       Color.new(0, 0, brightness, kelvin)
@@ -37,7 +37,7 @@ module LIFX
     extend Colors
     UINT16_MAX = 65535
     KELVIN_MIN = 2500
-    KELVIN_MAX = 10000
+    KELVIN_MAX = 9000
 
     class << self
       # Helper method to create from HSB/HSV
@@ -54,7 +54,7 @@ module LIFX
       # @param hue [Float] Valid range: `0..360`
       # @param saturation [Float] Valid range: `0..1`
       # @param brightness [Float] Valid range: `0..1`
-      # @param kelvin [Integer] Valid range: `2500..10000`
+      # @param kelvin [Integer] Valid range: `2500..9000`
       # @return [Color]
       def hsbk(hue, saturation, brightness, kelvin)
         new(hue, saturation, brightness, kelvin)
@@ -150,7 +150,7 @@ module LIFX
     end
 
     # Returns a new Color with the kelvin changed while keeping other attributes
-    # @param kelvin [Integer] Kelvin. `2500..10000`
+    # @param kelvin [Integer] Kelvin. `2500..9000`
     # @return [Color]
     def with_kelvin(kelvin)
       Color.new(hue, saturation, brightness, kelvin)
@@ -184,7 +184,7 @@ module LIFX
       conditions = []
 
       conditions << (((hue - other.hue).abs < (threshold * 360)) || begin
-        # FIXME: Surely there's a better way. 
+        # FIXME: Surely there's a better way.
         hues = [hue, other.hue].sort
         hues[0] += 360
         (hues[0] - hues[1]).abs < (threshold * 360)
