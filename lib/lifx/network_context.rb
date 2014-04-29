@@ -97,7 +97,7 @@ module LIFX
 
       time = nil
       try_until -> { time } do
-        light = gateways.sample
+        light = lights.alive.sample
         time = light && light.time
       end
 
