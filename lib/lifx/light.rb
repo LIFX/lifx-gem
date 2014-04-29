@@ -158,7 +158,7 @@ module LIFX
     # @return [:unknown, :off, :on] Light power state
     def power(refresh: false, fetch: true)
       @power = nil if refresh
-      send_message!(Protocol::Device::GetPower.new, wait_for: Protocol::Device::StatePower) if !@power && fetch
+      send_message!(Protocol::Light::Get.new, wait_for: Protocol::Light::State) if !@power && fetch
       case @power
       when nil
         :unknown
