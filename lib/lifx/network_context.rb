@@ -101,7 +101,7 @@ module LIFX
         time = light && light.time
       end
 
-      delay = (messages.count + 1) * (1.0 / message_rate)
+      delay = (messages.count + 1) * (1.0 / @transport_manager.message_rate)
       at_time = ((time.to_f + delay) * 1_000_000_000).to_i
       messages.each do |m|
         m.at_time = at_time
