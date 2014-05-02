@@ -39,7 +39,7 @@ module LIFX
             begin
               bytes, (_, _, ip, _) = reader.recvfrom(128)
               message = Message.unpack(bytes)
-              notify_observers(message: message, ip: ip, transport: self)
+              notify_observers(:message_received, {message: message, ip: ip, transport: self})
             rescue Message::UnpackError
               if Config.log_invalid_messages
                 logger.warn("#{self}: Unrecognised bytes: #{bytes.bytes.map { |b| '%02x ' % b }.join}")

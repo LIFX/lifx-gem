@@ -11,7 +11,7 @@ module LIFX
     include Logging
     include Observable
     include RequiredKeywordArguments
-    
+
     attr_reader :id, :gateways, :tag_manager
 
     def initialize(id: required!(:id))
@@ -38,8 +38,8 @@ module LIFX
         @gateways_mutex.synchronize do
           @gateways[message.device_id] ||= GatewayConnection.new
           @gateways[message.device_id].handle_message(message, ip, transport)
-          @gateways[message.device_id].add_observer(self) do |**args|
-            notify_observers(**args)
+          @gateways[message.device_id].add_observer(self, :message_received) do |**args|
+            notify_observers(:message_received, **args)
           end
         end
       end
@@ -53,7 +53,7 @@ module LIFX
         end
       end.each(&:join)
     end
-    
+
     def to_s
       %Q{#<LIFX::Site id=#{id}>}
     end
@@ -66,6 +66,12 @@ module LIFX
       @gateways.values.each do |gateway|
         gateway.close
       end
+    end
+
+    def observer_callback_definition
+      {
+        message_received: -> (message: nil, ip: nil, transport: nil) {}
+      }
     end
 
 

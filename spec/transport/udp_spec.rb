@@ -24,7 +24,7 @@ module LIFX
       let(:socket) { UDPSocket.new }
       let(:messages) { [] }
       before do
-        udp.add_observer(self) do |message: nil, ip: nil, transport: nil|
+        udp.add_observer(self, :message_received) do |message: nil, ip: nil, transport: nil|
           messages << message
         end
         udp.listen

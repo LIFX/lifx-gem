@@ -5,7 +5,7 @@ module LIFX
   class Transport
     include Logging
     include Observable
-    
+
     attr_reader :host, :port
 
     def initialize(host, port, ignore_unpackable_messages: true)
@@ -32,7 +32,9 @@ module LIFX
     alias_method :inspect, :to_s
 
     def observer_callback_definition
-      -> (message: nil, ip: nil, transport: nil) {}
+      {
+        message_received: -> (message: nil, ip: nil, transport: nil) {}
+      }
     end
   end
 end

@@ -22,7 +22,7 @@ module LIFX
 
       @transport_manager = transport_manager
       @transport_manager.context = self
-      @transport_manager.add_observer(self) do |message: nil, ip: nil, transport: nil|
+      @transport_manager.add_observer(self, :message_received) do |message: nil, ip: nil, transport: nil|
         handle_message(message, ip, transport)
       end
 

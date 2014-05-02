@@ -66,8 +66,8 @@ module LIFX
       @tcp_attempts += 1
       logger.info("#{self}: Establishing connection to #{ip}:#{port}")
       @tcp_transport = Transport::TCP.new(ip, port)
-      @tcp_transport.add_observer(self) do |message: nil, ip: nil, transport: nil|
-        notify_observers(message: message, ip: ip, transport: @tcp_transport)
+      @tcp_transport.add_observer(self, :message_received) do |message: nil, ip: nil, transport: nil|
+        notify_observers(:message_received, message: message, ip: ip, transport: @tcp_transport)
       end
       @tcp_transport.listen
       at_exit do
@@ -172,6 +172,12 @@ module LIFX
       end
 
       false
+    end
+
+    def observer_callback_definition
+      {
+        message_received: -> (message: nil, ip: nil, transport: nil) {}
+      }
     end
 
   end

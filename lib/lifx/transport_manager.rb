@@ -27,7 +27,11 @@ module LIFX
         raise NotImplementedError
       end
 
-
+      def observer_callback_definition
+        {
+          message_received: -> (message: nil, ip: nil, transport: nil) {}
+        }
+      end
     end
   end
 end

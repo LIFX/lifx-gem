@@ -50,7 +50,7 @@ module LIFX
               data        = @socket.recv(size)
               message     = Message.unpack(data)
 
-              notify_observers(message: message, ip: host, transport: self)
+              notify_observers(:message_received, {message: message, ip: host, transport: self})
             rescue Message::UnpackError
               if Config.log_invalid_messages
                 logger.info("#{self}: Exception occured while decoding message - #{ex}")
