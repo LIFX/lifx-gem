@@ -1,3 +1,5 @@
+require 'weakref'
+
 module LIFX
   # @api private
   # @private
@@ -15,7 +17,7 @@ module LIFX
     class TagLimitReached < StandardError; end
 
     def initialize(context: required!(:context), tag_table: required!(:tag_table))
-      @context = context
+      @context = WeakRef.new(context)
       @tag_table = tag_table
     end
 
@@ -83,7 +85,7 @@ module LIFX
         end
       end
     end
-    
+
     protected
 
     VALID_TAG_IDS = (0...64).to_a.freeze

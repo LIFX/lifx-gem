@@ -1,6 +1,7 @@
 require 'lifx/routing_table'
 require 'lifx/tag_table'
 require 'lifx/utilities'
+require 'weakref'
 
 module LIFX
   # @private
@@ -16,11 +17,11 @@ module LIFX
     STALE_ROUTING_TABLE_PURGE_INTERVAL = 60
 
     def initialize(context: required!(:context))
-      @context = context
+      @context = WeakRef.new(context)
       @routing_table = RoutingTable.new
       @tag_table = TagTable.new
       @last_refresh_seen = {}
-      context.timers.every(STALE_ROUTING_TABLE_PURGE_INTERVAL) do
+      @context.timers.every(STALE_ROUTING_TABLE_PURGE_INTERVAL) do
         routing_table.clear_stale_entries
       end
     end

@@ -70,9 +70,6 @@ module LIFX
         notify_observers(:message_received, message: message, ip: ip, transport: @tcp_transport)
       end
       @tcp_transport.listen
-      at_exit do
-        @tcp_transport.close if @tcp_transport
-      end
     end
 
     def write(message)
@@ -80,7 +77,9 @@ module LIFX
     end
 
     def close
-      @threads.each { |thr| Thread.kill(thr) }
+      @threads.each do |thr|
+        thr.abort
+      end
       [@tcp_transport, @udp_transport].compact.each(&:close)
     end
 
@@ -118,8 +117,7 @@ module LIFX
     def initialize_write_queue
       @queue = SizedQueue.new(MAXIMUM_QUEUE_LENGTH)
       @last_write = Time.now
-      Thread.abort_on_exception = true
-      Thread.new do
+      Thread.start do
         loop do
           if !connected?
             sleep 0.1

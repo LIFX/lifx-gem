@@ -23,7 +23,7 @@ module LIFX
     end
 
     def close
-      raise NotImplementedError
+      remove_observers
     end
 
     def to_s

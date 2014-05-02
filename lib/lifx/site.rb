@@ -48,7 +48,7 @@ module LIFX
 
     def flush(**options)
       @gateways.values.map do |gateway|
-        Thread.new do
+        Thread.start do
           gateway.flush(**options)
         end
       end.each(&:join)
@@ -61,7 +61,7 @@ module LIFX
 
     def stop
       @threads.each do |thread|
-        Thread.kill(thread)
+        thread.abort
       end
       @gateways.values.each do |gateway|
         gateway.close

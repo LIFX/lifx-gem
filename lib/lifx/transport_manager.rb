@@ -24,7 +24,8 @@ module LIFX
       end
 
       def stop
-        raise NotImplementedError
+        @context = nil
+        remove_observers
       end
 
       def observer_callback_definition

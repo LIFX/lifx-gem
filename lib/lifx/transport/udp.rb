@@ -29,8 +29,7 @@ module LIFX
           raise "Socket already being listened to"
         end
 
-        Thread.abort_on_exception = true
-        @listener = Thread.new do
+        @listener = Thread.start do
           reader = UDPSocket.new
           reader.setsockopt(Socket::SOL_SOCKET, Socket::SO_REUSEADDR, true)
           reader.setsockopt(Socket::SOL_SOCKET, Socket::SO_REUSEPORT, true) if Socket.const_defined?('SO_REUSEPORT')
@@ -50,10 +49,13 @@ module LIFX
       end
 
       def close
+        super
         return if !@socket
         @socket.close
         @socket = nil
-        Thread.kill(@listener) if @listener
+        if @listener
+          @listener.abort
+        end
       end
 
       protected

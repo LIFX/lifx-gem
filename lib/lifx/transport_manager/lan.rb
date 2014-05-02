@@ -21,7 +21,7 @@ module LIFX
 
       def flush(**options)
         @sites.values.map do |site|
-          Thread.new do
+          Thread.start do
             site.flush(**options)
           end
         end.each(&:join)
@@ -31,8 +31,7 @@ module LIFX
       DISCOVERY_INTERVAL                     = 15   # seconds
       def discover
         stop_discovery
-        Thread.abort_on_exception = true
-        @discovery_thread = Thread.new do
+        @discovery_thread = Thread.start do
           @last_request_seen = Time.at(0)
           message = Message.new(path: ProtocolPath.new(tagged: true), payload: Protocol::Device::GetPanGateway.new)
           logger.info("Discovering gateways on #{@bind_ip}:#{@port}")
@@ -49,12 +48,19 @@ module LIFX
       end
 
       def stop_discovery
-        Thread.kill(@discovery_thread) if @discovery_thread
+        if @discovery_thread
+          @discovery_thread.abort
+        end
       end
 
       def stop
+        super
         stop_discovery
-        @threads.each(&:kill)
+        stop_timers
+        @threads.each do |thr|
+          thr.abort
+        end
+        @peer_transport.close
         @transport.close
         @sites.values.each do |site|
           site.stop

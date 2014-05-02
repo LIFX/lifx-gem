@@ -1,0 +1,33 @@
+#!/usr/bin/env ruby
+$LOAD_PATH << File.join(File.dirname(__FILE__), "..", "lib")
+
+require 'lifx'
+require 'objspace'
+
+# Helpers
+CLASSES = ObjectSpace.each_object(Class).reject {|klass| klass.to_s =~ /Ruby|Hash|Gem|Net|SSL|Resolv|Pry|RSpec|Class|Object|Module|Bundler|Proc/ }
+def references_to(target)
+  ret = []
+  CLASSES.each do |klass|
+    ObjectSpace.each_object(klass).each do |obj|
+      next if obj.is_a?(Array) && obj.first.class.to_s =~ /Bundler|Gem/
+      objs = ObjectSpace.reachable_objects_from(obj)
+      return false if !objs || objs.empty?
+      if match = objs.find { |o| o.object_id == target.object_id }
+        ret << obj
+      end
+    end
+  end
+  ret
+end
+
+
+x = {}
+loop do
+  ObjectSpace.count_objects(x)
+  $stderr.print "\r#{x[:TOTAL] - x[:FREE]}       "
+  client = LIFX::Client.new(transport_manager: LIFX::TransportManager::LAN.new)
+  client.discover
+  client.stop
+  GC.start
+end

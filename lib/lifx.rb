@@ -7,6 +7,8 @@ require "lifx/required_keyword_arguments"
 require "lifx/utilities"
 require "lifx/logging"
 
+require "lifx/thread"
+
 require "lifx/protocol/payload"
 %w(device light sensor wan wifi message).each { |f| require "lifx/protocol/#{f}" }
 require "lifx/protocol/type"

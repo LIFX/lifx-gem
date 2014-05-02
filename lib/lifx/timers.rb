@@ -5,10 +5,17 @@ module LIFX
     protected
     def initialize_timer_thread
       timers.after(1) {} # Just so timers.wait doesn't complain when there's no timer
-      Thread.new do
+      @timer_thread = Thread.start do
         loop do
           timers.wait
         end
+      end
+    end
+
+    def stop_timers
+      timers.each(&:cancel)
+      if @timer_thread
+        @timer_thread.abort
       end
     end
 

@@ -6,6 +6,8 @@ require 'lifx/light'
 require 'lifx/protocol_path'
 require 'lifx/timers'
 
+require 'weakref'
+
 module LIFX
   class NetworkContext
     include Logging
@@ -21,7 +23,7 @@ module LIFX
       @devices = {}
 
       @transport_manager = transport_manager
-      @transport_manager.context = self
+      @transport_manager.context = WeakRef.new(self)
       @transport_manager.add_observer(self, :message_received) do |message: nil, ip: nil, transport: nil|
         handle_message(message, ip, transport)
       end
@@ -47,9 +49,12 @@ module LIFX
 
     def stop
       @transport_manager.stop
+      stop_timers
       @threads.each do |thread|
-        Thread.kill(thread)
+        thread.abort
+        thread.join
       end
+      @threads = nil
     end
 
     # Sends a message to their destination(s)
@@ -87,7 +92,7 @@ module LIFX
       if within_sync?
         raise "You cannot nest sync"
       end
-      messages = Thread.new do
+      messages = Thread.start do
         Thread.current[:sync_enabled] = true
         Thread.current[:sync_messages] = messages = []
         block.call

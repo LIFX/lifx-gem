@@ -31,17 +31,20 @@ module LIFX
       end
 
       def close
+        super
         return if !@socket
         @socket.close if !@socket.closed?
         @socket = nil
-        Thread.kill(@listener) if @listener
+        if @listener
+          @listener.abort
+        end
         @listener = nil
       end
 
       HEADER_SIZE = 8
       def listen
         return if @listener
-        @listener = Thread.new do
+        @listener = Thread.start do
           while @socket do
             begin
               header_data = @socket.recv(HEADER_SIZE, Socket::MSG_PEEK)

@@ -1,3 +1,5 @@
+require 'weakref'
+
 module LIFX
   # @private
   module Observable
@@ -11,11 +13,15 @@ module LIFX
       if !callback_has_required_keys?(type, callback)
         raise ObserverCallbackMismatch.new
       end
-      observers[type][obj] = callback
+      observers[type][WeakRef.new(obj)] = callback
     end
 
     def remove_observer(obj, type)
       observers[type].delete(obj)
+    end
+
+    def remove_observers
+      observers.clear
     end
 
     def notify_observers(type, **args)
