@@ -1,3 +1,8 @@
+### 0.4.8
+
+- Routing table is only updated from State messages
+- Fix memory leaks
+
 ### 0.4.7
 
 - Only create Light devices when a Light::State is received
