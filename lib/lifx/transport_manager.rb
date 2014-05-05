@@ -30,7 +30,8 @@ module LIFX
 
       def observer_callback_definition
         {
-          message_received: -> (message: nil, ip: nil, transport: nil) {}
+          message_received: -> (message: nil, ip: nil, transport: nil) {},
+          disconnected: -> {}
         }
       end
     end
