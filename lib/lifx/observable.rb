@@ -8,7 +8,7 @@ module LIFX
 
     def add_observer(obj, type, &callback)
       if !callback_type_exists?(type)
-        raise ObserverCallbackNotFound.new
+        raise ObserverCallbackNotFound.new("Callback #{type} not found in #{observer_callback_definition.keys}")
       end
       if !callback_has_required_keys?(type, callback)
         raise ObserverCallbackMismatch.new
@@ -25,6 +25,9 @@ module LIFX
     end
 
     def notify_observers(type, **args)
+      if !callback_type_exists?(type)
+        raise ObserverCallbackNotFound.new("Callback #{type} not found in #{observer_callback_definition.keys}")
+      end
       observers[type].each do |_, callback|
         callback.call(**args)
       end

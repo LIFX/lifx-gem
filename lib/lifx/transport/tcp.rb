@@ -33,7 +33,10 @@ module LIFX
       def close
         super
         return if !@socket
-        @socket.close if !@socket.closed?
+        if !@socket.closed?
+          @socket.close
+          notify_observers(:disconnected)
+        end
         @socket = nil
         if @listener
           @listener.abort

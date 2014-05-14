@@ -356,7 +356,9 @@ module LIFX
     end
 
     # An exception for when synchronous messages take too long to receive a response
-    class MessageTimeout < StandardError; end
+    class MessageTimeout < StandardError
+      attr_accessor :device
+    end
 
     # Queues a message to be sent to the Light and waits for a response
     # @param payload [Protocol::Payload] the payload to send
@@ -385,6 +387,7 @@ module LIFX
         backtrace = caller_locations(2).map { |c| c.to_s }
         caller_method = caller_locations(2, 1).first.label
         ex = MessageTimeout.new("#{caller_method}: Timeout exceeded waiting for response from #{self}")
+        ex.device = self
         ex.set_backtrace(backtrace)
         raise ex
       ensure
