@@ -75,7 +75,6 @@ module LIFX
                     stream: 0)
       set_waveform(color, waveform: Protocol::Light::Waveform::SINE,
                           cycles: cycles,
-                          duty_cycle: 0,
                           stream: stream,
                           transient: transient,
                           period: period)
@@ -140,7 +139,7 @@ module LIFX
 
     # Attempts to set the power state to `state` asynchronously.
     # This method cannot guarantee the message was received.
-    # @param state [:on, :off] 
+    # @param state [:on, :off]
     # @return [Light, LightCollection] self for chaining
     def set_power(state)
       level = case state
