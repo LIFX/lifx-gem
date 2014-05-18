@@ -332,6 +332,12 @@ module LIFX
       context.tags_for_device(self)
     end
 
+    # Returns whether the light is a gateway
+    # @api private
+    def gateway?
+      context.transport_manager.gateways.include?(self)
+    end
+
     # Returns a nice string representation of the Light
     # @return [String]
     def to_s
