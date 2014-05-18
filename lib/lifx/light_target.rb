@@ -41,7 +41,7 @@ module LIFX
 
     # Attempts to make the light(s) pulse `color` and then back to its original color. Asynchronous.
     # @param color [Color] Color to pulse
-    # @param duty_cycle: [Float] Percentage of a cycle the light(s) is set to `color`
+    # @param duty_cycle: [Float] Ratio of a cycle the light(s) is set to `color`
     # @param cycles: [Integer] Number of cycles
     # @param transient: [Boolean] If false, the light will remain at the color the waveform is at when it ends
     # @param period: [Integer] Number of seconds a cycle. Must be above 1.0 (?)
@@ -64,6 +64,7 @@ module LIFX
     # Attempts to make the light(s) transition to `color` and back in a smooth sine wave. Asynchronous.
     # @param color [Color] Color
     # @param cycles: [Integer] Number of cycles
+    # @param peak: [Float] Defines the peak point of the wave. Defaults to 0.5 which is a standard sine
     # @param transient: [Boolean] If false, the light will remain at the color the waveform is at when it ends
     # @param period: [Integer] Number of seconds a cycle. Must be above 1.0 (?)
     # @param stream: [Integer] Unused
@@ -71,10 +72,12 @@ module LIFX
     # @note Marked as private pending bug fixes in firmware
     def sine(color, cycles: 1,
                     period: 1.0,
+                    peak: 0.5,
                     transient: true,
                     stream: 0)
       set_waveform(color, waveform: Protocol::Light::Waveform::SINE,
                           cycles: cycles,
+                          duty_cycle: peak,
                           stream: stream,
                           transient: transient,
                           period: period)
