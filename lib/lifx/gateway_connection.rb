@@ -90,7 +90,7 @@ module LIFX
         end
       end
       if timeout
-        Timeout.timeout(timeout) do
+        Timeout.timeout(timeout, TimeoutError) do
           proc.call
         end
       else

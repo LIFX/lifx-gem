@@ -14,7 +14,7 @@ module LIFX
       it 'does not send if there is no available connection' do
         expect(gateway).to_not receive(:actually_write)
         gateway.write(message)
-        expect { gateway.flush(timeout: 0.5) }.to raise_error(Timeout::Error)
+        expect { gateway.flush(timeout: 0.5) }.to raise_error(TimeoutError)
       end
 
       it 'pushes message back into queue if unable to write' do

@@ -362,7 +362,7 @@ module LIFX
     end
 
     # An exception for when synchronous messages take too long to receive a response
-    class MessageTimeout < StandardError
+    class MessageTimeout < TimeoutError
       attr_accessor :device
     end
 
@@ -389,7 +389,7 @@ module LIFX
           send_message(payload)
         end
         result
-      rescue Timeout::Error
+      rescue TimeoutError
         backtrace = caller_locations(2).map { |c| c.to_s }
         caller_method = caller_locations(2, 1).first.label
         ex = MessageTimeout.new("#{caller_method}: Timeout exceeded waiting for response from #{self}")

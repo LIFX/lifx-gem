@@ -39,13 +39,13 @@ module LIFX
       @context.discover
     end
 
-    class DiscoveryTimeout < Timeout::Error; end
+    class DiscoveryTimeout < TimeoutError; end
     # This method tells the {NetworkContext} to look for devices, and will block
     # until there's at least one device.
     #
     # @example Wait until at least three lights have been found
     #   client.discover! { |c| c.lights.count >= 3 }
-    # 
+    #
     # @param timeout: [Numeric] How long to try to wait for before returning
     # @param condition_interval: [Numeric] Seconds between evaluating the block
     # @yield [Client] This block is evaluated every `condition_interval` seconds. If true, method returns. If no block is supplied, it will block until it finds at least one light.
@@ -75,7 +75,7 @@ module LIFX
     #
     # You cannot nest `sync` calls, nor call synchronous methods inside a `sync` block.
     #
-    # Due to messaging rate constraints, the amount of messages determine the delay before 
+    # Due to messaging rate constraints, the amount of messages determine the delay before
     # the commands are executed. This method also assumes all the lights have the same time.
     # @example This example sets all the lights to a random colour at the same time.
     #   client.sync do
@@ -128,7 +128,7 @@ module LIFX
 
     # Blocks until all messages have been sent to the gateways
     # @param timeout: [Numeric] When specified, flush will wait `timeout:` seconds before throwing `Timeout::Error`
-    # @raise [Timeout::Error] if `timeout:` was exceeded while waiting for send queue to flush
+    # @raise [TimeoutError] if `timeout:` was exceeded while waiting for send queue to flush
     # @return [void]
     def flush(timeout: nil)
       context.flush(timeout: timeout)

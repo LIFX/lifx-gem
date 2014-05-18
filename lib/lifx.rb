@@ -20,4 +20,6 @@ require "lifx/client"
 
 module LIFX
   NULL_SITE_ID = "000000000000"
+
+  class TimeoutError < StandardError; end
 end

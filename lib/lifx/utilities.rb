@@ -1,7 +1,7 @@
 module LIFX
   # @private
   module Utilities
-    def try_until(condition_proc, timeout_exception: Timeout::Error,
+    def try_until(condition_proc, timeout_exception: TimeoutError,
                                             timeout: 3,
                                  condition_interval: 0.1,
                                     action_interval: 0.5,
