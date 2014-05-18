@@ -116,14 +116,14 @@ module LIFX
       end
 
       def gateway_connections
-        gateways.map(&:values).flatten
+        @sites.values.map(&:gateways).map(&:values).flatten
       end
 
       protected
 
       def initialize_periodic_refresh
         timers.every(10) do
-          context.refresh
+          context.refresh(force: false)
         end
       end
 

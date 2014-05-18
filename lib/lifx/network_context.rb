@@ -38,8 +38,8 @@ module LIFX
       @transport_manager.discover
     end
 
-    def refresh
-      @routing_manager.refresh
+    def refresh(force: true)
+      @routing_manager.refresh(force: force)
     end
 
     def reset!
