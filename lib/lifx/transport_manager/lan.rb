@@ -80,6 +80,7 @@ module LIFX
           end
         end
         broadcast_to_peers(message)
+        @message_rate_timer.reset
       end
 
       def on_network?
@@ -127,8 +128,10 @@ module LIFX
         end
       end
 
+      DEFAULT_MESSAGE_RATE = 5 # per second
+      MESSAGE_RATE_1_2 = 20
       def initialize_message_rate_updater
-        timers.every(5) do
+        @message_rate_timer = timers.every(2) do
           missing_mesh_firmware = context.lights.alive.select { |l| l.mesh_firmware(fetch: false).nil? }
           if missing_mesh_firmware.count > 10
             context.send_message(target: Target.new(broadcast: true), payload: Protocol::Device::GetMeshFirmware.new)
@@ -138,7 +141,7 @@ module LIFX
             @message_rate = context.lights.alive.all? do |light|
               m = light.mesh_firmware(fetch: false)
               m && m >= '1.2'
-            end ? 20 : 5
+            end ? MESSAGE_RATE_1_2 : DEFAULT_MESSAGE_RATE
             gateway_connections.each do |connection|
               connection.set_message_rate(@message_rate)
             end
@@ -146,9 +149,8 @@ module LIFX
         end
       end
 
-      DEFAULT_MESSAGING_RATE = 5 # per second
       def message_rate
-        @message_rate || 5
+        @message_rate || DEFAULT_MESSAGE_RATE
       end
 
       def initialize_transports
