@@ -1,3 +1,8 @@
+### 0.4.9
+
+- Message rate checker only runs when connection is idle
+- Now uses `LIFX::TimeoutError` rather than `Timeout::Error` for internal timeout exceptions
+
 ### 0.4.8
 
 - Routing table is only updated from State messages
