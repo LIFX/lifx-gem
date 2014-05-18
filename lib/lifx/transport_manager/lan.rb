@@ -113,7 +113,7 @@ module LIFX
       end
 
       def gateways
-        @sites.values.map(&:gateways).map(&:keys).flatten.uniq.map { |id| context.lights.with_id(id) }
+        @sites.values.map(&:gateways).map(&:keys).flatten.uniq.map { |id| context.lights.with_id(id) }.compact
       end
 
       def gateway_connections
