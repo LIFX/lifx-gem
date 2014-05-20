@@ -120,6 +120,10 @@ module LIFX
         @sites.values.map(&:gateways).map(&:values).flatten
       end
 
+      def message_rate
+        @message_rate || DEFAULT_MESSAGE_RATE
+      end
+
       protected
 
       def initialize_periodic_refresh
@@ -147,10 +151,6 @@ module LIFX
             end
           end
         end
-      end
-
-      def message_rate
-        @message_rate || DEFAULT_MESSAGE_RATE
       end
 
       def initialize_transports
