@@ -7,6 +7,7 @@ end
 task :default => :spec
 
 task :console do
+  $LOAD_PATH << "lib"
   require "lifx"
   require "pry"
   if ENV['DEBUG']

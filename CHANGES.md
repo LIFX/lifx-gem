@@ -1,3 +1,7 @@
+### 0.4.10
+
+- Fix `message_rate` visibility bug
+
 ### 0.4.9
 
 - Message rate checker only runs when connection is idle
