@@ -61,11 +61,12 @@ module LIFX
     # @param target: [Target] Target of the message
     # @param payload: [Protocol::Payload] Message payload
     # @param acknowledge: [Boolean] If recipients must acknowledge with a response
-    def send_message(target: required!(:target), payload: required!(:payload), acknowledge: false)
+    # @param at_time: [Integer] Unix epoch in milliseconds to run the payload. Only applicable to certain payload types.
+    def send_message(target: required!(:target), payload: required!(:payload), acknowledge: false, at_time: nil)
       paths = @routing_manager.resolve_target(target)
 
       messages = paths.map do |path|
-        Message.new(path: path, payload: payload, acknowledge: acknowledge)
+        Message.new(path: path, payload: payload, acknowledge: acknowledge, at_time: at_time)
       end
 
       if within_sync?

@@ -356,9 +356,10 @@ module LIFX
     # Queues a message to be sent the Light
     # @param payload [Protocol::Payload] the payload to send
     # @param acknowledge: [Boolean] whether the device should respond
+    # @param at_time: [Integer] Unix epoch in milliseconds to run the payload. Only applicable to certain payload types.
     # @return [Light] returns self for chaining
-    def send_message(payload, acknowledge: true)
-      context.send_message(target: Target.new(device_id: id, site_id: @site_id), payload: payload, acknowledge: acknowledge)
+    def send_message(payload, acknowledge: true, at_time: nil)
+      context.send_message(target: Target.new(device_id: id, site_id: @site_id), payload: payload, acknowledge: acknowledge, at_time: nil)
     end
 
     # An exception for when synchronous messages take too long to receive a response

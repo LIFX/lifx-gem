@@ -22,7 +22,7 @@ module LIFX
     # Creates a {LightCollection} instance. Should not be used directly.
     # @api private
     # @param context: [NetworkContext] NetworkContext this collection belongs to
-    # @param tag: [String] Tag 
+    # @param tag: [String] Tag
     def initialize(context: required!(:context), tag: nil)
       @context = context
       @tag = tag
@@ -31,13 +31,14 @@ module LIFX
     # Queues a {Protocol::Payload} to be sent to bulbs in the collection
     # @param payload [Protocol::Payload] Payload to be sent
     # @param acknowledge: [Boolean] whether recipients should acknowledge message
+    # @param at_time: [Integer] Unix epoch in milliseconds to run the payload. Only applicable to certain payload types.
     # @api private
     # @return [LightCollection] self for chaining
-    def send_message(payload, acknowledge: false)
+    def send_message(payload, acknowledge: false, at_time: nil)
       if tag
-        context.send_message(target: Target.new(tag: tag), payload: payload, acknowledge: acknowledge)
+        context.send_message(target: Target.new(tag: tag), payload: payload, acknowledge: acknowledge, at_time: at_time)
       else
-        context.send_message(target: Target.new(broadcast: true), payload: payload, acknowledge: acknowledge)
+        context.send_message(target: Target.new(broadcast: true), payload: payload, acknowledge: acknowledge, at_time: at_time)
       end
       self
     end
