@@ -86,9 +86,10 @@ module LIFX
     # Synchronize asynchronous set_color, set_waveform and set_power messages to multiple devices.
     # You cannot use synchronous methods in the block
     # @note This is alpha
+    # @param delay: [Float] The delay to add to sync commands when dealing with latency.
     # @yield Block to synchronize commands in
     # @return [Float] Delay before messages are executed
-    def sync(&block)
+    def sync(delay: 0, &block)
       if within_sync?
         raise "You cannot nest sync"
       end
@@ -106,7 +107,7 @@ module LIFX
         time = light && light.time
       end
 
-      delay = (messages.count + 1) * (1.0 / @transport_manager.message_rate)
+      delay += (messages.count + 1) * (1.0 / @transport_manager.message_rate)
       at_time = ((time.to_f + delay) * 1_000_000_000).to_i
       messages.each do |m|
         m.at_time = at_time
