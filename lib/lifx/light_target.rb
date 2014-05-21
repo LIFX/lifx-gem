@@ -55,7 +55,7 @@ module LIFX
                      stream: 0)
       set_waveform(color, waveform: Protocol::Light::Waveform::PULSE,
                           cycles: cycles,
-                          duty_cycle: duty_cycle,
+                          duty_cycle: 1 - duty_cycle,
                           stream: stream,
                           transient: transient,
                           period: period)
