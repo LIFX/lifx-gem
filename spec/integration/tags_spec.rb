@@ -29,5 +29,12 @@ module LIFX
       lifx.purge_unused_tags!
       expect(lifx.unused_tags).to be_empty
     end
+
+    it 'handles non-ascii tags' do
+      light.add_tag('_tést')
+      expect(light.tags).to include('_tést')
+      light.remove_tag('_tést')
+      lifx.purge_unused_tags!
+    end
   end
 end

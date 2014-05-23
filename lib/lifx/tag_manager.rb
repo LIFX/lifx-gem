@@ -28,7 +28,7 @@ module LIFX
       # we don't receive a StateTagLabels before another tag gets created
       @tag_table.update_table(tag_id: id, label: label, site_id: site_id)
       context.send_message(target: Target.new(site_id: site_id),
-                           payload: Protocol::Device::SetTagLabels.new(tags: id_to_tags_field(id), label: label))
+                           payload: Protocol::Device::SetTagLabels.new(tags: id_to_tags_field(id), label: label.encode('utf-8')))
     end
 
     def add_tag_to_device(tag: required!(:tag), device: required!(:device))
