@@ -374,7 +374,7 @@ module LIFX
     # @param block: [Proc] the block that is executed when the expected `wait_for` payload comes back. If the return value is false or nil, it will try to send the message again.
     # @return [Object] the truthy result of `block` is returned.
     # @raise [MessageTimeout] if the device doesn't respond in time
-    def send_message!(payload, wait_for: wait_for, wait_timeout: 3, &block)
+    def send_message!(payload, wait_for: wait_for, wait_timeout: Config.message_wait_timeout, retry_interval: Config.message_retry_interval, &block)
       if Thread.current[:sync_enabled]
         raise "Cannot use synchronous methods inside a sync block"
       end
@@ -386,7 +386,7 @@ module LIFX
           result = block.call(payload)
         }
         add_hook(wait_for, proc)
-        try_until -> { result }, signal: @message_signal do
+        try_until -> { result }, action_interval: retry_interval, signal: @message_signal do
           send_message(payload)
         end
         result
