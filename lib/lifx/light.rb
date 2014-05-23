@@ -98,11 +98,11 @@ module LIFX
     # @raise [LabelTooLong] if label is greater than {MAX_LABEL_LENGTH}
     # @return [Light] self
     def set_label(label)
-      if label.length > MAX_LABEL_LENGTH
-        raise LabelTooLong.new("Label length must be below or equal to #{MAX_LABEL_LENGTH}")
+      if label.bytes.length > MAX_LABEL_LENGTH
+        raise LabelTooLong.new("Label length in bytes must be below or equal to #{MAX_LABEL_LENGTH}")
       end
       while self.label != label
-        send_message!(Protocol::Device::SetLabel.new(label: label), wait_for: Protocol::Device::StateLabel)
+        send_message!(Protocol::Device::SetLabel.new(label: label.encode('utf-8')), wait_for: Protocol::Device::StateLabel)
       end
       self
     end
@@ -406,7 +406,7 @@ module LIFX
 
     def add_hooks
       add_hook(Protocol::Device::StateLabel) do |payload|
-        @label = payload.label.to_s
+        @label = payload.label.to_s.force_encoding('utf-8')
         seen!
       end
 

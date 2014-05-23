@@ -32,11 +32,22 @@ module LIFX
     end
 
     describe '#set_label' do
-      let(:label) { light.label.sub(/\d+|$/, rand(100).to_s) }
+      let!(:original_label) { light.label }
+
+      after do
+        light.set_label(original_label)
+      end
 
       it 'sets the label of the light synchronously' do
+        label = light.label.sub(/\d+|$/, rand(100).to_s)
         light.set_label(label)
-        expect(light.label).to eq label
+        expect(light.label).to eq(label)
+      end
+
+      it 'works with accented characters' do
+        label = 'tést'
+        light.set_label(label)
+        expect(light.label).to eq(label)
       end
     end
   end
