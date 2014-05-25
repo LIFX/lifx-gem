@@ -53,6 +53,7 @@ module LIFX
 
     def tags_for_device_id(device_id)
       entry = @routing_table.entry_for_device_id(device_id)
+      return [] if entry.nil?
       entry.tag_ids.map do |tag_id|
         tag = @tag_table.entry_with(site_id: entry.site_id, tag_id: tag_id)
         tag && tag.label
