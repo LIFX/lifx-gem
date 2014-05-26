@@ -26,7 +26,7 @@ module LIFX
                             stream: 0,
                             transient: true,
                             period: 1.0,
-                            duty_cycle: 0.5,
+                            skew_ratio: 0.5,
                             acknowledge: false)
       send_message(Protocol::Light::SetWaveform.new(
         color: color.to_hsbk,
@@ -35,7 +35,7 @@ module LIFX
         stream: stream,
         transient: transient,
         period: (period * 1_000).to_i,
-        duty_cycle: (duty_cycle * 65535).round - 32768
+        skew_ratio: (skew_ratio * 65535).round - 32768,
       ), acknowledge: acknowledge)
     end
 
@@ -55,7 +55,7 @@ module LIFX
                      stream: 0)
       set_waveform(color, waveform: Protocol::Light::Waveform::PULSE,
                           cycles: cycles,
-                          duty_cycle: 1 - duty_cycle,
+                          skew_ratio: 1 - duty_cycle,
                           stream: stream,
                           transient: transient,
                           period: period)
@@ -77,7 +77,7 @@ module LIFX
                     stream: 0)
       set_waveform(color, waveform: Protocol::Light::Waveform::SINE,
                           cycles: cycles,
-                          duty_cycle: peak,
+                          skew_ratio: peak,
                           stream: stream,
                           transient: transient,
                           period: period)
@@ -112,10 +112,12 @@ module LIFX
     # @note Marked as private pending bug fixes in firmware
     def triangle(color, cycles: 1,
                      period: 1.0,
+                     peak: 0.5,
                      transient: true,
                      stream: 0)
       set_waveform(color, waveform: Protocol::Light::Waveform::TRIANGLE,
                           cycles: cycles,
+                          skew_ratio: peak,
                           stream: stream,
                           transient: transient,
                           period: period)

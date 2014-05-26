@@ -40,7 +40,7 @@ module LIFX
         hsbk :color
         uint32 :period # Milliseconds per cycle.
         float :cycles
-        int16 :duty_cycle
+        int16 :skew_ratio
         uint8 :waveform
       end
 
