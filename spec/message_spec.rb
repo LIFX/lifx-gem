@@ -48,7 +48,7 @@ describe LIFX::Message do
       expect(payload.color.kelvin).to eq 3_500
       expect(payload.period).to eq 200
       expect(payload.cycles).to eq 1.0
-      expect(payload.duty_cycle).to eq 0
+      expect(payload.skew_ratio).to eq 0
       expect(payload.waveform).to eq 0
     end
 
