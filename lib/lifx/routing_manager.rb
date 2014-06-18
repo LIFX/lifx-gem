@@ -39,8 +39,6 @@ module LIFX
         end
       elsif target.site_id && target.device_id.nil?
         [ProtocolPath.new(site_id: target.site_id, tag_ids: [])]
-      elsif target.site_id && target.device_id
-        [ProtocolPath.new(site_id: target.site_id, device_id: target.device_id)]
       else
         site_id = @routing_table.site_id_for_device_id(target.device_id)
         if site_id
