@@ -97,7 +97,7 @@ module LIFX
       end
     end
 
-    MINIMUM_REFRESH_INTERVAL = 15
+    MINIMUM_REFRESH_INTERVAL = 1
     def refresh(force: false)
       @routing_table.site_ids.each do |site_id|
         next if (seen = @last_refresh_seen[site_id]) && Time.now - seen < MINIMUM_REFRESH_INTERVAL && !force
