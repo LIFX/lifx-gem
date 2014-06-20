@@ -199,13 +199,5 @@ module LIFX
     def set_time(time = Time.now)
       send_message(Protocol::Device::SetTime.new(time: (time.to_f * NSEC_IN_SEC).round))
     end
-
-
-    # Attempts to reboots the light(s).
-    # This method cannot guarantee the message was received.
-    # @return [Light, LightCollection] self for chaining
-    def reboot!
-      send_message(Protocol::Device::Reboot.new)
-    end
   end
 end
