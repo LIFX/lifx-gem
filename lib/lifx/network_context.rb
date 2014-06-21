@@ -90,6 +90,8 @@ module LIFX
     # @param delay: [Float] The delay to add to sync commands when dealing with latency.
     # @yield Block to synchronize commands in
     # @return [Float] Delay before messages are executed
+    NSEC_PER_SEC = 1_000_000_000
+    AT_TIME_DELTA = 0.002
     def sync(delay: 0, &block)
       if within_sync?
         raise "You cannot nest sync"
@@ -109,9 +111,9 @@ module LIFX
       end
 
       delay += (messages.count + 1) * (1.0 / @transport_manager.message_rate)
-      at_time = ((time.to_f + delay) * 1_000_000_000).to_i
-      messages.each do |m|
-        m.at_time = at_time
+      at_time = ((time.to_f + delay) * NSEC_PER_SEC).to_i
+      messages.each_with_index do |m, i|
+        m.at_time = at_time + (i * AT_TIME_DELTA * NSEC_PER_SEC).to_i
         @transport_manager.write(m)
       end
       flush

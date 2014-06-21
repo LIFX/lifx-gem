@@ -87,8 +87,8 @@ module LIFX
     # @note This method is in alpha and might go away. Use tags for better group messaging.
     # @yield Block of commands to synchronize
     # @return [Float] Number of seconds until commands are executed
-    def sync(&block)
-      @context.sync(&block)
+    def sync(**kwargs, &block)
+      @context.sync(**kwargs, &block)
     end
 
     # This is the same as {#sync}, except it will block until the commands have been executed.
