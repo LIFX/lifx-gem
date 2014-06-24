@@ -20,6 +20,7 @@ module LIFX
 
     extend Forwardable
     include Utilities
+    include RequiredKeywordArguments
 
     # Refers to the client's network context.
     # @return [NetworkContext] Enclosed network context
