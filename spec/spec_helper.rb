@@ -16,7 +16,7 @@ shared_context 'integration', integration: true do
         c.discover! do
           c.tags.include?('_Test') && c.lights.with_tag('_Test').count > 0
         end
-      rescue DiscoveryTimeout
+      rescue LIFX::Client::DiscoveryTimeout
         raise "Could not find any lights with tag _Test in #{c.lights.inspect}"
       end
       c
