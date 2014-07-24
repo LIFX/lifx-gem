@@ -411,7 +411,7 @@ module LIFX
       end
 
       add_hook(Protocol::Light::State) do |payload|
-        @label      = payload.label.snapshot
+        @label      = payload.label.snapshot.force_encoding('utf-8')
         @color      = Color.from_struct(payload.color.snapshot)
         @power      = payload.power.to_i
         @tags_field = payload.tags
