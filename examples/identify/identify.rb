@@ -16,7 +16,7 @@ COLOURS = {
   'blue' => [220, 1, 1]
 }
 
-LIFX::Config.logger = Yell.new(STDERR, :level => :error)
+LIFX::Config.logger = Logger.new(STDERR)
 c = LIFX::Client.lan
 c.discover
 5.times do
