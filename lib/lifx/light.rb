@@ -56,7 +56,7 @@ module LIFX
     def add_hook(payload_class, hook_arg = nil, &hook_block)
       hook = block_given? ? hook_block : hook_arg
       if !hook || !hook.is_a?(Proc)
-        raise "MUst pass a proc either as an argument or a block"
+        raise "Must pass a proc either as an argument or a block"
       end
       @message_hooks[payload_class] << hook
     end
