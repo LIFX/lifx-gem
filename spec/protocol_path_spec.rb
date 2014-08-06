@@ -65,7 +65,7 @@ module LIFX
         end
 
         it 'sets tagged to false' do
-          subject.tagged?.should be_false
+          subject.tagged?.should be false
         end
       end
 
