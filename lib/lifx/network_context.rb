@@ -105,9 +105,16 @@ module LIFX
       end.join.value
 
       time = nil
-      try_until -> { time } do
-        light = lights.alive.sample
-        time = light && light.time
+      failed_lights = []
+      try_until -> { time }, timeout: 5, action_interval: 1 do
+        light = (lights.alive - failed_lights).sample
+        begin
+          time = light && light.send_message!(Protocol::Device::GetTime.new, wait_for: Protocol::Device::StateTime, wait_timeout: 1, retry_interval: 0.5) do |payload|
+            Time.at(payload.time.to_f / NSEC_PER_SEC)
+          end
+        rescue => ex
+          failed_lights << light
+        end
       end
 
       delay += (messages.count + 1) * (1.0 / @transport_manager.message_rate)
