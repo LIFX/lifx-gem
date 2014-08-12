@@ -386,7 +386,7 @@ module LIFX
           result = block.call(payload)
         }
         add_hook(wait_for, proc)
-        try_until -> { result }, action_interval: retry_interval, signal: @message_signal do
+        try_until -> { result }, timeout: wait_timeout, timeout_exception: TimeoutError, action_interval: retry_interval, signal: @message_signal do
           send_message(payload)
         end
         result
