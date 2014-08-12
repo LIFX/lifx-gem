@@ -41,7 +41,7 @@ describe LIFX::Message do
     it 'returns the payload' do
       expect(payload.class).to eq LIFX::Protocol::Light::SetWaveform
       expect(payload.stream).to eq 0
-      expect(payload.transient).to be_truthy
+      expect(payload.transient).to eq(true)
       expect(payload.color.hue).to eq 0
       expect(payload.color.saturation).to eq 65_535
       expect(payload.color.brightness).to eq 65_535

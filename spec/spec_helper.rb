@@ -37,6 +37,7 @@ module SpecHelpers
       begin
         block.call
       rescue RSpec::Expectations::ExpectationNotMetError
+        lights.refresh
         sleep(retry_wait)
         retry
       end
