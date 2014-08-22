@@ -25,7 +25,7 @@ module LIFX
         @socket.setsockopt(Socket::IPPROTO_TCP, Socket::TCP_NODELAY,  1)
         logger.info("#{self}: Connected.")
       rescue => ex
-        logger.warn("#{self}: Exception occured in #connect - #{ex}")
+        logger.warn("#{self}: Exception occurred in #connect - #{ex}")
         logger.debug("#{self}: Backtrace: #{ex.backtrace.join("\n")}")
         @socket = nil
       end
@@ -59,11 +59,11 @@ module LIFX
               notify_observers(:message_received, {message: message, ip: host, transport: self})
             rescue Message::UnpackError
               if Config.log_invalid_messages
-                logger.info("#{self}: Exception occured while decoding message - #{ex}")
+                logger.info("#{self}: Exception occurred while decoding message - #{ex}")
                 logger.info("Data: #{data.inspect}")
               end
             rescue => ex
-              logger.warn("#{self}: Exception occured in #listen - #{ex}")
+              logger.warn("#{self}: Exception occurred in #listen - #{ex}")
               logger.debug("#{self}: Backtrace: #{ex.backtrace.join("\n")}")
               close
             end
