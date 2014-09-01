@@ -61,11 +61,11 @@ module LIFX
         end
 
         it 'sets raw_target correctly' do
-          subject.raw_target.should == "\xAB\xCD\xEF\x12\x34\x56\x00\x00".b
+          expect(subject.raw_target).to eq "\xAB\xCD\xEF\x12\x34\x56\x00\x00".b
         end
 
         it 'sets tagged to false' do
-          subject.tagged?.should be false
+          expect(subject).to_not be_tagged
         end
       end
 
