@@ -12,7 +12,7 @@ end
 
 group :test do
   gem 'rake', '~> 10.1'
-  gem 'rspec', '~> 2.14'
+  gem 'rspec', '~> 3.0.0'
 end
 
 # Specify your gem's dependencies in lifx.gemspec
