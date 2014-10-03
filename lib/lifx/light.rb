@@ -341,7 +341,7 @@ module LIFX
     # Returns a nice string representation of the Light
     # @return [String]
     def to_s
-      %Q{#<LIFX::Light id=#{id} label=#{label(fetch: false)} power=#{power(fetch: false)}>}.force_encoding(Encoding.default_external)
+      %Q{#<LIFX::Light id=#{id} label=#{label(fetch: false)} power=#{power(fetch: false)}>}.force_encoding('utf-8')
     end
     alias_method :inspect, :to_s
 
